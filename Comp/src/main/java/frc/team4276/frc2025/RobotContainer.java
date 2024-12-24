@@ -16,6 +16,7 @@ package frc.team4276.frc2025;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,16 +25,26 @@ import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.team4276.frc2025.commands.DriveCommands;
+import frc.team4276.frc2025.subsystems.arm.Arm;
+import frc.team4276.frc2025.subsystems.arm.ArmIOSim;
+import frc.team4276.frc2025.subsystems.arm.ArmIOSparkMax;
 import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.drive.GyroIO;
 import frc.team4276.frc2025.subsystems.drive.GyroIOADIS;
 import frc.team4276.frc2025.subsystems.drive.ModuleIO;
 import frc.team4276.frc2025.subsystems.drive.ModuleIOSim;
 import frc.team4276.frc2025.subsystems.drive.ModuleIOSpark;
+import frc.team4276.frc2025.subsystems.feedtake.Feedtake;
+import frc.team4276.frc2025.subsystems.feedtake.Roller;
+import frc.team4276.frc2025.subsystems.feedtake.RollerIOSparkMax;
+import frc.team4276.frc2025.subsystems.feedtake.RollerSensorsIOHardware;
+import frc.team4276.frc2025.subsystems.flywheels.FlywheelIOSpark;
+import frc.team4276.frc2025.subsystems.flywheels.Flywheels;
 import frc.team4276.frc2025.subsystems.vision.Vision;
 import frc.team4276.frc2025.subsystems.vision.VisionConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO;
-import frc.team4276.frc2025.subsystems.vision.VisionIOLimelight;
+import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVision;
+import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -44,10 +55,14 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Subsystems
-  private final Drive drive;
+  private Drive drive;
 
   @SuppressWarnings("unused")
-  private final Vision vision;
+  private Vision vision;
+
+  private Flywheels flywheels;
+  private Arm arm;
+  private Feedtake feedtake;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -58,50 +73,62 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    switch (Constants.getMode()) {
-      case REAL:
-        // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOADIS(),
-                new ModuleIOSpark(0),
-                new ModuleIOSpark(1),
-                new ModuleIOSpark(2),
-                new ModuleIOSpark(3));
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
-        break;
+    if (Constants.getMode() != Constants.Mode.REPLAY) {
+      switch (Constants.getMode()) {
+        case REAL:
+          // Real robot, instantiate hardware IO implementations
+          drive =
+              new Drive(
+                  new GyroIOADIS(),
+                  new ModuleIOSpark(0),
+                  new ModuleIOSpark(1),
+                  new ModuleIOSpark(2),
+                  new ModuleIOSpark(3));
+          vision =
+              new Vision(
+                  drive::addVisionMeasurement,
+                  new VisionIOPhotonVision(VisionConstants.camera0Name, new Transform3d()),
+                  new VisionIOPhotonVision(VisionConstants.camera1Name, new Transform3d()));
+          flywheels = new Flywheels(new FlywheelIOSpark());
+          feedtake =
+              new Feedtake(new Roller(new RollerIOSparkMax()), new RollerSensorsIOHardware());
+          arm = new Arm(new ArmIOSparkMax());
+          break;
 
-      case SIM:
-        // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim());
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
-        break;
+        case SIM:
+          // Sim robot, instantiate physics sim IO implementations
+          drive =
+              new Drive(
+                  new GyroIO() {},
+                  new ModuleIOSim(),
+                  new ModuleIOSim(),
+                  new ModuleIOSim(),
+                  new ModuleIOSim());
+          vision =
+              new Vision(
+                  drive::addVisionMeasurement,
+                  new VisionIOPhotonVisionSim(
+                      VisionConstants.camera0Name, new Transform3d(), () -> new Pose2d()),
+                  new VisionIOPhotonVisionSim(
+                      VisionConstants.camera1Name, new Transform3d(), () -> new Pose2d()));
+          flywheels = new Flywheels(new FlywheelIOSpark());
+          feedtake =
+              new Feedtake(new Roller(new RollerIOSparkMax()), new RollerSensorsIOHardware());
+          arm = new Arm(new ArmIOSim());
+          break;
 
-      default:
-        // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-        break;
+        default:
+          // Replayed robot, disable IO implementations
+          drive =
+              new Drive(
+                  new GyroIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {},
+                  new ModuleIO() {});
+          vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+          break;
+      }
     }
 
     // Set up auto routines
@@ -138,9 +165,9 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> keyboard.getRawAxis(0),
+            () -> keyboard.getRawAxis(1),
+            () -> keyboard.getRawAxis(1)));
 
     // Lock to 0° when A button is held
     controller
