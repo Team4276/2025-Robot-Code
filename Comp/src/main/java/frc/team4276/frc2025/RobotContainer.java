@@ -13,10 +13,10 @@
 
 package frc.team4276.frc2025;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,8 +36,11 @@ import frc.team4276.frc2025.subsystems.drive.ModuleIOSim;
 import frc.team4276.frc2025.subsystems.drive.ModuleIOSpark;
 import frc.team4276.frc2025.subsystems.feedtake.Feedtake;
 import frc.team4276.frc2025.subsystems.feedtake.Roller;
+import frc.team4276.frc2025.subsystems.feedtake.RollerIOSim;
 import frc.team4276.frc2025.subsystems.feedtake.RollerIOSparkMax;
+import frc.team4276.frc2025.subsystems.feedtake.RollerSensorsIO;
 import frc.team4276.frc2025.subsystems.feedtake.RollerSensorsIOHardware;
+import frc.team4276.frc2025.subsystems.flywheels.FlywheelIOSim;
 import frc.team4276.frc2025.subsystems.flywheels.FlywheelIOSpark;
 import frc.team4276.frc2025.subsystems.flywheels.Flywheels;
 import frc.team4276.frc2025.subsystems.vision.Vision;
@@ -45,7 +48,7 @@ import frc.team4276.frc2025.subsystems.vision.VisionConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVision;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVisionSim;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import java.util.function.BooleanSupplier;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -67,9 +70,12 @@ public class RobotContainer {
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandGenericHID keyboard = new CommandGenericHID(1);
+  private final DigitalInput armCoastDio = new DigitalInput(Ports.ARM_COAST_SWITCH);
+
+  private final BooleanSupplier disableDriveAim = () -> true;
 
   // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+  private final AutoSelector autoSelector = new AutoSelector();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -111,9 +117,8 @@ public class RobotContainer {
                       VisionConstants.camera0Name, new Transform3d(), () -> new Pose2d()),
                   new VisionIOPhotonVisionSim(
                       VisionConstants.camera1Name, new Transform3d(), () -> new Pose2d()));
-          flywheels = new Flywheels(new FlywheelIOSpark());
-          feedtake =
-              new Feedtake(new Roller(new RollerIOSparkMax()), new RollerSensorsIOHardware());
+          flywheels = new Flywheels(new FlywheelIOSim());
+          feedtake = new Feedtake(new Roller(new RollerIOSim()), new RollerSensorsIO() {});
           arm = new Arm(new ArmIOSim());
           break;
 
@@ -132,22 +137,22 @@ public class RobotContainer {
     }
 
     // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    // TODO: impl
 
     // Set up SysId routines
-    autoChooser.addOption(
+    autoSelector.addRoutine(
         "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
+    autoSelector.addRoutine(
         "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
+    autoSelector.addRoutine(
         "Drive SysId (Quasistatic Forward)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    autoSelector.addRoutine(
         "Drive SysId (Quasistatic Reverse)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
+    autoSelector.addRoutine(
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
+    autoSelector.addRoutine(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
@@ -202,6 +207,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return autoSelector.getCommand();
   }
 }

@@ -156,9 +156,8 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousPeriodic() {}
 
-  /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {
+  public void autonomousExit() {
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -168,9 +167,16 @@ public class Robot extends LoggedRobot {
     }
   }
 
+  /** This function is called once when teleop is enabled. */
+  @Override
+  public void teleopInit() {}
+
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {}
+
+  @Override
+  public void teleopExit() {}
 
   /** This function is called once when test mode is enabled. */
   @Override
