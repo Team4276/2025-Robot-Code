@@ -17,14 +17,16 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.team4276.frc2025.commands.DriveCommands;
+import frc.team4276.frc2025.Constants.RobotType;
+import frc.team4276.frc2025.commands.FeedForwardCharacterization;
+import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
 import frc.team4276.frc2025.subsystems.arm.Arm;
 import frc.team4276.frc2025.subsystems.arm.ArmIOSim;
 import frc.team4276.frc2025.subsystems.arm.ArmIOSparkMax;
@@ -36,19 +38,18 @@ import frc.team4276.frc2025.subsystems.drive.ModuleIOSim;
 import frc.team4276.frc2025.subsystems.drive.ModuleIOSpark;
 import frc.team4276.frc2025.subsystems.feedtake.Feedtake;
 import frc.team4276.frc2025.subsystems.feedtake.Roller;
-import frc.team4276.frc2025.subsystems.feedtake.RollerIOSim;
+import frc.team4276.frc2025.subsystems.feedtake.RollerIO;
 import frc.team4276.frc2025.subsystems.feedtake.RollerIOSparkMax;
 import frc.team4276.frc2025.subsystems.feedtake.RollerSensorsIO;
 import frc.team4276.frc2025.subsystems.feedtake.RollerSensorsIOHardware;
-import frc.team4276.frc2025.subsystems.flywheels.FlywheelIOSim;
+import frc.team4276.frc2025.subsystems.flywheels.FlywheelIO;
 import frc.team4276.frc2025.subsystems.flywheels.FlywheelIOSpark;
 import frc.team4276.frc2025.subsystems.flywheels.Flywheels;
 import frc.team4276.frc2025.subsystems.vision.Vision;
 import frc.team4276.frc2025.subsystems.vision.VisionConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVision;
-import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVisionSim;
-import java.util.function.BooleanSupplier;
+import frc.team4276.util.BetterXboxController;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -68,11 +69,9 @@ public class RobotContainer {
   private Feedtake feedtake;
 
   // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
+  private final BetterXboxController driver = new BetterXboxController(0);
   private final CommandGenericHID keyboard = new CommandGenericHID(1);
   private final DigitalInput armCoastDio = new DigitalInput(Ports.ARM_COAST_SWITCH);
-
-  private final BooleanSupplier disableDriveAim = () -> true;
 
   // Dashboard inputs
   private final AutoSelector autoSelector = new AutoSelector();
@@ -92,7 +91,7 @@ public class RobotContainer {
                   new ModuleIOSpark(3));
           vision =
               new Vision(
-                  drive::addVisionMeasurement,
+                  RobotState.getInstance()::addVisionMeasurement,
                   new VisionIOPhotonVision(VisionConstants.camera0Name, new Transform3d()),
                   new VisionIOPhotonVision(VisionConstants.camera1Name, new Transform3d()));
           flywheels = new Flywheels(new FlywheelIOSpark());
@@ -110,15 +109,9 @@ public class RobotContainer {
                   new ModuleIOSim(),
                   new ModuleIOSim(),
                   new ModuleIOSim());
-          vision =
-              new Vision(
-                  drive::addVisionMeasurement,
-                  new VisionIOPhotonVisionSim(
-                      VisionConstants.camera0Name, new Transform3d(), () -> new Pose2d()),
-                  new VisionIOPhotonVisionSim(
-                      VisionConstants.camera1Name, new Transform3d(), () -> new Pose2d()));
-          flywheels = new Flywheels(new FlywheelIOSim());
-          feedtake = new Feedtake(new Roller(new RollerIOSim()), new RollerSensorsIO() {});
+          vision = new Vision(RobotState.getInstance()::addVisionMeasurement, new VisionIO() {});
+          flywheels = new Flywheels(new FlywheelIO() {});
+          feedtake = new Feedtake(new Roller(new RollerIO() {}), new RollerSensorsIO() {});
           arm = new Arm(new ArmIOSim());
           break;
 
@@ -131,19 +124,27 @@ public class RobotContainer {
                   new ModuleIO() {},
                   new ModuleIO() {},
                   new ModuleIO() {});
-          vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+          vision =
+              new Vision(
+                  RobotState.getInstance()::addVisionMeasurement,
+                  new VisionIO() {},
+                  new VisionIO() {});
           break;
       }
     }
+
+    arm.setCoastOverride(armCoastDio::get);
 
     // Set up auto routines
     // TODO: impl
 
     // Set up SysId routines
     autoSelector.addRoutine(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+        "Drive Wheel Radius Characterization", new WheelRadiusCharacterization(drive));
     autoSelector.addRoutine(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+        "Drive Simple FF Characterization",
+        new FeedForwardCharacterization(
+            drive, drive::runCharacterization, drive::getFFCharacterizationVelocity));
     autoSelector.addRoutine(
         "Drive SysId (Quasistatic Forward)",
         drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -157,6 +158,11 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+
+    // Peace and quiet
+    if (Constants.getType() == RobotType.SIMBOT) {
+      DriverStation.silenceJoystickConnectionWarning(true);
+    }
   }
 
   /**
@@ -167,34 +173,27 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> keyboard.getRawAxis(0),
-            () -> keyboard.getRawAxis(1),
-            () -> keyboard.getRawAxis(1)));
+    drive.setDefaultCommand(drive.run(() -> drive.feedTeleopInput(0.0, 0, 0)));
 
     // Lock to 0° when A button is held
-    controller
+    driver
         .a()
         .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
-
-    // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+            Commands.startEnd(
+                () -> drive.setHeadingGoal(() -> new Rotation2d()),
+                () -> drive.clearHeadingGoal()));
 
     // Reset gyro to 0° when B button is pressed
-    controller
+    driver
         .b()
         .onTrue(
             Commands.runOnce(
                     () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                        RobotState.getInstance()
+                            .resetPose(
+                                new Pose2d(
+                                    RobotState.getInstance().getEstimatedPose().getTranslation(),
+                                    new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
 

@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-// TODO: damn abstraction; fix to not look stupid
 public class Feedtake extends SubsystemBase {
   public enum Goal {
     IDLE,

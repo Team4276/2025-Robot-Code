@@ -1,79 +1,34 @@
 package frc.team4276.frc2025.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import java.util.Queue;
 
 public class GyroIOADIS implements GyroIO {
-  // Actual pigeon object
-  private final ADIS16470_IMU mGyro;
+  private final ADIS16470_IMU gyro = new ADIS16470_IMU();
+  private final Queue<Double> yawPositionQueue;
+  private final Queue<Double> yawTimestampQueue;
 
   public GyroIOADIS() {
-    mGyro = new ADIS16470_IMU();
+    yawTimestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
+    yawPositionQueue = SparkOdometryThread.getInstance().registerSignal(gyro::getAngle);
   }
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {
-    inputs.yawPosition = getYaw();
-  }
+    inputs.connected = gyro.isConnected();
 
-  // Configs
-  private Rotation2d yawAdjustmentAngle = new Rotation2d();
-  private Rotation2d rollAdjustmentAngle = new Rotation2d();
-  private Rotation2d pitchAdjustmentAngle = new Rotation2d();
+    inputs.yawPosition = Rotation2d.fromDegrees(gyro.getAngle());
+    inputs.yawVelocityRadPerSec = Units.degreesToRadians(gyro.getRate());
 
-  public Rotation2d getYaw() {
-    Rotation2d angle = getUnadjustedYaw().minus(yawAdjustmentAngle);
-    return angle;
-  }
-
-  public Rotation2d getRoll() {
-    return getUnadjustedRoll().minus(rollAdjustmentAngle);
-  }
-
-  public Rotation2d getPitch() {
-    return getUnadjustedPitch().minus(pitchAdjustmentAngle).unaryMinus();
-  }
-
-  /**
-   * Sets the yaw register to read the specified value.
-   *
-   * @param angleDeg New yaw in degrees
-   */
-  public void setYaw(double angleDeg) {
-    yawAdjustmentAngle = getUnadjustedYaw().minus(Rotation2d.fromDegrees(angleDeg));
-  }
-
-  /**
-   * Sets the roll register to read the specified value.
-   *
-   * @param angleDeg New yaw in degrees
-   */
-  public void setRoll(double angleDeg) {
-    rollAdjustmentAngle = getUnadjustedRoll().minus(Rotation2d.fromDegrees(angleDeg));
-  }
-
-  /**
-   * Sets the pitch register to read the specified value.
-   *
-   * @param angleDeg New yaw in degrees
-   */
-  public void setPitch(double angleDeg) {
-    pitchAdjustmentAngle = getUnadjustedPitch().minus(Rotation2d.fromDegrees(angleDeg));
-  }
-
-  public Rotation2d getUnadjustedYaw() {
-    return Rotation2d.fromDegrees(mGyro.getAngle());
-  }
-
-  public Rotation2d getUnadjustedPitch() {
-    return Rotation2d.fromDegrees(mGyro.getYComplementaryAngle());
-  }
-
-  public Rotation2d getUnadjustedRoll() {
-    return Rotation2d.fromDegrees(mGyro.getXComplementaryAngle());
-  }
-
-  public Rotation2d getYawOffset() {
-    return yawAdjustmentAngle;
+    inputs.odometryYawTimestamps =
+        yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
+    inputs.odometryYawPositions =
+        yawPositionQueue.stream()
+            .map((Double value) -> Rotation2d.fromDegrees(-value))
+            .toArray(Rotation2d[]::new);
+    yawTimestampQueue.clear();
+    yawPositionQueue.clear();
   }
 }

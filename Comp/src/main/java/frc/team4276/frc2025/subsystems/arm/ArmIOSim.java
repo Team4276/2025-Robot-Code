@@ -30,7 +30,6 @@ public class ArmIOSim implements ArmIO {
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
-
     sim.update(Constants.kLooperDt);
 
     inputs.positionRads = new Rotation2d(sim.getAngleRads());
