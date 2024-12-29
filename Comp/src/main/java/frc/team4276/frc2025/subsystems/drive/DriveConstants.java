@@ -38,6 +38,7 @@ public class DriveConstants {
       new SwerveDriveKinematics(moduleTranslations);
 
   public static final double maxSpeed = 4.8;
+  public static final double maxAccel = 8.9;
   public static final double maxAngularSpeed = maxSpeed / driveBaseRadius;
   public static final double maxAngularAccel = 20.0;
 
@@ -67,6 +68,8 @@ public class DriveConstants {
   // x pinion teeth
   // and 22 spur teeth
   public static final DCMotor driveGearbox = DCMotor.getNEO(1);
+  public static final double maxSteerVelocity =
+      driveGearbox.freeSpeedRadPerSec / driveMotorReduction;
 
   // Drive encoder configuration
   public static final double driveEncoderPositionFactor =
@@ -82,7 +85,7 @@ public class DriveConstants {
   public static final double driveKs = 0.0;
   public static final double driveKv =
       12.0 / (driveGearbox.freeSpeedRadPerSec / driveMotorReduction);
-  public static final double driveSimP = 0.05;
+  public static final double driveSimP = 0.0;
   public static final double driveSimD = 0.0;
   public static final double driveSimKs = 0.0;
   public static final double driveSimKv = 0.0789;
@@ -92,7 +95,6 @@ public class DriveConstants {
   public static final int turnMotorCurrentLimit = 20;
   public static final double turnMotorReduction = 9424.0 / 203.0;
   public static final DCMotor turnGearbox = DCMotor.getNeo550(1);
-  public static final double maxSteerVelocity = turnGearbox.freeSpeedRadPerSec / turnMotorReduction;
 
   // Turn encoder configuration
   public static final boolean turnEncoderInverted = true;

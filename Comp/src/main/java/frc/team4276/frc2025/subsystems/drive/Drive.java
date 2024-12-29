@@ -20,7 +20,6 @@ import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
-import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -38,6 +37,7 @@ import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.subsystems.drive.controllers.HeadingController;
 import frc.team4276.frc2025.subsystems.drive.controllers.TeleopDriveController;
 import frc.team4276.frc2025.subsystems.drive.controllers.TrajectoryController;
+import frc.team4276.util.SwerveSetpointGenerator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -73,7 +73,7 @@ public class Drive extends SubsystemBase {
   private SwerveModulePosition[] lastModulePositions = null;
   private double lastTime = 0.0;
 
-  private SwerveSetpointGenerator swerveSetpointGenerator =
+  private final SwerveSetpointGenerator swerveSetpointGenerator =
       new SwerveSetpointGenerator(driveConfig, maxSteerVelocity);
   private SwerveSetpoint prevSetpoint;
 
@@ -222,24 +222,32 @@ public class Drive extends SubsystemBase {
 
     if (mode != DriveMode.CHARACTERIZATION) {
       // Calculate setpoints
-      SwerveSetpoint setpoint =
-          swerveSetpointGenerator.generateSetpoint(prevSetpoint, desiredSpeeds, 0.02);
-      SwerveModuleState[] setpointStates = setpoint.moduleStates();
-      prevSetpoint = setpoint;
+      prevSetpoint = swerveSetpointGenerator.generateSetpoint(prevSetpoint, desiredSpeeds, 0.02);
+      SwerveModuleState[] setpointStates = prevSetpoint.moduleStates();
 
-      SwerveModuleState[] setpointTorques = new SwerveModuleState[4];
+      SwerveModuleState[] setpointTorques =
+          new SwerveModuleState[] {
+            new SwerveModuleState(),
+            new SwerveModuleState(),
+            new SwerveModuleState(),
+            new SwerveModuleState()
+          };
 
       // Send setpoints to modules
       for (int i = 0; i < 4; i++) {
-        setpointTorques[i] =
-            new SwerveModuleState(
-                setpoint.feedforwards().linearForcesNewtons()[i] * wheelRadiusMeters,
-                setpointStates[i].angle);
+        if (mode == DriveMode.TRAJECTORY) {
+          setpointTorques[i] =
+              new SwerveModuleState(
+                  trajectoryController.getModuleForces()[i] * wheelRadiusMeters,
+                  setpointStates[i].angle);
+        } else {
+          setpointTorques[i] = new SwerveModuleState(0.0, setpointStates[i].angle);
+        }
         modules[i].runSetpoint(setpointStates[i], setpointTorques[i]);
       }
 
       // Log optimized setpoints (runSetpoint mutates each state)
-      Logger.recordOutput("Drive/SetpointSpeeds", setpoint.robotRelativeSpeeds());
+      Logger.recordOutput("Drive/SetpointSpeeds", prevSetpoint.robotRelativeSpeeds());
       Logger.recordOutput("Drive/SwerveStates/OptimizedSetpoints", setpointStates);
       Logger.recordOutput("Drive/SwerveStates/Torques", setpointTorques);
     }

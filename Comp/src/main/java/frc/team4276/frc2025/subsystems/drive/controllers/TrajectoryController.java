@@ -24,6 +24,7 @@ public class TrajectoryController {
   private final PIDController yController;
   private final PIDController rotationController;
 
+  private double[] moduleForces;
   private final double[] dummyForces = {0.0, 0.0, 0.0, 0.0};
 
   public TrajectoryController() {
@@ -82,6 +83,10 @@ public class TrajectoryController {
 
     RobotState.getInstance().setTrajectorySetpoint(targetState.getPose());
 
+    for (int i = 0; i < 4; i++) {
+      moduleForces[i] = Math.hypot(targetState.moduleForcesX()[i], targetState.moduleForcesY()[i]);
+    }
+
     double xError = targetState.x - currentPose.getTranslation().getX();
     double yError = targetState.y - currentPose.getTranslation().getY();
     double xFeedback = xController.calculate(0.0, xError);
@@ -119,5 +124,9 @@ public class TrajectoryController {
   @AutoLogOutput(key = "Trajectory/Finished")
   public boolean isFinished() {
     return isFinished;
+  }
+
+  public double[] getModuleForces() {
+    return moduleForces;
   }
 }

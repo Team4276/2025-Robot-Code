@@ -70,7 +70,9 @@ public class RobotContainer {
 
   // Controller
   private final BetterXboxController driver = new BetterXboxController(0);
-  private final CommandGenericHID keyboard = new CommandGenericHID(1);
+  private final CommandGenericHID keyboard0 = new CommandGenericHID(1);
+  private final CommandGenericHID keyboard1 = new CommandGenericHID(2);
+  private final CommandGenericHID keyboard2 = new CommandGenericHID(3);
   private final DigitalInput armCoastDio = new DigitalInput(Ports.ARM_COAST_SWITCH);
 
   // Dashboard inputs
@@ -173,7 +175,11 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(drive.run(() -> drive.feedTeleopInput(0.0, 0, 0)));
+    drive.setDefaultCommand(
+        drive.run(
+            () ->
+                drive.feedTeleopInput(
+                    keyboard0.getRawAxis(1), keyboard0.getRawAxis(0), keyboard2.getRawAxis(0))));
 
     // Lock to 0° when A button is held
     driver
@@ -197,7 +203,7 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    keyboard.button(1).onTrue(Commands.run(() -> System.out.println("test")));
+    keyboard0.button(1).onTrue(Commands.run(() -> System.out.println("test")));
   }
 
   /**

@@ -128,6 +128,7 @@ public class RobotState {
       yaw =
           lastGyroAngle.rotateBy(
               new Rotation2d(kinematics.toTwist2d(wheelPositions, lastWheelPositions).dtheta));
+      lastGyroAngle = yaw;
     }
 
     lastWheelPositions = wheelPositions;
