@@ -6,7 +6,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
-import frc.team4276.frc2025.Constants;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.subsystems.drive.DriveConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -57,7 +56,7 @@ public class TrajectoryController {
 
     if (targetState.getPose().getTranslation().getDistance(currentPose.getTranslation())
         > DriveConstants.autoMaxError) {
-      timeOffset += Constants.kLooperDt;
+      timeOffset += 0.02;
 
       var dummyState = trajectory.sampleAt(getTrajectoryTime(), false);
       if (dummyState.isEmpty()) {

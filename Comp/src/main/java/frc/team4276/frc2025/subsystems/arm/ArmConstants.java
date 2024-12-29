@@ -1,6 +1,7 @@
 package frc.team4276.frc2025.subsystems.arm;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.team4276.frc2025.Ports;
 
 public class ArmConstants {
@@ -9,7 +10,8 @@ public class ArmConstants {
 
   public static final boolean invertFollower = true;
 
-  public static final double gearRatio = 1.0;
+  public static final double gearRatio = 135.0;
+  public static final Translation2d armOrigin = new Translation2d();
   public static final double length = 1.0;
 
   public static final int currentLimit = 50;

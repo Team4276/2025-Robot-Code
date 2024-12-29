@@ -1,6 +1,5 @@
 package frc.team4276.frc2025.subsystems.arm;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ArmIO {
@@ -9,8 +8,8 @@ public interface ArmIO {
     public boolean leaderMotorConnected = true;
     public boolean followerMotorConnected = true;
 
-    public Rotation2d positionRads = new Rotation2d();
-    public Rotation2d velocityRadsPerSec = new Rotation2d();
+    public double positionRads = 0.0;
+    public double velocityRadsPerSec = 0.0;
 
     public double[] appliedVolts = new double[] {};
     public double[] currentAmps = new double[] {};

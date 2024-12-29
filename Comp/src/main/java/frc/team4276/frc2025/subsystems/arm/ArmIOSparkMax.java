@@ -106,11 +106,11 @@ public class ArmIOSparkMax implements ArmIO {
     ifOk(
         leaderSpark,
         absoluteEncoder::getPosition,
-        (value) -> inputs.positionRads = new Rotation2d(value).minus(offset));
+        (value) -> inputs.positionRads = new Rotation2d(value).minus(offset).getRadians());
     ifOk(
         leaderSpark,
         absoluteEncoder::getVelocity,
-        (value) -> inputs.velocityRadsPerSec = new Rotation2d(value));
+        (value) -> inputs.velocityRadsPerSec = new Rotation2d(value).getRadians());
     ifOk(
         leaderSpark,
         new DoubleSupplier[] {leaderSpark::getAppliedOutput, leaderSpark::getBusVoltage},

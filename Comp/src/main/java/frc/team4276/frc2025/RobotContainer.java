@@ -203,7 +203,11 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    keyboard0.button(1).onTrue(Commands.run(() -> System.out.println("test")));
+    keyboard0
+        .button(1)
+        .whileTrue(
+            arm.setGoalCommand(Arm.Goal.INTAKE)
+                .alongWith(Commands.runOnce(() -> System.out.println("test"))));
   }
 
   /**
