@@ -36,8 +36,8 @@ public class ArmConstants {
 
   public static final double allowedClosedLoopError = 0.1;
 
-  public static final double maxAccel = 2.0;
-  public static final double maxVel = 2.0;
+  public static final double maxAccel = 8.0;
+  public static final double maxVel = 4.0;
 
   public static final FourbarFeedForward.FourbarFeedForwardConstants kFeedForwardConstants =
       new FourbarFeedForward.FourbarFeedForwardConstants();

@@ -23,7 +23,7 @@ public class TrajectoryController {
   private final PIDController yController;
   private final PIDController rotationController;
 
-  private double[] moduleForces;
+  private double[] moduleForces = {0.0, 0.0, 0.0, 0.0};
   private final double[] dummyForces = {0.0, 0.0, 0.0, 0.0};
 
   public TrajectoryController() {
@@ -83,7 +83,8 @@ public class TrajectoryController {
     RobotState.getInstance().setTrajectorySetpoint(targetState.getPose());
 
     for (int i = 0; i < 4; i++) {
-      moduleForces[i] = Math.hypot(targetState.moduleForcesX()[i], targetState.moduleForcesY()[i]);
+      // moduleForces[i] = Math.hypot(targetState.moduleForcesX()[i],
+      // targetState.moduleForcesY()[i]);
     }
 
     double xError = targetState.x - currentPose.getTranslation().getX();

@@ -1,5 +1,7 @@
 package frc.team4276.frc2025.commands.auto;
 
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import choreo.util.AllianceFlipUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -7,12 +9,26 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.field.FieldConstants;
 import frc.team4276.frc2025.subsystems.drive.Drive;
+import java.util.function.Supplier;
 
 public class AutoCommands {
   private AutoCommands() {}
 
   public static Command resetPose(Pose2d pose) {
     return Commands.runOnce(() -> RobotState.getInstance().resetPose(pose));
+  }
+
+  /** Creates a command that follows a trajectory, command ends when the trajectory is finished */
+  public static Command followTrajectory(Drive drive, Trajectory<SwerveSample> trajectory) {
+    return followTrajectory(drive, () -> trajectory);
+  }
+
+  /** Creates a command that follows a trajectory, command ends when the trajectory is finished */
+  public static Command followTrajectory(
+      Drive drive, Supplier<Trajectory<SwerveSample>> trajectorySupplier) {
+    return Commands.startEnd(
+            () -> drive.setTrajectory(trajectorySupplier.get()), drive::clearTrajectory)
+        .until(drive::isTrajectoryCompleted);
   }
 
   /**

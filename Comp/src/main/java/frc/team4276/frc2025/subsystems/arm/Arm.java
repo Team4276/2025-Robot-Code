@@ -13,7 +13,7 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-// TODO: cleanup; refactor; add characterization
+// TODO: add characterization
 public class Arm extends SubsystemBase {
   public enum Goal {
     STOW(new LoggedTunableNumber("Arm/StowDegrees", 70.0)),

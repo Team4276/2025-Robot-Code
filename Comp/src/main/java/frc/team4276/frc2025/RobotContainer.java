@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.team4276.frc2025.Constants.RobotType;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
+import frc.team4276.frc2025.commands.auto.AutoCommands;
 import frc.team4276.frc2025.subsystems.arm.Arm;
 import frc.team4276.frc2025.subsystems.arm.ArmIOSim;
 import frc.team4276.frc2025.subsystems.arm.ArmIOSparkMax;
@@ -50,6 +51,7 @@ import frc.team4276.frc2025.subsystems.vision.VisionConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVision;
 import frc.team4276.util.BetterXboxController;
+import frc.team4276.util.path.ChoreoUtil;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -138,7 +140,7 @@ public class RobotContainer {
     arm.setCoastOverride(armCoastDio::get);
 
     // Set up auto routines
-    // TODO: impl
+    autoSelector.addRoutine("Demo Traj", Commands.none());
 
     // Set up SysId routines
     autoSelector.addRoutine(
@@ -226,6 +228,9 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoSelector.getCommand();
+    var traj = ChoreoUtil.getSwerveTrajectory("Demo");
+    return Commands.sequence(
+        AutoCommands.resetPose(traj.getInitialPose(false).get()),
+        AutoCommands.followTrajectory(drive, traj));
   }
 }

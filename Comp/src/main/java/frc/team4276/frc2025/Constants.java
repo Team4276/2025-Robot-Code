@@ -19,7 +19,7 @@ package frc.team4276.frc2025;
  * (log replay from a file).
  */
 @SuppressWarnings("unused")
-public final class Constants { // TODO: SWITCH INTERNAL UNITS TO RADIANS
+public final class Constants {
   public static enum Mode {
     /** Running on a real robot. */
     REAL,
@@ -57,5 +57,5 @@ public final class Constants { // TODO: SWITCH INTERNAL UNITS TO RADIANS
         : "Robot must be in REAL mode when SysIdMode is enabled.";
   }
 
-  public static final boolean isTuning = true;
+  public static final boolean isTuning = false;
 }
