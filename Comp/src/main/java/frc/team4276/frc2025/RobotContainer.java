@@ -203,11 +203,21 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
+    keyboard0.button(1).whileTrue(arm.setGoalCommand(Arm.Goal.INTAKE));
+
     keyboard0
-        .button(1)
+        .button(2)
         .whileTrue(
-            arm.setGoalCommand(Arm.Goal.INTAKE)
-                .alongWith(Commands.runOnce(() -> System.out.println("test"))));
+            arm.setGoalCommand(Arm.Goal.SPEAKER)
+                .alongWith(
+                    Commands.run(
+                        () ->
+                            drive.setHeadingGoal(
+                                () ->
+                                    RobotState.getInstance()
+                                        .getSpeakerAimingParameters()
+                                        .driveHeading()))))
+        .onFalse(Commands.run(() -> drive.clearHeadingGoal()));
   }
 
   /**

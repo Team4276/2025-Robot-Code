@@ -109,17 +109,15 @@ public class DriveConstants {
   public static final double turnPIDMinInput = 0; // Radians
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 
-  public static final double snapKp = 3.0;
+  public static final double snapKp = 0.5;
   public static final double snapKi = 0.0;
-  public static final double snapKd = 0.0;
+  public static final double snapKd = 0.1;
+  public static final double snapPositionTolerance = 1.0;
 
   public static final double kProfiledSnapHeadingKp = 0.0;
   public static final double kProfiledSnapHeadingKi = 0.0;
   public static final double kProfiledSnapHeadingKd = 0.0;
-
-  public static final double kProfiledSnapPositionTolerance = 2 * Math.PI / 180;
-
-  public static final double snapPositionTolerance = 0.1;
+  public static final double kProfiledSnapPositionTolerance = 1.0;
 
   public static final double autoTranslationKp = 3.0;
   public static final double autoTranslationKd = 0.0;

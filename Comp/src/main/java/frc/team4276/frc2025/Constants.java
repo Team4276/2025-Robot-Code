@@ -57,5 +57,5 @@ public final class Constants { // TODO: SWITCH INTERNAL UNITS TO RADIANS
         : "Robot must be in REAL mode when SysIdMode is enabled.";
   }
 
-  public static final boolean isTuning = false;
+  public static final boolean isTuning = true;
 }

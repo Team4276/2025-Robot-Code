@@ -32,7 +32,7 @@ public class ArmIOSim implements ArmIO {
   private final ArmViz setpointViz;
 
   public ArmIOSim() {
-    controller = new PIDController(10.0, 0.0, 0.0);
+    controller = new PIDController(30.0, 0.0, 0.0);
 
     profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(maxVel, maxAccel));
     setpointViz = new ArmViz("Setpoint", Color.kRed);

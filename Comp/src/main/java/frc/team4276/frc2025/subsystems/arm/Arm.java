@@ -13,12 +13,12 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-// TODO: cleanup; refactor; add viz; add characterization
+// TODO: cleanup; refactor; add characterization
 public class Arm extends SubsystemBase {
   public enum Goal {
     STOW(new LoggedTunableNumber("Arm/StowDegrees", 70.0)),
     INTAKE(new LoggedTunableNumber("Arm/IntakeDegrees", 135.0)),
-    SPEAKER(RobotState.getInstance().getSpeakerAimingParameters()::fourbarSetpoint),
+    SPEAKER(() -> RobotState.getInstance().getSpeakerAimingParameters().fourbarSetpoint()),
     FERRY(RobotState.getInstance().getFerryAimingParameters()::fourbarSetpoint),
     PREP(new LoggedTunableNumber("Arm/PrepDegrees", 90.0)),
     AMP(new LoggedTunableNumber("Arm/AmpDegrees", 135.0)),

@@ -37,7 +37,7 @@ import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.subsystems.drive.controllers.HeadingController;
 import frc.team4276.frc2025.subsystems.drive.controllers.TeleopDriveController;
 import frc.team4276.frc2025.subsystems.drive.controllers.TrajectoryController;
-import frc.team4276.util.SwerveSetpointGenerator;
+import frc.team4276.util.swerve.SwerveSetpointGenerator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -127,17 +127,15 @@ public class Drive extends SubsystemBase {
     }
     odometryLock.unlock();
 
-    // Stop moving when disabled
     if (DriverStation.isDisabled()) {
+      // Stop moving when disabled
       for (var module : modules) {
         module.stop();
       }
-    }
 
-    // Log empty setpoint states when disabled
-    if (DriverStation.isDisabled()) {
-      Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
-      Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
+      // Log empty setpoint states when disabled
+      Logger.recordOutput("Drive/SwerveStates/Setpoints", new SwerveModuleState[] {});
+      Logger.recordOutput("Drive/SwerveStates/OptimizedSetpoints", new SwerveModuleState[] {});
     }
 
     // Update odometry

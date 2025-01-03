@@ -1,4 +1,4 @@
-package frc.team4276.util;
+package frc.team4276.util.path;
 
 import choreo.Choreo;
 import choreo.trajectory.SwerveSample;

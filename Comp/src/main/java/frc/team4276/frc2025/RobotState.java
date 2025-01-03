@@ -2,6 +2,7 @@ package frc.team4276.frc2025;
 
 import static frc.team4276.frc2025.subsystems.drive.DriveConstants.kinematics;
 
+import choreo.util.AllianceFlipUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -11,6 +12,7 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import frc.team4276.frc2025.Constants.RobotType;
 import frc.team4276.frc2025.field.FieldConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
 
@@ -155,7 +157,7 @@ public class RobotState {
   }
 
   public AimingParameters getSpeakerAimingParameters() {
-    if (latestSpeakerParams != null) {
+    if (latestSpeakerParams != null && Constants.getMode() != Constants.Mode.SIM) {
       return latestSpeakerParams; // return cached params if no new updates
     }
 
@@ -167,13 +169,20 @@ public class RobotState {
     double flywheel_speeds = speakerFlywheelRPMs.get(distance);
 
     latestSpeakerParams =
-        new AimingParameters(robot_to_target.getAngle(), armAngle, flywheel_speeds, distance);
+        new AimingParameters(
+            robot_to_target
+                .getAngle()
+                .rotateBy(
+                    AllianceFlipUtil.shouldFlip() ? Rotation2d.fromDegrees(180) : new Rotation2d()),
+            armAngle,
+            flywheel_speeds,
+            distance);
 
     return latestSpeakerParams;
   }
 
   public AimingParameters getFerryAimingParameters() {
-    if (latestFerryParams != null) {
+    if (latestFerryParams != null && Constants.getType() != RobotType.SIMBOT) {
       return latestFerryParams; // return cached params if no new updates
     }
 
