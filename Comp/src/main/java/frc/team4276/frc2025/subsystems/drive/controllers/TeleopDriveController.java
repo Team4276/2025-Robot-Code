@@ -44,6 +44,6 @@ public class TeleopDriveController {
             linearVelocity.getY() * DriveConstants.maxSpeed,
             omega * DriveConstants.maxAngularSpeed * ANGULAR_VELOCITY_SCALAR);
     return ChassisSpeeds.fromFieldRelativeSpeeds(
-        speeds, AllianceFlipUtil.shouldFlip() ? yaw.plus(new Rotation2d(Math.PI)) : yaw);
+        speeds, AllianceFlipUtil.shouldFlip() ? yaw : yaw.plus(Rotation2d.fromDegrees(180)));
   }
 }

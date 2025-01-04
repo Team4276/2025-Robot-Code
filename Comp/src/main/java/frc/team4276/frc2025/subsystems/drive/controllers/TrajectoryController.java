@@ -2,6 +2,8 @@ package frc.team4276.frc2025.subsystems.drive.controllers;
 
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -13,6 +15,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class TrajectoryController {
   private Trajectory<SwerveSample> trajectory;
+  private PathPlannerTrajectory ppTrajectory;
+  private boolean isPPTraj = false;
 
   private double startTime = 0.0;
   private double timeOffset = 0.0;
@@ -38,12 +42,70 @@ public class TrajectoryController {
 
   public void setTrajectory(Trajectory<SwerveSample> traj) {
     trajectory = traj;
+    isPPTraj = false;
     isFinished = false;
     startTime = Timer.getTimestamp();
     timeOffset = 0.0;
   }
 
+  public void setPathPlannerTrajectory(PathPlannerTrajectory traj) {
+    ppTrajectory = traj;
+    isPPTraj = true;
+    isFinished = false;
+    startTime = Timer.getTimestamp();
+    timeOffset = 0.0;
+  }
+
+  public ChassisSpeeds updatePP(Pose2d currentPose) {
+    var sampledState = ppTrajectory.sample(getTrajectoryTime());
+
+    if (sampledState.pose.getTranslation().getDistance(currentPose.getTranslation())
+        > DriveConstants.autoMaxError) {
+      timeOffset += 0.02;
+
+      var dummyState = ppTrajectory.sample(getTrajectoryTime());
+
+      sampledState = new PathPlannerTrajectoryState();
+      sampledState.timeSeconds = dummyState.timeSeconds;
+      sampledState.pose = dummyState.pose;
+      sampledState.heading = dummyState.heading;
+    }
+
+    RobotState.getInstance().setTrajectorySetpoint(sampledState.pose);
+
+    for (int i = 0; i < 4; i++) {
+      moduleForces[i] = sampledState.feedforwards.linearForcesNewtons()[i];
+    }
+
+    double xError = sampledState.pose.getX() - currentPose.getTranslation().getX();
+    double yError = sampledState.pose.getY() - currentPose.getTranslation().getY();
+    double xFeedback = xController.calculate(0.0, xError);
+    double yFeedback = yController.calculate(0.0, yError);
+    double thetaError = sampledState.heading.getRadians() - currentPose.getRotation().getRadians();
+    double thetaFeedback = rotationController.calculate(0.0, thetaError);
+
+    ChassisSpeeds outputSpeeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            sampledState.fieldSpeeds.vxMetersPerSecond + xFeedback,
+            sampledState.fieldSpeeds.vyMetersPerSecond + yFeedback,
+            sampledState.heading.getRadians() + thetaFeedback,
+            currentPose.getRotation());
+
+    Logger.recordOutput("Trajectory/SetpointPose", sampledState.pose);
+    Logger.recordOutput("Trajectory/SetpointSpeeds/vx", sampledState.fieldSpeeds.vxMetersPerSecond);
+    Logger.recordOutput("Trajectory/SetpointSpeeds/vy", sampledState.fieldSpeeds.vyMetersPerSecond);
+    Logger.recordOutput("Trajectory/SetpointSpeeds/omega", sampledState.heading.getRadians());
+    Logger.recordOutput("Trajectory/OutputSpeeds", outputSpeeds);
+    Logger.recordOutput("Trajectory/TranslationError", Math.hypot(xError, yError));
+    Logger.recordOutput("Trajectory/RotationError", thetaError);
+
+    return outputSpeeds;
+  }
+
   public ChassisSpeeds update(Pose2d currentPose) {
+    if (isPPTraj) {
+      return updatePP(currentPose);
+    }
     var sampledState = trajectory.sampleAt(getTrajectoryTime(), false);
 
     // Auto finished or interrupted
@@ -53,6 +115,7 @@ public class TrajectoryController {
     }
 
     SwerveSample targetState = sampledState.get();
+    currentPose = targetState.getPose();
 
     if (targetState.getPose().getTranslation().getDistance(currentPose.getTranslation())
         > DriveConstants.autoMaxError) {
@@ -83,8 +146,7 @@ public class TrajectoryController {
     RobotState.getInstance().setTrajectorySetpoint(targetState.getPose());
 
     for (int i = 0; i < 4; i++) {
-      // moduleForces[i] = Math.hypot(targetState.moduleForcesX()[i],
-      // targetState.moduleForcesY()[i]);
+      moduleForces[i] = Math.hypot(targetState.moduleForcesX()[i], targetState.moduleForcesY()[i]);
     }
 
     double xError = targetState.x - currentPose.getTranslation().getX();

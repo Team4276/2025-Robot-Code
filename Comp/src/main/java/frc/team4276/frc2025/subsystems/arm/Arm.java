@@ -19,7 +19,7 @@ public class Arm extends SubsystemBase {
     STOW(new LoggedTunableNumber("Arm/StowDegrees", 70.0)),
     INTAKE(new LoggedTunableNumber("Arm/IntakeDegrees", 135.0)),
     SPEAKER(() -> RobotState.getInstance().getSpeakerAimingParameters().fourbarSetpoint()),
-    FERRY(RobotState.getInstance().getFerryAimingParameters()::fourbarSetpoint),
+    FERRY(() -> RobotState.getInstance().getFerryAimingParameters().fourbarSetpoint()),
     PREP(new LoggedTunableNumber("Arm/PrepDegrees", 90.0)),
     AMP(new LoggedTunableNumber("Arm/AmpDegrees", 135.0)),
     SUB(new LoggedTunableNumber("Arm/SubDegrees", 135.0)),

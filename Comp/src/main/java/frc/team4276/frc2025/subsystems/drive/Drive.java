@@ -18,6 +18,7 @@ import static frc.team4276.frc2025.subsystems.drive.DriveConstants.*;
 
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -73,6 +74,7 @@ public class Drive extends SubsystemBase {
   private SwerveModulePosition[] lastModulePositions = null;
   private double lastTime = 0.0;
 
+  private boolean useSetpointGenerator = false;
   private final SwerveSetpointGenerator swerveSetpointGenerator =
       new SwerveSetpointGenerator(driveConfig, maxSteerVelocity);
   private SwerveSetpoint prevSetpoint;
@@ -220,8 +222,16 @@ public class Drive extends SubsystemBase {
 
     if (mode != DriveMode.CHARACTERIZATION) {
       // Calculate setpoints
-      prevSetpoint = swerveSetpointGenerator.generateSetpoint(prevSetpoint, desiredSpeeds, 0.02);
-      SwerveModuleState[] setpointStates = prevSetpoint.moduleStates();
+      ChassisSpeeds setpointSpeeds;
+      SwerveModuleState[] setpointStates;
+      if (useSetpointGenerator) {
+        prevSetpoint = swerveSetpointGenerator.generateSetpoint(prevSetpoint, desiredSpeeds, 0.02);
+        setpointSpeeds = prevSetpoint.robotRelativeSpeeds();
+        setpointStates = prevSetpoint.moduleStates();
+      } else {
+        setpointSpeeds = ChassisSpeeds.discretize(desiredSpeeds, 0.02);
+        setpointStates = kinematics.toSwerveModuleStates(setpointSpeeds);
+      }
 
       SwerveModuleState[] setpointTorques =
           new SwerveModuleState[] {
@@ -245,7 +255,7 @@ public class Drive extends SubsystemBase {
       }
 
       // Log optimized setpoints (runSetpoint mutates each state)
-      Logger.recordOutput("Drive/SetpointSpeeds", prevSetpoint.robotRelativeSpeeds());
+      Logger.recordOutput("Drive/SetpointSpeeds", setpointSpeeds);
       Logger.recordOutput("Drive/SwerveStates/OptimizedSetpoints", setpointStates);
       Logger.recordOutput("Drive/SwerveStates/Torques", setpointTorques);
     }
@@ -273,6 +283,13 @@ public class Drive extends SubsystemBase {
   public void setTrajectory(Trajectory<SwerveSample> traj) {
     if (DriverStation.isAutonomousEnabled()) {
       trajectoryController.setTrajectory(traj);
+      mode = DriveMode.TRAJECTORY;
+    }
+  }
+
+  public void setPathPlannerTrajectory(PathPlannerTrajectory traj) {
+    if (DriverStation.isAutonomousEnabled()) {
+      trajectoryController.setPathPlannerTrajectory(traj);
       mode = DriveMode.TRAJECTORY;
     }
   }

@@ -14,8 +14,8 @@ public class ArmIOSim implements ArmIO {
   private final SingleJointedArmSim sim =
       new SingleJointedArmSim(
           DCMotor.getNEO(2),
-          gearRatio,
-          1.0,
+          kFeedForwardConstants.kGearRatio,
+          0.1,
           length,
           Math.toRadians(50.0),
           Math.toRadians(135.0),
@@ -26,7 +26,7 @@ public class ArmIOSim implements ArmIO {
   private final TrapezoidProfile profile;
   private TrapezoidProfile.State setpointState;
   private final double kg = 0 / (2 * Math.PI);
-  private final double kv = DCMotor.getNEO(1).KvRadPerSecPerVolt / gearRatio;
+  private final double kv = DCMotor.getNEO(1).KvRadPerSecPerVolt / kFeedForwardConstants.kGearRatio;
   private double appliedVoltage = 0.0;
 
   private final ArmViz setpointViz;

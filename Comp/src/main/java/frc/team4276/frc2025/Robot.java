@@ -13,6 +13,7 @@
 
 package frc.team4276.frc2025;
 
+import choreo.util.AllianceFlipUtil;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -144,6 +145,12 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    if (AllianceFlipUtil.shouldFlip()) {
+      RobotState.getInstance().setRed();
+    } else {
+      RobotState.getInstance().setBlue();
+    }
+
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -169,7 +176,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    RobotState.getInstance().resetPose(RobotState.getInstance().getTrajectorySetpoint());
+  }
 
   /** This function is called periodically during operator control. */
   @Override

@@ -7,6 +7,7 @@ import choreo.util.AllianceFlipUtil;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -58,7 +59,7 @@ public class ChoreoUtil {
 
       return AllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
     } catch (Exception e) {
-      return new PathPlannerTrajectory(List.of());
+      return new PathPlannerTrajectory(List.of(new PathPlannerTrajectoryState()));
     }
   }
 
@@ -73,7 +74,7 @@ public class ChoreoUtil {
 
       return AllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
     } catch (Exception e) {
-      return new PathPlannerTrajectory(List.of());
+      return new PathPlannerTrajectory(List.of(new PathPlannerTrajectoryState()));
     }
   }
 }

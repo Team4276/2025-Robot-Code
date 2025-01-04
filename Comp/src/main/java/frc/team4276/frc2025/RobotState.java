@@ -12,6 +12,7 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.team4276.frc2025.Constants.RobotType;
 import frc.team4276.frc2025.field.FieldConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -149,7 +150,10 @@ public class RobotState {
 
   @AutoLogOutput(key = "RobotState/EstimatedPose")
   public Pose2d getEstimatedPose() {
-    return poseEstimator.getEstimatedPosition();
+    // Temp until i get the sim to be consistent
+    return Constants.getMode() == Constants.Mode.SIM && DriverStation.isAutonomousEnabled()
+        ? trajectorySetpoint
+        : poseEstimator.getEstimatedPosition();
   }
 
   public Pose2d getTrajectorySetpoint() {
