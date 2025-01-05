@@ -113,6 +113,8 @@ public class RobotContainer {
       }
     }
 
+    autoBuilder = new AutoBuilder(drive);
+
     // Set up auto routines
     autoSelector.addRoutine("Demo Traj", autoBuilder.Test());
 
@@ -186,6 +188,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoSelector.getCommand();
+    return autoBuilder.TestPP();
   }
 }

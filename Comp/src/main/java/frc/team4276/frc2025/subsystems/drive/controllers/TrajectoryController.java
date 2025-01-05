@@ -74,7 +74,7 @@ public class TrajectoryController {
     RobotState.getInstance().setTrajectorySetpoint(sampledState.pose);
 
     for (int i = 0; i < 4; i++) {
-      moduleForces[i] = sampledState.feedforwards.linearForcesNewtons()[i];
+      // moduleForces[i] = sampledState.feedforwards.linearForcesNewtons()[i];
     }
 
     double xError = sampledState.pose.getX() - currentPose.getTranslation().getX();
@@ -146,7 +146,8 @@ public class TrajectoryController {
     RobotState.getInstance().setTrajectorySetpoint(targetState.getPose());
 
     for (int i = 0; i < 4; i++) {
-      moduleForces[i] = Math.hypot(targetState.moduleForcesX()[i], targetState.moduleForcesY()[i]);
+      // moduleForces[i] = Math.hypot(targetState.moduleForcesX()[i],
+      // targetState.moduleForcesY()[i]);
     }
 
     double xError = targetState.x - currentPose.getTranslation().getX();

@@ -4,6 +4,7 @@ import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import choreo.util.AllianceFlipUtil;
+import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
@@ -11,6 +12,7 @@ import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.system.plant.DCMotor;
 import java.util.List;
 
 public class ChoreoUtil {
@@ -55,10 +57,21 @@ public class ChoreoUtil {
               .generateTrajectory(
                   new ChassisSpeeds(),
                   new Rotation2d(),
-                  new RobotConfig(0.0, 0.0, null, new Translation2d[] {}));
+                  new RobotConfig(
+                      0.0,
+                      0.0,
+                      new ModuleConfig(0, 0, 0, DCMotor.getNEO(1), 0, 0),
+                      new Translation2d[] {
+                        new Translation2d(),
+                        new Translation2d(),
+                        new Translation2d(),
+                        new Translation2d()
+                      }));
 
       return AllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
     } catch (Exception e) {
+      System.out.println("Failed to load Choreo Trajectory from PPlib " + name);
+      System.out.println(e);
       return new PathPlannerTrajectory(List.of(new PathPlannerTrajectoryState()));
     }
   }
@@ -74,6 +87,9 @@ public class ChoreoUtil {
 
       return AllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
     } catch (Exception e) {
+      System.out.println(
+          "Failed to load split " + split + " of Choreo Trajectory from PPlib " + name);
+      System.out.println(e);
       return new PathPlannerTrajectory(List.of(new PathPlannerTrajectoryState()));
     }
   }

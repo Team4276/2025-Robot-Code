@@ -22,4 +22,11 @@ public class AutoBuilder {
             () -> RobotState.getInstance().resetPose(traj1.getInitialPose(false).get()))
         .andThen(followTrajectory(drive, traj1));
   }
+
+  public Command TestPP() {
+    var traj1 = getPathPlannerTrajectoryFromChoreo("Demo");
+
+    return Commands.runOnce(() -> RobotState.getInstance().resetPose(traj1.getInitialPose()))
+        .andThen(followPathPlannerTrajectory(drive, traj1));
+  }
 }

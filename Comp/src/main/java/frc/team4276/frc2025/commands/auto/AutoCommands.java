@@ -102,13 +102,4 @@ public class AutoCommands {
   public static Command waitUntilYCrossed(double yPosition, boolean towardsCenterline) {
     return Commands.waitUntil(() -> yCrossed(yPosition, towardsCenterline));
   }
-
-  /** Command that points drive at speaker, does not end */
-  public static Command aim(Drive drive) {
-    return Commands.startEnd(
-        () ->
-            drive.setHeadingGoal(
-                () -> RobotState.getInstance().getSpeakerAimingParameters().driveHeading()),
-        drive::clearHeadingGoal);
-  }
 }
