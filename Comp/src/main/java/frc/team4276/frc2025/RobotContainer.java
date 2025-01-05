@@ -16,7 +16,6 @@ package frc.team4276.frc2025;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -28,24 +27,12 @@ import frc.team4276.frc2025.Constants.RobotType;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
 import frc.team4276.frc2025.commands.auto.AutoBuilder;
-import frc.team4276.frc2025.subsystems.arm.Arm;
-import frc.team4276.frc2025.subsystems.arm.ArmIOSim;
-import frc.team4276.frc2025.subsystems.arm.ArmIOSparkMax;
 import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.drive.GyroIO;
 import frc.team4276.frc2025.subsystems.drive.GyroIOADIS;
 import frc.team4276.frc2025.subsystems.drive.ModuleIO;
 import frc.team4276.frc2025.subsystems.drive.ModuleIOSim;
 import frc.team4276.frc2025.subsystems.drive.ModuleIOSpark;
-import frc.team4276.frc2025.subsystems.feedtake.Feedtake;
-import frc.team4276.frc2025.subsystems.feedtake.Roller;
-import frc.team4276.frc2025.subsystems.feedtake.RollerIO;
-import frc.team4276.frc2025.subsystems.feedtake.RollerIOSparkMax;
-import frc.team4276.frc2025.subsystems.feedtake.RollerSensorsIO;
-import frc.team4276.frc2025.subsystems.feedtake.RollerSensorsIOHardware;
-import frc.team4276.frc2025.subsystems.flywheels.FlywheelIO;
-import frc.team4276.frc2025.subsystems.flywheels.FlywheelIOSpark;
-import frc.team4276.frc2025.subsystems.flywheels.Flywheels;
 import frc.team4276.frc2025.subsystems.vision.Vision;
 import frc.team4276.frc2025.subsystems.vision.VisionConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO;
@@ -65,10 +52,6 @@ public class RobotContainer {
   @SuppressWarnings("unused")
   private Vision vision;
 
-  private Flywheels flywheels;
-  private Arm arm;
-  private Feedtake feedtake;
-
   private AutoBuilder autoBuilder;
 
   // Controller
@@ -76,7 +59,6 @@ public class RobotContainer {
   private final CommandGenericHID keyboard0 = new CommandGenericHID(1);
   private final CommandGenericHID keyboard1 = new CommandGenericHID(2);
   private final CommandGenericHID keyboard2 = new CommandGenericHID(3);
-  private final DigitalInput armCoastDio = new DigitalInput(Ports.ARM_COAST_SWITCH);
 
   // Dashboard inputs
   private final AutoSelector autoSelector = new AutoSelector();
@@ -99,10 +81,6 @@ public class RobotContainer {
                   RobotState.getInstance()::addVisionMeasurement,
                   new VisionIOPhotonVision(VisionConstants.camera0Name, new Transform3d()),
                   new VisionIOPhotonVision(VisionConstants.camera1Name, new Transform3d()));
-          flywheels = new Flywheels(new FlywheelIOSpark());
-          feedtake =
-              new Feedtake(new Roller(new RollerIOSparkMax()), new RollerSensorsIOHardware());
-          arm = new Arm(new ArmIOSparkMax());
           break;
 
         case SIM:
@@ -115,9 +93,6 @@ public class RobotContainer {
                   new ModuleIOSim(),
                   new ModuleIOSim());
           vision = new Vision(RobotState.getInstance()::addVisionMeasurement, new VisionIO() {});
-          flywheels = new Flywheels(new FlywheelIO() {});
-          feedtake = new Feedtake(new Roller(new RollerIO() {}), new RollerSensorsIO() {});
-          arm = new Arm(new ArmIOSim());
           break;
 
         default:
@@ -138,12 +113,8 @@ public class RobotContainer {
       }
     }
 
-    arm.setCoastOverride(armCoastDio::get);
-
-    autoBuilder = new AutoBuilder(drive, arm, feedtake, flywheels);
-
     // Set up auto routines
-    autoSelector.addRoutine("Demo Traj", Commands.none());
+    autoSelector.addRoutine("Demo Traj", autoBuilder.Test());
 
     // Set up SysId routines
     autoSelector.addRoutine(
@@ -207,22 +178,6 @@ public class RobotContainer {
                                     new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
-
-    keyboard0.button(1).whileTrue(arm.setGoalCommand(Arm.Goal.INTAKE));
-
-    keyboard0
-        .button(2)
-        .whileTrue(
-            arm.setGoalCommand(Arm.Goal.SPEAKER)
-                .alongWith(
-                    Commands.run(
-                        () ->
-                            drive.setHeadingGoal(
-                                () ->
-                                    RobotState.getInstance()
-                                        .getSpeakerAimingParameters()
-                                        .driveHeading()))))
-        .onFalse(Commands.run(() -> drive.clearHeadingGoal()));
   }
 
   /**
@@ -231,6 +186,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoBuilder.CrescendoTest();
+    return autoSelector.getCommand();
   }
 }
