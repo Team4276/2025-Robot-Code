@@ -15,16 +15,16 @@ public class AutoBuilder {
     this.drive = drive;
   }
 
-  public Command Test() {
-    var traj1 = getSwerveTrajectory("Demo");
+  public Command TestChoreoTraj(String name) {
+    var traj1 = getChoreoSwerveTrajectory(name);
 
     return Commands.runOnce(
             () -> RobotState.getInstance().resetPose(traj1.getInitialPose(false).get()))
         .andThen(followTrajectory(drive, traj1));
   }
 
-  public Command TestPP() {
-    var traj1 = getPathPlannerTrajectoryFromChoreo("Demo");
+  public Command TestPPTraj(String name) {
+    var traj1 = getPathPlannerTrajectoryFromChoreo(name);
 
     return Commands.runOnce(() -> RobotState.getInstance().resetPose(traj1.getInitialPose()))
         .andThen(followPathPlannerTrajectory(drive, traj1));

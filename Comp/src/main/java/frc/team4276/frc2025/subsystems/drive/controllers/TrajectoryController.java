@@ -1,11 +1,15 @@
 package frc.team4276.frc2025.subsystems.drive.controllers;
 
+import static frc.team4276.frc2025.subsystems.drive.DriveConstants.*;
+
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import frc.team4276.frc2025.RobotState;
@@ -13,7 +17,7 @@ import frc.team4276.frc2025.subsystems.drive.DriveConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class TrajectoryController {
+public class TrajectoryController { // TODO: fix
   private Trajectory<SwerveSample> trajectory;
   private PathPlannerTrajectory ppTrajectory;
   private boolean isPPTraj = false;
@@ -27,7 +31,10 @@ public class TrajectoryController {
   private final PIDController yController;
   private final PIDController rotationController;
 
-  private double[] moduleForces = {0.0, 0.0, 0.0, 0.0};
+  // private Translation2d[] moduleForces = {
+  //   new Translation2d(), new Translation2d(), new Translation2d(), new Translation2d()
+  // };
+  private final double[] moduleForces = {0.0, 0.0, 0.0, 0.0};
   private final double[] dummyForces = {0.0, 0.0, 0.0, 0.0};
 
   public TrajectoryController() {
@@ -38,6 +45,10 @@ public class TrajectoryController {
     rotationController =
         new PIDController(DriveConstants.autoRotationKp, 0.0, DriveConstants.autoRotationKd);
     rotationController.enableContinuousInput(-Math.PI, Math.PI);
+
+    xController.setTolerance(autoTranslationTol);
+    yController.setTolerance(autoTranslationTol);
+    rotationController.setTolerance(autoRotationTol);
   }
 
   public void setTrajectory(Trajectory<SwerveSample> traj) {
@@ -69,26 +80,28 @@ public class TrajectoryController {
       sampledState.timeSeconds = dummyState.timeSeconds;
       sampledState.pose = dummyState.pose;
       sampledState.heading = dummyState.heading;
+      sampledState.feedforwards =
+          new DriveFeedforwards(dummyForces, dummyForces, dummyForces, dummyForces, dummyForces);
     }
 
     RobotState.getInstance().setTrajectorySetpoint(sampledState.pose);
 
     for (int i = 0; i < 4; i++) {
-      // moduleForces[i] = sampledState.feedforwards.linearForcesNewtons()[i];
+      moduleForces[i] = sampledState.feedforwards.linearForcesNewtons()[i];
     }
 
     double xError = sampledState.pose.getX() - currentPose.getTranslation().getX();
     double yError = sampledState.pose.getY() - currentPose.getTranslation().getY();
     double xFeedback = xController.calculate(0.0, xError);
     double yFeedback = yController.calculate(0.0, yError);
-    double thetaError = sampledState.heading.getRadians() - currentPose.getRotation().getRadians();
+    double thetaError = sampledState.heading.minus(currentPose.getRotation()).getRadians();
     double thetaFeedback = rotationController.calculate(0.0, thetaError);
 
     ChassisSpeeds outputSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             sampledState.fieldSpeeds.vxMetersPerSecond + xFeedback,
             sampledState.fieldSpeeds.vyMetersPerSecond + yFeedback,
-            sampledState.heading.getRadians() + thetaFeedback,
+            sampledState.fieldSpeeds.omegaRadiansPerSecond + thetaFeedback,
             currentPose.getRotation());
 
     Logger.recordOutput("Trajectory/SetpointPose", sampledState.pose);
@@ -146,8 +159,8 @@ public class TrajectoryController {
     RobotState.getInstance().setTrajectorySetpoint(targetState.getPose());
 
     for (int i = 0; i < 4; i++) {
-      // moduleForces[i] = Math.hypot(targetState.moduleForcesX()[i],
-      // targetState.moduleForcesY()[i]);
+      // moduleForces[i] =
+      //     new Translation2d(targetState.moduleForcesX()[i], targetState.moduleForcesY()[i]);
     }
 
     double xError = targetState.x - currentPose.getTranslation().getX();
@@ -155,7 +168,8 @@ public class TrajectoryController {
     double xFeedback = xController.calculate(0.0, xError);
     double yFeedback = yController.calculate(0.0, yError);
     double thetaFF = targetState.omega;
-    double thetaError = targetState.heading - currentPose.getRotation().getRadians();
+    double thetaError =
+        Rotation2d.fromRadians(targetState.heading).minus(currentPose.getRotation()).getRadians();
     double thetaFeedback = rotationController.calculate(0.0, thetaError);
 
     ChassisSpeeds outputSpeeds =

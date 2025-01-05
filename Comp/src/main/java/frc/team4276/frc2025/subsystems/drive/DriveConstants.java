@@ -85,10 +85,10 @@ public class DriveConstants {
   public static final double driveKs = 0.0;
   public static final double driveKv =
       12.0 / (driveGearbox.freeSpeedRadPerSec / driveMotorReduction);
-  public static final double driveSimP = 0.0;
+  public static final double driveSimP = 1.0;
   public static final double driveSimD = 0.0;
-  public static final double driveSimKs = 0.0;
-  public static final double driveSimKv = 0.0789;
+  public static final double driveSimKs = 0.028;
+  public static final double driveSimKv = 0.1;
 
   // Turn motor configuration
   public static final boolean turnInverted = false;
@@ -119,10 +119,12 @@ public class DriveConstants {
   public static final double kProfiledSnapHeadingKd = 0.0;
   public static final double kProfiledSnapPositionTolerance = 1.0;
 
-  public static final double autoTranslationKp = 3.0;
+  public static final double autoTranslationKp = 4.0;
   public static final double autoTranslationKd = 0.0;
-  public static final double autoRotationKp = 4.0;
+  public static final double autoTranslationTol = 0.1;
+  public static final double autoRotationKp = 0.0;
   public static final double autoRotationKd = 0.0;
+  public static final double autoRotationTol = Math.toRadians(1.0);
 
   public static final double autoMaxError = 0.75; // Meters
 

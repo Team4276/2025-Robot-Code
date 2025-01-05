@@ -32,6 +32,8 @@ public class RobotState {
 
   private static RobotState mInstance;
 
+  private boolean enableSimTrajPoseEstimation = true;
+
   public static RobotState getInstance() {
     if (mInstance == null) {
       mInstance = new RobotState();
@@ -90,9 +92,13 @@ public class RobotState {
   @AutoLogOutput(key = "RobotState/EstimatedPose")
   public Pose2d getEstimatedPose() {
     // Temp until i get the sim to be consistent
-    return Constants.getMode() == Constants.Mode.SIM && DriverStation.isAutonomousEnabled()
-        ? trajectorySetpoint
-        : poseEstimator.getEstimatedPosition();
+    return useTrajectorySetpoint() ? trajectorySetpoint : poseEstimator.getEstimatedPosition();
+  }
+
+  private boolean useTrajectorySetpoint() {
+    return enableSimTrajPoseEstimation
+        ? false
+        : Constants.getMode() == Constants.Mode.SIM && DriverStation.isAutonomousEnabled();
   }
 
   public Pose2d getTrajectorySetpoint() {

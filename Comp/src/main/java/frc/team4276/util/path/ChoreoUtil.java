@@ -4,15 +4,12 @@ import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import choreo.util.AllianceFlipUtil;
-import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.system.plant.DCMotor;
+import frc.team4276.frc2025.subsystems.drive.DriveConstants;
 import java.util.List;
 
 public class ChoreoUtil {
@@ -21,7 +18,7 @@ public class ChoreoUtil {
   // Assume swerve sample and if not then we screwed ig
   /** Loads and flips trajectory accordingly */
   @SuppressWarnings("unchecked")
-  public static Trajectory<SwerveSample> getSwerveTrajectory(String name) {
+  public static Trajectory<SwerveSample> getChoreoSwerveTrajectory(String name) {
     var uncheckedTraj = Choreo.loadTrajectory(name);
 
     if (uncheckedTraj.isEmpty()) {
@@ -37,7 +34,7 @@ public class ChoreoUtil {
   // Assume swerve sample and if not then we screwed ig
   /** Loads and flips trajectory accordingly */
   @SuppressWarnings("unchecked")
-  public static Trajectory<SwerveSample> getSwerveTrajectory(String name, int split) {
+  public static Trajectory<SwerveSample> getChoreoSwerveTrajectory(String name, int split) {
     var uncheckedTraj = Choreo.loadTrajectory(name);
     try {
       var traj =
@@ -55,18 +52,7 @@ public class ChoreoUtil {
       var traj =
           PathPlannerPath.fromChoreoTrajectory(name)
               .generateTrajectory(
-                  new ChassisSpeeds(),
-                  new Rotation2d(),
-                  new RobotConfig(
-                      0.0,
-                      0.0,
-                      new ModuleConfig(0, 0, 0, DCMotor.getNEO(1), 0, 0),
-                      new Translation2d[] {
-                        new Translation2d(),
-                        new Translation2d(),
-                        new Translation2d(),
-                        new Translation2d()
-                      }));
+                  new ChassisSpeeds(), new Rotation2d(), DriveConstants.driveConfig);
 
       return AllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
     } catch (Exception e) {
@@ -81,9 +67,7 @@ public class ChoreoUtil {
       var traj =
           PathPlannerPath.fromChoreoTrajectory(name, split)
               .generateTrajectory(
-                  new ChassisSpeeds(),
-                  new Rotation2d(),
-                  new RobotConfig(0.0, 0.0, null, new Translation2d[] {}));
+                  new ChassisSpeeds(), new Rotation2d(), DriveConstants.driveConfig);
 
       return AllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
     } catch (Exception e) {

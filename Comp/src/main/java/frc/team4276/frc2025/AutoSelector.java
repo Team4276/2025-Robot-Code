@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.team4276.util.VirtualSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-public class AutoSelector extends VirtualSubsystem { // TODO: impl
+public class AutoSelector extends VirtualSubsystem {
   private static final AutoRoutine defaultRoutine = new AutoRoutine("Do Nothing", Commands.none());
 
   private final LoggedDashboardChooser<AutoRoutine> routineChooser;

@@ -111,7 +111,7 @@ public class ModuleIOSim implements ModuleIO {
     driveFFVolts =
         (driveSimKs * Math.signum(velocityRadPerSec))
             + (driveSimKv * velocityRadPerSec)
-            + (feedForward * ffkT);
+            + (feedForward);
     driveController.setSetpoint(velocityRadPerSec);
   }
 

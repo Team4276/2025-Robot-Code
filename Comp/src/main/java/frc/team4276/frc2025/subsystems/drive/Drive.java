@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.team4276.frc2025.Constants;
 import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.frc2025.RobotState;
+import frc.team4276.frc2025.subsystems.drive.controllers.AutoAlignController;
 import frc.team4276.frc2025.subsystems.drive.controllers.HeadingController;
 import frc.team4276.frc2025.subsystems.drive.controllers.TeleopDriveController;
 import frc.team4276.frc2025.subsystems.drive.controllers.TrajectoryController;
@@ -74,7 +75,7 @@ public class Drive extends SubsystemBase {
   private SwerveModulePosition[] lastModulePositions = null;
   private double lastTime = 0.0;
 
-  private boolean useSetpointGenerator = false;
+  private boolean useSetpointGenerator = true;
   private final SwerveSetpointGenerator swerveSetpointGenerator =
       new SwerveSetpointGenerator(driveConfig, maxSteerVelocity);
   private SwerveSetpoint prevSetpoint;
@@ -82,9 +83,10 @@ public class Drive extends SubsystemBase {
   private DriveMode mode = DriveMode.TELEOP;
   private boolean isHeadingControlled = false;
 
-  private TeleopDriveController teleopDriveController = new TeleopDriveController();
-  private HeadingController headingController = new HeadingController();
-  private TrajectoryController trajectoryController = new TrajectoryController();
+  private final TeleopDriveController teleopDriveController = new TeleopDriveController();
+  private final HeadingController headingController = new HeadingController();
+  private final TrajectoryController trajectoryController = new TrajectoryController();
+  private final AutoAlignController autoAlignController = new AutoAlignController();
 
   private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
   private double characterizationInput = 0.0;
@@ -194,7 +196,7 @@ public class Drive extends SubsystemBase {
 
         break;
       case AUTO_ALIGN:
-        // TODO: impl
+        desiredSpeeds = autoAlignController.update(currentPose);
 
         break;
       case TRAJECTORY:
@@ -244,6 +246,16 @@ public class Drive extends SubsystemBase {
       // Send setpoints to modules
       for (int i = 0; i < 4; i++) {
         if (mode == DriveMode.TRAJECTORY) {
+          // setpointTorques[i] =
+          //     new SwerveModuleState(
+          //         trajectoryController
+          //                 .getModuleForces()[i]
+          //                 .getAngle()
+          //                 .minus(setpointStates[i].angle)
+          //                 .getCos()
+          //             * trajectoryController.getModuleForces()[i].getNorm()
+          //             * wheelRadiusMeters,
+          //         setpointStates[i].angle);
           setpointTorques[i] =
               new SwerveModuleState(
                   trajectoryController.getModuleForces()[i] * wheelRadiusMeters,

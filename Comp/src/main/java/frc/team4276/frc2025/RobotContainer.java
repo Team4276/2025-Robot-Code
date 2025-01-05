@@ -116,7 +116,10 @@ public class RobotContainer {
     autoBuilder = new AutoBuilder(drive);
 
     // Set up auto routines
-    autoSelector.addRoutine("Demo Traj", autoBuilder.Test());
+    autoSelector.addRoutine("Test 1 PP Traj", autoBuilder.TestPPTraj("Demo"));
+    autoSelector.addRoutine("Test 1 Choreo Traj", autoBuilder.TestChoreoTraj("Demo"));
+    autoSelector.addRoutine("Test 2 PP Traj", autoBuilder.TestPPTraj("SimDemo"));
+    autoSelector.addRoutine("Test 2 Choreo Traj", autoBuilder.TestChoreoTraj("SimDemo"));
 
     // Set up SysId routines
     autoSelector.addRoutine(
@@ -188,6 +191,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoBuilder.TestPP();
+    return autoBuilder.TestPPTraj("SimDemo");
+    // new FeedForwardCharacterization(
+    //     drive, drive::runCharacterization, drive::getFFCharacterizationVelocity);
   }
 }
