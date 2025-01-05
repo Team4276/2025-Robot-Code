@@ -4,6 +4,7 @@ import static frc.team4276.frc2025.subsystems.arm.ArmConstants.*;
 import static frc.team4276.util.SparkUtil.*;
 
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -138,7 +139,7 @@ public class ArmIOSparkMax implements ArmIO {
     closedLoopController.setReference(
         MathUtil.clamp(setpointRads, minInput, maxInput),
         ControlType.kMAXMotionPositionControl,
-        0,
+        ClosedLoopSlot.kSlot0,
         ff,
         ArbFFUnits.kVoltage);
   }

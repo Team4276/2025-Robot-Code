@@ -18,6 +18,7 @@ import static frc.team4276.util.SparkUtil.*;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -238,7 +239,11 @@ public class ModuleIOSpark implements ModuleIO {
             + (driveKv * velocityRadPerSec)
             + (feedforward * ffkT);
     driveController.setReference(
-        velocityRadPerSec, ControlType.kVelocity, 0, ffVolts, ArbFFUnits.kVoltage);
+        velocityRadPerSec,
+        ControlType.kVelocity,
+        ClosedLoopSlot.kSlot0,
+        ffVolts,
+        ArbFFUnits.kVoltage);
   }
 
   @Override
