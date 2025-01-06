@@ -15,7 +15,6 @@ package frc.team4276.frc2025;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -37,6 +36,7 @@ import frc.team4276.frc2025.subsystems.vision.Vision;
 import frc.team4276.frc2025.subsystems.vision.VisionConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVision;
+import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.team4276.util.BetterXboxController;
 
 /**
@@ -79,8 +79,10 @@ public class RobotContainer {
           vision =
               new Vision(
                   RobotState.getInstance()::addVisionMeasurement,
-                  new VisionIOPhotonVision(VisionConstants.camera0Name, new Transform3d()),
-                  new VisionIOPhotonVision(VisionConstants.camera1Name, new Transform3d()));
+                  new VisionIOPhotonVision(
+                      VisionConstants.camera0Name, VisionConstants.robotToCamera0),
+                  new VisionIOPhotonVision(
+                      VisionConstants.camera1Name, VisionConstants.robotToCamera1));
           break;
 
         case SIM:
@@ -92,7 +94,17 @@ public class RobotContainer {
                   new ModuleIOSim(),
                   new ModuleIOSim(),
                   new ModuleIOSim());
-          vision = new Vision(RobotState.getInstance()::addVisionMeasurement, new VisionIO() {});
+          vision =
+              new Vision(
+                  RobotState.getInstance()::addVisionMeasurement,
+                  new VisionIOPhotonVisionSim(
+                      VisionConstants.camera0Name,
+                      VisionConstants.robotToCamera0,
+                      RobotState.getInstance()::getEstimatedPose),
+                  new VisionIOPhotonVisionSim(
+                      VisionConstants.camera0Name,
+                      VisionConstants.robotToCamera1,
+                      RobotState.getInstance()::getEstimatedPose));
           break;
 
         default:
