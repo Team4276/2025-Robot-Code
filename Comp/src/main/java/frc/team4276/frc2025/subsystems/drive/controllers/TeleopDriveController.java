@@ -1,6 +1,6 @@
 package frc.team4276.frc2025.subsystems.drive.controllers;
 
-import choreo.util.AllianceFlipUtil;
+import choreo.util.ChoreoAllianceFlipUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -44,6 +44,6 @@ public class TeleopDriveController {
             linearVelocity.getY() * DriveConstants.maxSpeed,
             omega * DriveConstants.maxAngularSpeed * ANGULAR_VELOCITY_SCALAR);
     return ChassisSpeeds.fromFieldRelativeSpeeds(
-        speeds, AllianceFlipUtil.shouldFlip() ? yaw : yaw.plus(Rotation2d.fromDegrees(180)));
+        speeds, ChoreoAllianceFlipUtil.shouldFlip() ? yaw : yaw.plus(Rotation2d.fromDegrees(180)));
   }
 }

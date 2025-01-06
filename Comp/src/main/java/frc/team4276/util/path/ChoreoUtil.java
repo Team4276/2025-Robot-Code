@@ -3,7 +3,7 @@ package frc.team4276.util.path;
 import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
-import choreo.util.AllianceFlipUtil;
+import choreo.util.ChoreoAllianceFlipUtil;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
@@ -28,7 +28,7 @@ public class ChoreoUtil {
 
     var traj = (Trajectory<SwerveSample>) uncheckedTraj.get();
 
-    return AllianceFlipUtil.shouldFlip() ? traj.flipped() : traj;
+    return ChoreoAllianceFlipUtil.shouldFlip() ? traj.flipped() : traj;
   }
 
   // Assume swerve sample and if not then we screwed ig
@@ -40,7 +40,7 @@ public class ChoreoUtil {
       var traj =
           (Trajectory<SwerveSample>) uncheckedTraj.orElseThrow().getSplit(split).orElseThrow();
 
-      return AllianceFlipUtil.shouldFlip() ? traj.flipped() : traj;
+      return ChoreoAllianceFlipUtil.shouldFlip() ? traj.flipped() : traj;
     } catch (Exception e) {
       System.out.println("Failed to load split " + split + " of trajectory " + name);
       return new Trajectory<SwerveSample>(name, List.of(), List.of(), List.of());
@@ -54,7 +54,7 @@ public class ChoreoUtil {
               .generateTrajectory(
                   new ChassisSpeeds(), new Rotation2d(), DriveConstants.driveConfig);
 
-      return AllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
+      return ChoreoAllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
     } catch (Exception e) {
       System.out.println("Failed to load Choreo Trajectory from PPlib " + name);
       System.out.println(e);
@@ -69,7 +69,7 @@ public class ChoreoUtil {
               .generateTrajectory(
                   new ChassisSpeeds(), new Rotation2d(), DriveConstants.driveConfig);
 
-      return AllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
+      return ChoreoAllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
     } catch (Exception e) {
       System.out.println(
           "Failed to load split " + split + " of Choreo Trajectory from PPlib " + name);

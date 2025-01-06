@@ -13,7 +13,7 @@
 
 package frc.team4276.frc2025;
 
-import choreo.util.AllianceFlipUtil;
+import choreo.util.ChoreoAllianceFlipUtil;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -145,7 +145,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    if (AllianceFlipUtil.shouldFlip()) {
+    if (ChoreoAllianceFlipUtil.shouldFlip()) {
       RobotState.getInstance().setRed();
     } else {
       RobotState.getInstance().setBlue();

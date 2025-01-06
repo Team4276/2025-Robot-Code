@@ -2,7 +2,7 @@ package frc.team4276.frc2025.commands.auto;
 
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
-import choreo.util.AllianceFlipUtil;
+import choreo.util.ChoreoAllianceFlipUtil;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -54,7 +54,7 @@ public class AutoCommands {
    */
   public static boolean xCrossed(double xPosition, boolean towardsCenterline) {
     Pose2d robotPose = RobotState.getInstance().getTrajectorySetpoint();
-    if (AllianceFlipUtil.shouldFlip()) {
+    if (ChoreoAllianceFlipUtil.shouldFlip()) {
       if (towardsCenterline) {
         return robotPose.getX() < FieldConstants.fieldLength - xPosition;
       } else {
@@ -83,7 +83,7 @@ public class AutoCommands {
    */
   public static boolean yCrossed(double yPosition, boolean towardsCenterline) {
     Pose2d robotPose = RobotState.getInstance().getTrajectorySetpoint();
-    if (AllianceFlipUtil.shouldFlip()) {
+    if (ChoreoAllianceFlipUtil.shouldFlip()) {
       if (towardsCenterline) {
         return robotPose.getY() < FieldConstants.fieldWidth - yPosition;
       } else {
