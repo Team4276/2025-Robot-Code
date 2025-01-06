@@ -14,17 +14,18 @@ import frc.team4276.frc2025.field.FieldConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class RobotState {
-  private SwerveModulePosition[] lastWheelPositions =
-      new SwerveModulePosition[] {
-        new SwerveModulePosition(),
-        new SwerveModulePosition(),
-        new SwerveModulePosition(),
-        new SwerveModulePosition()
-      };
+  private SwerveModulePosition[] lastWheelPositions = new SwerveModulePosition[] {
+      new SwerveModulePosition(),
+      new SwerveModulePosition(),
+      new SwerveModulePosition(),
+      new SwerveModulePosition()
+  };
   private Rotation2d lastGyroAngle = new Rotation2d();
 
-  private SwerveDrivePoseEstimator poseEstimator =
-      new SwerveDrivePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions, new Pose2d());
+  private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kinematics, lastGyroAngle,
+      lastWheelPositions, new Pose2d());
+  private SwerveDrivePoseEstimator poseEstimatorVision = new SwerveDrivePoseEstimator(kinematics, lastGyroAngle,
+      lastWheelPositions, new Pose2d());
 
   private Pose2d trajectorySetpoint = new Pose2d();
 
@@ -41,7 +42,8 @@ public class RobotState {
     return mInstance;
   }
 
-  private RobotState() {}
+  private RobotState() {
+  }
 
   public FieldConstants.POIs getPOIs() {
     return POIs;
@@ -58,6 +60,7 @@ public class RobotState {
   /** Resets the current odometry pose. */
   public void resetPose(Pose2d pose) {
     poseEstimator.resetPose(pose);
+    poseEstimatorVision.resetPose(pose);
   }
 
   public void setTrajectorySetpoint(Pose2d setpoint) {
@@ -69,9 +72,8 @@ public class RobotState {
     // Update gyro angle
     if (yaw == null) {
       // Derive from kinematics
-      yaw =
-          lastGyroAngle.rotateBy(
-              new Rotation2d(kinematics.toTwist2d(wheelPositions, lastWheelPositions).dtheta));
+      yaw = lastGyroAngle.rotateBy(
+          new Rotation2d(kinematics.toTwist2d(wheelPositions, lastWheelPositions).dtheta));
       lastGyroAngle = yaw;
     }
 
@@ -85,7 +87,7 @@ public class RobotState {
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
-    poseEstimator.addVisionMeasurement(
+    poseEstimatorVision.addVisionMeasurement(
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
   }
 
@@ -93,6 +95,11 @@ public class RobotState {
   public Pose2d getEstimatedPose() {
     // Temp until i get the sim to be consistent
     return useTrajectorySetpoint() ? trajectorySetpoint : poseEstimator.getEstimatedPosition();
+  }
+
+  @AutoLogOutput(key = "RobotState/EstimatedVisionPose")
+  public Pose2d getEstimatedVisionPose(){
+    return poseEstimatorVision.getEstimatedPosition();
   }
 
   private boolean useTrajectorySetpoint() {

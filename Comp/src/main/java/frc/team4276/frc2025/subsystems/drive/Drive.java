@@ -57,7 +57,10 @@ public class Drive extends SubsystemBase {
     /** Driving to a location on the field automatically. */
     AUTO_ALIGN,
 
-    /** Characterizing (modules oriented forwards, motor outputs supplied externally). */
+    /**
+     * Characterizing (modules oriented forwards, motor outputs supplied
+     * externally).
+     */
     CHARACTERIZATION,
 
     /** Running wheel radius characterization routine (spinning in circle) */
@@ -69,15 +72,15 @@ public class Drive extends SubsystemBase {
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
-  private final Alert gyroDisconnectedAlert =
-      new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
+  private final Alert gyroDisconnectedAlert = new Alert("Disconnected gyro, using kinematics as fallback.",
+      AlertType.kError);
 
   private SwerveModulePosition[] lastModulePositions = null;
   private double lastTime = 0.0;
 
   private boolean useSetpointGenerator = true;
-  private final SwerveSetpointGenerator swerveSetpointGenerator =
-      new SwerveSetpointGenerator(driveConfig, maxSteerVelocity);
+  private final SwerveSetpointGenerator swerveSetpointGenerator = new SwerveSetpointGenerator(driveConfig,
+      maxSteerVelocity);
   private SwerveSetpoint prevSetpoint;
 
   private DriveMode mode = DriveMode.TELEOP;
@@ -106,19 +109,17 @@ public class Drive extends SubsystemBase {
     // Start odometry thread
     SparkOdometryThread.getInstance().start();
 
-    prevSetpoint =
-        new SwerveSetpoint(getChassisSpeeds(), getModuleStates(), DriveFeedforwards.zeros(4));
+    prevSetpoint = new SwerveSetpoint(getChassisSpeeds(), getModuleStates(), DriveFeedforwards.zeros(4));
 
     // Configure SysId
-    sysId =
-        new SysIdRoutine(
-            new SysIdRoutine.Config(
-                null,
-                null,
-                null,
-                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
-            new SysIdRoutine.Mechanism(
-                (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+    sysId = new SysIdRoutine(
+        new SysIdRoutine.Config(
+            null,
+            null,
+            null,
+            (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+        new SysIdRoutine.Mechanism(
+            (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
 
   @Override
@@ -143,8 +144,7 @@ public class Drive extends SubsystemBase {
     }
 
     // Update odometry
-    double[] sampleTimestamps =
-        modules[0].getOdometryTimestamps(); // All signals are sampled together
+    double[] sampleTimestamps = modules[0].getOdometryTimestamps(); // All signals are sampled together
     int sampleCount = sampleTimestamps.length;
     for (int i = 0; i < sampleCount; i++) {
       // Read wheel positions and deltas from each module
@@ -157,10 +157,8 @@ public class Drive extends SubsystemBase {
       if (lastModulePositions != null) {
         double dt = sampleTimestamps[i] - lastTime;
         for (int j = 0; j < modules.length; j++) {
-          double velocity =
-              (modulePositions[j].distanceMeters - lastModulePositions[j].distanceMeters) / dt;
-          double omega =
-              modulePositions[j].angle.minus(lastModulePositions[j].angle).getRadians() / dt;
+          double velocity = (modulePositions[j].distanceMeters - lastModulePositions[j].distanceMeters) / dt;
+          double omega = modulePositions[j].angle.minus(lastModulePositions[j].angle).getRadians() / dt;
           // Check if delta is too large
           if (Math.abs(omega) > DriveConstants.maxSpeed * 5.0
               || Math.abs(velocity) > DriveConstants.maxAngularSpeed * 5.0) {
@@ -184,14 +182,15 @@ public class Drive extends SubsystemBase {
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.getMode() != Mode.SIM);
 
-    Pose2d currentPose = RobotState.getInstance().getEstimatedPose();
+    Pose2d currentPose = RobotState.getInstance().getEstimatedVisionPose();
+    currentPose = RobotState.getInstance().getEstimatedPose();
+
     switch (mode) {
       case TELEOP:
         desiredSpeeds = teleopDriveController.update(currentPose.getRotation());
 
         if (isHeadingControlled) {
-          desiredSpeeds.omegaRadiansPerSecond =
-              headingController.update(currentPose.getRotation().getRadians());
+          desiredSpeeds.omegaRadiansPerSecond = headingController.update(currentPose.getRotation().getRadians());
         }
 
         break;
@@ -203,8 +202,7 @@ public class Drive extends SubsystemBase {
         desiredSpeeds = trajectoryController.update(currentPose);
 
         if (isHeadingControlled) {
-          desiredSpeeds.omegaRadiansPerSecond =
-              headingController.update(currentPose.getRotation().getRadians());
+          desiredSpeeds.omegaRadiansPerSecond = headingController.update(currentPose.getRotation().getRadians());
         }
 
         break;
@@ -235,31 +233,29 @@ public class Drive extends SubsystemBase {
         setpointStates = kinematics.toSwerveModuleStates(setpointSpeeds);
       }
 
-      SwerveModuleState[] setpointTorques =
-          new SwerveModuleState[] {
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState()
-          };
+      SwerveModuleState[] setpointTorques = new SwerveModuleState[] {
+          new SwerveModuleState(),
+          new SwerveModuleState(),
+          new SwerveModuleState(),
+          new SwerveModuleState()
+      };
 
       // Send setpoints to modules
       for (int i = 0; i < 4; i++) {
         if (mode == DriveMode.TRAJECTORY) {
           // setpointTorques[i] =
-          //     new SwerveModuleState(
-          //         trajectoryController
-          //                 .getModuleForces()[i]
-          //                 .getAngle()
-          //                 .minus(setpointStates[i].angle)
-          //                 .getCos()
-          //             * trajectoryController.getModuleForces()[i].getNorm()
-          //             * wheelRadiusMeters,
-          //         setpointStates[i].angle);
-          setpointTorques[i] =
-              new SwerveModuleState(
-                  trajectoryController.getModuleForces()[i] * wheelRadiusMeters,
-                  setpointStates[i].angle);
+          // new SwerveModuleState(
+          // trajectoryController
+          // .getModuleForces()[i]
+          // .getAngle()
+          // .minus(setpointStates[i].angle)
+          // .getCos()
+          // * trajectoryController.getModuleForces()[i].getNorm()
+          // * wheelRadiusMeters,
+          // setpointStates[i].angle);
+          setpointTorques[i] = new SwerveModuleState(
+              trajectoryController.getModuleForces()[i] * wheelRadiusMeters,
+              setpointStates[i].angle);
         } else {
           setpointTorques[i] = new SwerveModuleState(0.0, setpointStates[i].angle);
         }
@@ -373,7 +369,10 @@ public class Drive extends SubsystemBase {
     return run(() -> runCharacterization(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction));
   }
 
-  /** Returns the module states (turn angles and drive velocities) for all of the modules. */
+  /**
+   * Returns the module states (turn angles and drive velocities) for all of the
+   * modules.
+   */
   @AutoLogOutput(key = "Drive/SwerveStates/Measured")
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
