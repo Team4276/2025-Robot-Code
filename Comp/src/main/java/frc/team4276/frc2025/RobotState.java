@@ -80,6 +80,7 @@ public class RobotState {
     lastWheelPositions = wheelPositions;
 
     poseEstimator.updateWithTime(timestamp, yaw, wheelPositions);
+    poseEstimatorVision.updateWithTime(timestamp, yaw, wheelPositions);
   }
 
   /** Adds a new timestamped vision measurement. */

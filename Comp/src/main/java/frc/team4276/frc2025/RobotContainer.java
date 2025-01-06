@@ -102,9 +102,10 @@ public class RobotContainer {
                       VisionConstants.robotToCamera0,
                       RobotState.getInstance()::getEstimatedPose),
                   new VisionIOPhotonVisionSim(
-                      VisionConstants.camera0Name,
+                      VisionConstants.camera1Name,
                       VisionConstants.robotToCamera1,
-                      RobotState.getInstance()::getEstimatedPose));
+                      RobotState.getInstance()::getEstimatedPose)
+                      );
           break;
 
         default:
