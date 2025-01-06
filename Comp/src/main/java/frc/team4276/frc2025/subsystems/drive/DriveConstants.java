@@ -26,7 +26,6 @@ public class DriveConstants {
   public static final double odometryFrequency = 100.0; // Hz
   public static final double trackWidth = Units.inchesToMeters(23.5);
   public static final double wheelBase = Units.inchesToMeters(23.5);
-  public static final double driveBaseRadius = Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
   public static final Translation2d[] moduleTranslations =
       new Translation2d[] {
         new Translation2d(trackWidth / 2.0, wheelBase / 2.0),
@@ -34,6 +33,7 @@ public class DriveConstants {
         new Translation2d(-trackWidth / 2.0, wheelBase / 2.0),
         new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0)
       };
+  public static final double driveBaseRadius = Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
   public static final SwerveDriveKinematics kinematics =
       new SwerveDriveKinematics(moduleTranslations);
 
@@ -114,19 +114,20 @@ public class DriveConstants {
   public static final double snapKd = 0.1;
   public static final double snapPositionTolerance = 1.0;
 
-  public static final double kProfiledSnapHeadingKp = 0.0;
-  public static final double kProfiledSnapHeadingKi = 0.0;
-  public static final double kProfiledSnapHeadingKd = 0.0;
-  public static final double kProfiledSnapPositionTolerance = 1.0;
-
   public static final double autoTranslationKp = 4.0;
   public static final double autoTranslationKd = 0.0;
   public static final double autoTranslationTol = 0.1;
   public static final double autoRotationKp = 0.0;
   public static final double autoRotationKd = 0.0;
   public static final double autoRotationTol = Math.toRadians(1.0);
-
   public static final double autoMaxError = 0.75; // Meters
+
+  public static final double autoAlignTranslationKp = 1.0;
+  public static final double autoAlignTranslationKd = 0.0;
+  public static final double autoAlignTranslationTol = 0.1;
+  public static final double autoAlignRotationKp = 1.0;
+  public static final double autoAlignRotationKd = 0.0;
+  public static final double autoAlignRotationTol = Math.toRadians(1.0);
 
   // PathPlanner configuration
   public static final double robotMassKg = 56.699;

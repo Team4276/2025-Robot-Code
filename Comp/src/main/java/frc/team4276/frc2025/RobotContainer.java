@@ -120,6 +120,8 @@ public class RobotContainer {
     autoSelector.addRoutine("Test 1 Choreo Traj", autoBuilder.TestChoreoTraj("Demo"));
     autoSelector.addRoutine("Test 2 PP Traj", autoBuilder.TestPPTraj("SimDemo"));
     autoSelector.addRoutine("Test 2 Choreo Traj", autoBuilder.TestChoreoTraj("SimDemo"));
+    autoSelector.addRoutine("Test 3 PP Traj", autoBuilder.TestPPTraj("BoxTest"));
+    autoSelector.addRoutine("Test 3 Choreo Traj", autoBuilder.TestChoreoTraj("BoxTest"));
 
     // Set up SysId routines
     autoSelector.addRoutine(
@@ -183,6 +185,13 @@ public class RobotContainer {
                                     new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+    keyboard0
+        .button(1)
+        .whileTrue(
+            Commands.startEnd(
+                    () -> drive.setAutoAlignPosition(new Pose2d(5.0, 5.0, new Rotation2d())),
+                    drive::disableAutoAlign)
+                .until(drive::isAutoAligned));
   }
 
   /**
@@ -193,6 +202,6 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return autoBuilder.TestPPTraj("SimDemo");
     // new FeedForwardCharacterization(
-    //     drive, drive::runCharacterization, drive::getFFCharacterizationVelocity);
+    // drive, drive::runCharacterization, drive::getFFCharacterizationVelocity);
   }
 }

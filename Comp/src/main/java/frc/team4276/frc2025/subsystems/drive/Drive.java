@@ -315,6 +315,19 @@ public class Drive extends SubsystemBase {
     mode = DriveMode.TELEOP;
   }
 
+  public void setAutoAlignPosition(Pose2d pose) {
+    autoAlignController.setSetpoint(pose);
+    mode = DriveMode.AUTO_ALIGN;
+  }
+
+  public boolean isAutoAligned() {
+    return autoAlignController.atGoal();
+  }
+
+  public void disableAutoAlign() {
+    mode = DriveMode.TELEOP;
+  }
+
   /** Runs the drive in a straight line with the specified drive output. */
   public void runCharacterization(double output) {
     characterizationInput = output;

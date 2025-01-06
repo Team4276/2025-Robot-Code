@@ -17,7 +17,7 @@ import frc.team4276.frc2025.subsystems.drive.DriveConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class TrajectoryController { // TODO: fix
+public class TrajectoryController {
   private Trajectory<SwerveSample> trajectory;
   private PathPlannerTrajectory ppTrajectory;
   private boolean isPPTraj = false;
