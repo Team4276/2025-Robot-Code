@@ -61,6 +61,8 @@ public class RobotContainer {
   private final CommandGenericHID keyboard1 = new CommandGenericHID(2);
   private final CommandGenericHID keyboard2 = new CommandGenericHID(3);
 
+  private final ScoringHelper scoringHelper = new ScoringHelper();
+
   // Dashboard inputs
   private final AutoSelector autoSelector = new AutoSelector();
 
@@ -203,13 +205,9 @@ public class RobotContainer {
         .button(1)
         .whileTrue(
             Commands.startEnd(
-                    () -> drive.setAutoAlignPosition(new Pose2d(5.0, 5.0, new Rotation2d())),
+                    () -> drive.setAutoAlignPosition(scoringHelper.getSelectedPose()),
                     drive::disableAutoAlign)
                 .until(drive::isAutoAligned));
-  }
-
-  public void test(){
-    drive.setAutoAlignPosition(FieldConstants.redPOIs.reefScoring[10]);
   }
 
   /**
