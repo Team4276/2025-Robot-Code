@@ -26,6 +26,7 @@ import frc.team4276.frc2025.Constants.RobotType;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
 import frc.team4276.frc2025.commands.auto.AutoBuilder;
+import frc.team4276.frc2025.field.FieldConstants;
 import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.drive.GyroIO;
 import frc.team4276.frc2025.subsystems.drive.GyroIOADIS;
@@ -205,6 +206,10 @@ public class RobotContainer {
                     () -> drive.setAutoAlignPosition(new Pose2d(5.0, 5.0, new Rotation2d())),
                     drive::disableAutoAlign)
                 .until(drive::isAutoAligned));
+  }
+
+  public void test(){
+    drive.setAutoAlignPosition(FieldConstants.redPOIs.reefScoring[10]);
   }
 
   /**

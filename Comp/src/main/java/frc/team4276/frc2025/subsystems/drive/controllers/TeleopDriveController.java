@@ -20,7 +20,7 @@ public class TeleopDriveController {
     controllerOmega = omega;
   }
 
-  public ChassisSpeeds update(Rotation2d yaw) {
+  public ChassisSpeeds updateRaw(Rotation2d yaw) {
     double linearMagnitude = Math.hypot(controllerX, controllerY);
 
     // Square magnitude for more precise control
@@ -29,21 +29,21 @@ public class TeleopDriveController {
     Translation2d linearVelocity = new Translation2d();
 
     if (linearMagnitude > 1e-6) {
-      linearVelocity =
-          new Translation2d(linearMagnitude, new Rotation2d(controllerX, controllerY))
-              .times(LINEAR_VELOCITY_SCALAR);
+      linearVelocity = new Translation2d(linearMagnitude, new Rotation2d(controllerX, controllerY))
+          .times(LINEAR_VELOCITY_SCALAR);
     }
 
     // Square rotation value for more precise control
     double omega = Math.copySign(controllerOmega * controllerOmega, controllerOmega);
 
-    // Convert to field relative speeds & send command
-    ChassisSpeeds speeds =
-        new ChassisSpeeds(
-            linearVelocity.getX() * DriveConstants.maxSpeed,
-            linearVelocity.getY() * DriveConstants.maxSpeed,
-            omega * DriveConstants.maxAngularSpeed * ANGULAR_VELOCITY_SCALAR);
-    return ChassisSpeeds.fromFieldRelativeSpeeds(
-        speeds, ChoreoAllianceFlipUtil.shouldFlip() ? yaw : yaw.plus(Rotation2d.fromDegrees(180)));
+    return new ChassisSpeeds(
+        linearVelocity.getX() * DriveConstants.maxSpeed,
+        linearVelocity.getY() * DriveConstants.maxSpeed,
+        omega * DriveConstants.maxAngularSpeed * ANGULAR_VELOCITY_SCALAR);
+  }
+
+  public ChassisSpeeds update(Rotation2d yaw) {
+    return ChassisSpeeds.fromFieldRelativeSpeeds(updateRaw(yaw),
+        ChoreoAllianceFlipUtil.shouldFlip() ? yaw : yaw.plus(Rotation2d.fromDegrees(180)));
   }
 }

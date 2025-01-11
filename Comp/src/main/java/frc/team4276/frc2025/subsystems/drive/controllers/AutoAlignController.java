@@ -18,21 +18,26 @@ public class AutoAlignController {
   private final Timer toleranceTimer = new Timer();
   private final double toleranceTime = 0.5;
 
+  @AutoLogOutput(key = "AutoAlign/SetpointPose")
   private Pose2d setpoint = new Pose2d();
 
+  private TeleopDriveController teleopDriveController = new TeleopDriveController();
+
+  private boolean cancelX = false;
+  private boolean cancelY = false;
+  private boolean cancelTheta = false;
+
   public AutoAlignController() {
-    translationController =
-        new ProfiledPIDController(
-            autoAlignTranslationKp,
-            0,
-            autoAlignTranslationKd,
-            new TrapezoidProfile.Constraints(maxSpeed, maxAccel));
-    headingController =
-        new ProfiledPIDController(
-            autoAlignRotationKp,
-            0,
-            autoAlignRotationKd,
-            new TrapezoidProfile.Constraints(maxAngularSpeed, maxAngularAccel));
+    translationController = new ProfiledPIDController(
+        autoAlignTranslationKp,
+        0,
+        autoAlignTranslationKd,
+        new TrapezoidProfile.Constraints(maxSpeed, maxAccel));
+    headingController = new ProfiledPIDController(
+        autoAlignRotationKp,
+        0,
+        autoAlignRotationKd,
+        new TrapezoidProfile.Constraints(maxAngularSpeed, maxAngularAccel));
     headingController.enableContinuousInput(-Math.PI, Math.PI);
 
     translationController.setTolerance(autoAlignTranslationTol);
@@ -44,15 +49,21 @@ public class AutoAlignController {
   public void setSetpoint(Pose2d pose) {
     this.setpoint = pose;
     toleranceTimer.reset();
+    cancelX = false;
+    cancelY = false;
+    cancelTheta = false;
   }
 
-  public ChassisSpeeds update(Pose2d currentPose) {
+  public void feedTeleopInput(double x, double y, double omega){
+    teleopDriveController.feedDriveInput(x, y, omega);
+  }
+
+  private ChassisSpeeds updateContoller(Pose2d currentPose) {
     Translation2d trans = currentPose.getTranslation().minus(setpoint.getTranslation());
     Translation2d linearOutput = new Translation2d();
     if (trans.getNorm() > 1e-6) {
-      linearOutput =
-          new Translation2d(
-              translationController.calculate(trans.getNorm(), 0.0), trans.getAngle());
+      linearOutput = new Translation2d(
+          translationController.calculate(trans.getNorm(), 0.0), trans.getAngle());
     }
 
     double thetaError = setpoint.getRotation().minus(currentPose.getRotation()).getRadians();
@@ -67,11 +78,32 @@ public class AutoAlignController {
     Logger.recordOutput("AutoAlign/ThetaMeasured", currentPose.getRotation().getRadians());
     Logger.recordOutput("AutoAlign/ThetaSetpoint", headingController.getSetpoint().position);
     Logger.recordOutput(
-        "AutoAlign/SetpointPose",
+        "AutoAlign/StateSetpoint",
         new Pose2d(linearOutput, new Rotation2d(headingController.getSetpoint().position)));
 
+    return new ChassisSpeeds(linearOutput.getX(), linearOutput.getY(), omega);
+
+  }
+
+  @AutoLogOutput(key = "AutoAlign/Output")
+  public ChassisSpeeds update(Pose2d currentPose) {
+    ChassisSpeeds controllerSpeeds = updateContoller(currentPose);
+    
+    var teleopSpeeds = teleopDriveController.updateRaw(currentPose.getRotation());
+
+    cancelX = cancelX || Math.abs(teleopSpeeds.vxMetersPerSecond) > 1e-6;
+    cancelY = cancelY || Math.abs(teleopSpeeds.vyMetersPerSecond) > 1e-6;
+    cancelTheta = cancelTheta || Math.abs(teleopSpeeds.omegaRadiansPerSecond) > 1e-6;
+    
+    Logger.recordOutput("AutoAlign/CancelX", cancelX);
+    Logger.recordOutput("AutoAlign/CancelY", cancelY);
+    Logger.recordOutput("AutoAlign/CancelTheta", cancelTheta);
+
     return ChassisSpeeds.fromFieldRelativeSpeeds(
-        linearOutput.getX(), linearOutput.getY(), omega, currentPose.getRotation());
+      cancelX ? teleopSpeeds.vxMetersPerSecond : controllerSpeeds.vxMetersPerSecond, 
+      cancelY ? teleopSpeeds.vyMetersPerSecond : controllerSpeeds.vyMetersPerSecond,
+      cancelTheta ? teleopSpeeds.omegaRadiansPerSecond : controllerSpeeds.omegaRadiansPerSecond,
+      currentPose.getRotation());
   }
 
   @AutoLogOutput(key = "AutoAlign/AtGoal")
