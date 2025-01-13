@@ -13,6 +13,7 @@
 
 package frc.team4276.frc2025;
 
+import choreo.util.ChoreoAllianceFlipUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -26,13 +27,28 @@ import frc.team4276.frc2025.Constants.RobotType;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
 import frc.team4276.frc2025.commands.auto.AutoBuilder;
-import frc.team4276.frc2025.field.FieldConstants;
+import frc.team4276.frc2025.subsystems.arm.Arm;
+import frc.team4276.frc2025.subsystems.arm.ArmIO;
+import frc.team4276.frc2025.subsystems.arm.ArmIOSparkMax;
+import frc.team4276.frc2025.subsystems.arm.Arm.Goal;
 import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.drive.GyroIO;
 import frc.team4276.frc2025.subsystems.drive.GyroIOADIS;
 import frc.team4276.frc2025.subsystems.drive.ModuleIO;
 import frc.team4276.frc2025.subsystems.drive.ModuleIOSim;
 import frc.team4276.frc2025.subsystems.drive.ModuleIOSpark;
+import frc.team4276.frc2025.subsystems.roller.Roller;
+import frc.team4276.frc2025.subsystems.roller.RollerIO;
+import frc.team4276.frc2025.subsystems.roller.RollerIOSparkMax;
+import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIO;
+import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIOHardware;
+import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
+import frc.team4276.frc2025.subsystems.superstructure.elevator.Elevator;
+import frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorIO;
+import frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorIOSparkMax;
+import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffector;
+import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffectorIO;
+import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffectorIOSparkMax;
 import frc.team4276.frc2025.subsystems.vision.Vision;
 import frc.team4276.frc2025.subsystems.vision.VisionConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO;
@@ -41,14 +57,20 @@ import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.team4276.util.BetterXboxController;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
   // Subsystems
   private Drive drive;
+  private Superstructure superstructure;
+  private Arm arm;
+  private Roller roller;
 
   @SuppressWarnings("unused")
   private Vision vision;
@@ -66,65 +88,96 @@ public class RobotContainer {
   // Dashboard inputs
   private final AutoSelector autoSelector = new AutoSelector();
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
     if (Constants.getMode() != Constants.Mode.REPLAY) {
       switch (Constants.getMode()) {
         case REAL:
           // Real robot, instantiate hardware IO implementations
-          drive =
-              new Drive(
-                  new GyroIOADIS(),
-                  new ModuleIOSpark(0),
-                  new ModuleIOSpark(1),
-                  new ModuleIOSpark(2),
-                  new ModuleIOSpark(3));
-          vision =
-              new Vision(
-                  RobotState.getInstance()::addVisionMeasurement,
-                  new VisionIOPhotonVision(
-                      VisionConstants.camera0Name, VisionConstants.robotToCamera0),
-                  new VisionIOPhotonVision(
-                      VisionConstants.camera1Name, VisionConstants.robotToCamera1));
+          drive = new Drive(
+              new GyroIOADIS(),
+              new ModuleIOSpark(0),
+              new ModuleIOSpark(1),
+              new ModuleIOSpark(2),
+              new ModuleIOSpark(3));
+          superstructure = new Superstructure(
+              new Elevator(new ElevatorIOSparkMax()),
+              new EndEffector(new EndEffectorIOSparkMax(Ports.ENDEFFECTOR, 40, false, true)),
+              new RollerSensorsIOHardware());
+          arm = new Arm(new ArmIOSparkMax());
+          roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40, false, true));
+          vision = new Vision(
+              RobotState.getInstance()::addVisionMeasurement,
+              new VisionIOPhotonVision(
+                  VisionConstants.camera0Name, VisionConstants.robotToCamera0),
+              new VisionIOPhotonVision(
+                  VisionConstants.camera1Name, VisionConstants.robotToCamera1));
           break;
 
         case SIM:
           // Sim robot, instantiate physics sim IO implementations
-          drive =
-              new Drive(
-                  new GyroIO() {},
-                  new ModuleIOSim(),
-                  new ModuleIOSim(),
-                  new ModuleIOSim(),
-                  new ModuleIOSim());
-          vision =
-              new Vision(
-                  RobotState.getInstance()::addVisionMeasurement,
-                  new VisionIOPhotonVisionSim(
-                      VisionConstants.camera0Name,
-                      VisionConstants.robotToCamera0,
-                      RobotState.getInstance()::getEstimatedPose),
-                  new VisionIOPhotonVisionSim(
-                      VisionConstants.camera1Name,
-                      VisionConstants.robotToCamera1,
-                      RobotState.getInstance()::getEstimatedPose)
-                      );
+          drive = new Drive(
+              new GyroIO() {
+              },
+              new ModuleIOSim(),
+              new ModuleIOSim(),
+              new ModuleIOSim(),
+              new ModuleIOSim());
+          superstructure = new Superstructure(
+              new Elevator(new ElevatorIO() {
+              }),
+              new EndEffector(new EndEffectorIO() {
+              }),
+              new RollerSensorsIO() {
+              });
+          arm = new Arm(new ArmIO() {
+          });
+          roller = new Roller(new RollerIO() {
+          });
+          vision = new Vision(
+              RobotState.getInstance()::addVisionMeasurement,
+              new VisionIOPhotonVisionSim(
+                  VisionConstants.camera0Name,
+                  VisionConstants.robotToCamera0,
+                  RobotState.getInstance()::getEstimatedPose),
+              new VisionIOPhotonVisionSim(
+                  VisionConstants.camera1Name,
+                  VisionConstants.robotToCamera1,
+                  RobotState.getInstance()::getEstimatedPose));
           break;
 
         default:
           // Replayed robot, disable IO implementations
-          drive =
-              new Drive(
-                  new GyroIO() {},
-                  new ModuleIO() {},
-                  new ModuleIO() {},
-                  new ModuleIO() {},
-                  new ModuleIO() {});
-          vision =
-              new Vision(
-                  RobotState.getInstance()::addVisionMeasurement,
-                  new VisionIO() {},
-                  new VisionIO() {});
+          drive = new Drive(
+              new GyroIO() {
+              },
+              new ModuleIO() {
+              },
+              new ModuleIO() {
+              },
+              new ModuleIO() {
+              },
+              new ModuleIO() {
+              });
+          superstructure = new Superstructure(
+              new Elevator(new ElevatorIO() {
+              }),
+              new EndEffector(new EndEffectorIO() {
+              }),
+              new RollerSensorsIO() {
+              });
+          arm = new Arm(new ArmIO() {
+          });
+          roller = new Roller(new RollerIO() {
+          });
+          vision = new Vision(
+              RobotState.getInstance()::addVisionMeasurement,
+              new VisionIO() {
+              },
+              new VisionIO() {
+              });
           break;
       }
     }
@@ -167,47 +220,97 @@ public class RobotContainer {
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be created by
+   * Use this method to define your button->command mappings. Buttons can be
+   * created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+   * it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         drive.run(
-            () ->
-                drive.feedTeleopInput(
-                    keyboard0.getRawAxis(1), keyboard0.getRawAxis(0), keyboard2.getRawAxis(0))));
+            () -> drive.feedTeleopInput(
+                keyboard0.getRawAxis(1), keyboard0.getRawAxis(0), keyboard2.getRawAxis(0))));
 
-    // Lock to 0° when A button is held
+    // Reset gyro to 0° when A button is pressed
     driver
         .a()
-        .whileTrue(
-            Commands.startEnd(
-                () -> drive.setHeadingGoal(() -> new Rotation2d()),
-                () -> drive.clearHeadingGoal()));
-
-    // Reset gyro to 0° when B button is pressed
-    driver
-        .b()
         .onTrue(
             Commands.runOnce(
-                    () ->
-                        RobotState.getInstance()
-                            .resetPose(
-                                new Pose2d(
-                                    RobotState.getInstance().getEstimatedPose().getTranslation(),
-                                    new Rotation2d())),
-                    drive)
+                () -> RobotState.getInstance()
+                    .resetPose(
+                        new Pose2d(
+                            RobotState.getInstance().getEstimatedPose().getTranslation(),
+                            new Rotation2d())),
+                drive)
                 .ignoringDisable(true));
+
     keyboard0
         .button(1)
         .whileTrue(
             Commands.startEnd(
-                    () -> drive.setAutoAlignPosition(scoringHelper.getSelectedPose()),
-                    drive::disableAutoAlign)
+                () -> drive.setAutoAlignPosition(scoringHelper.getSelectedPose()),
+                drive::disableAutoAlign)
                 .until(drive::isAutoAligned));
+
+    // Coral Intake Triggers
+    driver
+        .x()
+        .whileTrue(
+            superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
+                .alongWith(
+                    Commands.startEnd(
+                        () -> drive.setHeadingGoal(
+                            () -> Rotation2d.fromDegrees(120.0 + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
+                        drive::disableAutoAlign)));
+    driver
+        .b()
+        .whileTrue(
+            superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
+                .alongWith(
+                    Commands.startEnd(
+                        () -> drive.setHeadingGoal(
+                            () -> Rotation2d.fromDegrees(240.0 + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
+                        drive::disableAutoAlign)));
+
+    // Algae Intake Trigger
+    driver
+        .leftTrigger()
+        .whileTrue(
+            arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(
+                roller.setGoalCommand(Roller.Goal.INTAKE)))
+        .whileFalse(
+            Commands.either(
+                arm.setGoalCommand(Goal.HOLD)
+                    .alongWith(roller.setGoalCommand(Roller.Goal.HOLD)),
+                arm.setGoalCommand(Goal.STOW)
+                    .alongWith(roller.setGoalCommand(Roller.Goal.IDLE)),
+                () -> roller.hasGamePiece()));
+
+    // Coral Scoring Triggers
+    driver
+        .rightTrigger()
+        .whileTrue(
+            superstructure.setGoalCommand(scoringHelper.getSuperstructureGoal())
+                .alongWith(
+                    Commands.startEnd(
+                        () -> drive.setAutoAlignPosition(scoringHelper.getSelectedPose()),
+                        drive::disableAutoAlign)
+                        .until(drive::isAutoAligned)));
+
+    driver
+        .rightBumper()
+        .onTrue(
+            Commands.runOnce(() -> superstructure.scoreCommand()));
+
+    // Algae Scoring Trigger
+    driver
+        .leftBumper()
+        .whileTrue(
+            arm.setGoalCommand(Arm.Goal.SCORE)
+                .alongWith(roller.setGoalCommand(Roller.Goal.SCORE)));
   }
 
   /**
