@@ -73,7 +73,7 @@ public class Roller extends SubsystemBase {
   }
 
   public Command setGoalCommand(Goal goal) {
-    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.IDLE));
+    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.IDLE), this);
   }
 
   public boolean hasGamePiece(){

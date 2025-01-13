@@ -41,6 +41,8 @@ public class Superstructure extends SubsystemBase { //TODO: test logic
     this.endeffector = endeffector;
     this.sensorsIO = sensorsIO;
 
+    elevator.setCoastOverride(() -> false);
+
     scoringTimer.restart();
     setDefaultCommand(setGoalCommand(Superstructure.Goal.STOW));
   }
@@ -91,7 +93,7 @@ public class Superstructure extends SubsystemBase { //TODO: test logic
         elevator.requestHome();
 
         break;
-        
+
       case CHARACTERIZING:
         elevator.runCharacterization(elevatorCharacterizationInput);
 
@@ -112,7 +114,7 @@ public class Superstructure extends SubsystemBase { //TODO: test logic
   }
 
   public Command setGoalCommand(Goal goal) {
-    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW));
+    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW), this);
   }
 
   @AutoLogOutput

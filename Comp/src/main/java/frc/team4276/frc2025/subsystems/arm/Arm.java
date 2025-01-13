@@ -114,7 +114,7 @@ public class Arm extends SubsystemBase { // TODO: config; tune
   }
 
   public Command setGoalCommand(Goal goal) {
-    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW));
+    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW), this);
   }
   
   public void runCharacterization(double output) {

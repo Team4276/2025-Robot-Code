@@ -182,6 +182,8 @@ public class RobotContainer {
       }
     }
 
+    arm.setCoastOverride(() -> false);
+
     autoBuilder = new AutoBuilder(drive);
 
     // Set up auto routines

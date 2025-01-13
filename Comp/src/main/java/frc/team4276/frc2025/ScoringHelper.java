@@ -46,32 +46,32 @@ public class ScoringHelper extends VirtualSubsystem {
   @Override
   public void periodic() {
     // Update Positions
-    if (buttonBoard.getRawButtonPressed(0)) {
+    if (buttonBoard.getRawButtonPressed(1)) {
       isRight = true;
-    } else if (buttonBoard.getRawButtonPressed(0)) {
+    } else if (buttonBoard.getRawButtonPressed(1)) {
       isRight = false;
     }
 
-    if (buttonBoard.getRawButtonPressed(0)) {
+    if (buttonBoard.getRawButtonPressed(1)) {
       side = 0;
-    } else if (buttonBoard.getRawButtonPressed(0)) {
+    } else if (buttonBoard.getRawButtonPressed(1)) {
       side = 1;
-    } else if (buttonBoard.getRawButtonPressed(0)) {
+    } else if (buttonBoard.getRawButtonPressed(1)) {
       side = 2;
-    } else if (buttonBoard.getRawButtonPressed(0)) {
+    } else if (buttonBoard.getRawButtonPressed(1)) {
       side = 3;
-    } else if (buttonBoard.getRawButtonPressed(0)) {
+    } else if (buttonBoard.getRawButtonPressed(1)) {
       side = 5;
     }
 
     // Update Level
-    if (buttonBoard.getRawButtonPressed(0)) {
+    if (buttonBoard.getRawButtonPressed(1)) {
       level = Goal.L1;
-    } else if (buttonBoard.getRawButtonPressed(0)) {
+    } else if (buttonBoard.getRawButtonPressed(1)) {
       level = Goal.L2;
-    } else if (buttonBoard.getRawButtonPressed(0)) {
+    } else if (buttonBoard.getRawButtonPressed(1)) {
       level = Goal.L3;
-    } else if (buttonBoard.getRawButtonPressed(0)) {
+    } else if (buttonBoard.getRawButtonPressed(1)) {
       level = Goal.L3;
     }
   }
