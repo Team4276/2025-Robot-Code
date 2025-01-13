@@ -25,13 +25,16 @@ public class Superstructure extends SubsystemBase { //TODO: test logic
     INTAKE,
     L1,
     L2,
-    L3
+    L3,
+    CHARACTERIZING
   }
 
   private Goal desiredGoal = Goal.STOW;
   private Goal currentGoal = Goal.STOW;
 
   private Timer scoringTimer = new Timer();
+
+  private double elevatorCharacterizationInput = 0.0;
 
   public Superstructure(Elevator elevator, EndEffector endeffector, RollerSensorsIO sensorsIO) {
     this.elevator = elevator;
@@ -88,6 +91,9 @@ public class Superstructure extends SubsystemBase { //TODO: test logic
         elevator.requestHome();
 
         break;
+        
+      case CHARACTERIZING:
+        elevator.runCharacterization(elevatorCharacterizationInput);
 
       default:
         break;
@@ -116,5 +122,17 @@ public class Superstructure extends SubsystemBase { //TODO: test logic
 
   public Command scoreCommand() {
     return Commands.runOnce(() -> wantScore = true);
+  }
+
+  public void acceptCharacterizationInput(double input){
+    elevatorCharacterizationInput = input;
+  }
+
+  public double getFFCharacterizationVelocity(){
+    return elevator.getFFCharacterizationVelocity();
+  }
+
+  public void endCharacterizaton(){
+    elevator.endCharacterizaton();
   }
 }

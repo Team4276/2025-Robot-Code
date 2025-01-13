@@ -263,8 +263,8 @@ public class RobotContainer {
                 .alongWith(
                     Commands.startEnd(
                         () -> drive.setHeadingGoal(
-                            () -> Rotation2d.fromDegrees(120.0 + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
-                        drive::disableAutoAlign)));
+                            () -> Rotation2d.fromDegrees(125.0 + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
+                        drive::clearHeadingGoal)));
     driver
         .b()
         .whileTrue(
@@ -272,8 +272,8 @@ public class RobotContainer {
                 .alongWith(
                     Commands.startEnd(
                         () -> drive.setHeadingGoal(
-                            () -> Rotation2d.fromDegrees(240.0 + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
-                        drive::disableAutoAlign)));
+                            () -> Rotation2d.fromDegrees(235.0 + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
+                        drive::clearHeadingGoal)));
 
     // Algae Intake Trigger
     driver
@@ -305,12 +305,20 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(() -> superstructure.scoreCommand()));
 
-    // Algae Scoring Trigger
+    // Algae Scoring Triggers
     driver
-        .leftBumper()
+        .y()
         .whileTrue(
             arm.setGoalCommand(Arm.Goal.SCORE)
                 .alongWith(roller.setGoalCommand(Roller.Goal.SCORE)));
+
+    driver
+        .leftBumper()
+        .whileTrue(
+            Commands.startEnd(
+                () -> drive.setHeadingGoal(
+                    () -> Rotation2d.fromDegrees(-90.0 + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
+                drive::clearHeadingGoal));
   }
 
   /**
