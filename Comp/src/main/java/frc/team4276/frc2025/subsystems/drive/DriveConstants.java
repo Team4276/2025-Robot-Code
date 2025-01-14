@@ -80,7 +80,7 @@ public class DriveConstants {
   // Wheel Rad/Sec
 
   // Drive PID configuration
-  public static final double driveKp = 0.04;
+  public static final double driveKp = 0.001524;
   public static final double driveKd = 0.0;
   public static final double driveKs = 0.0;
   public static final double driveKv =
