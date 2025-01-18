@@ -44,79 +44,38 @@
 #include <XInput.h>
 
 // Setup
-const boolean UseLeftJoystick   = false;  // set to true to enable left joystick
-const boolean InvertLeftYAxis   = false;  // set to true to use inverted left joy Y
-
-const boolean UseRightJoystick  = false;  // set to true to enable right joystick
-const boolean InvertRightYAxis  = false;  // set to true to use inverted right joy Y
-
-const boolean UseTriggerButtons = true;   // set to false if using analog triggers
-
-const int ADC_Max = 1023;  // 10 bit
-
-// Joystick Pins
-const int Pin_LeftJoyX  = A0;
-const int Pin_LeftJoyY  = A1;
-const int Pin_RightJoyX = A2;
-const int Pin_RightJoyY = A3;
-
-// Trigger Pins
-const int Pin_TriggerL = A4;
-const int Pin_TriggerR = A5;
 
 // Button Pins
-const int Pin_ButtonA = 0;
-const int Pin_ButtonB = 1;
-const int Pin_ButtonX = 2;
-const int Pin_ButtonY = 3;
+const int Pin_Button_01 = 1;
+const int Pin_Button_02 = 2;
+const int Pin_Button_03 = 3;
+const int Pin_Button_04 = 4;
+const int Pin_Button_05 = 5;
+const int Pin_Button_06 = 6;
+const int Pin_Button_07 = 7;
+const int Pin_Button_08 = 8;
+const int Pin_Button_09 = 9;
+const int Pin_Button_10 = 10;
+const int Pin_Button_11 = 11;
+const int Pin_Button_12 = 12;
 
-const int Pin_ButtonLB = 4;
-const int Pin_ButtonRB = 5;
-
-const int Pin_ButtonBack  = 6;
-const int Pin_ButtonStart = 7;
-
-const int Pin_ButtonL3 = 8;
-const int Pin_ButtonR3 = 9;
-
-// Directional Pad Pins
-const int Pin_DpadUp    = 10;
-const int Pin_DpadDown  = 11;
-const int Pin_DpadLeft  = 12;
-const int Pin_DpadRight = 13;
 
 void setup() {
-	// If using buttons for the triggers, use internal pull-up resistors
-	if (UseTriggerButtons == true) {
-		pinMode(Pin_TriggerL, INPUT_PULLUP);
-		pinMode(Pin_TriggerR, INPUT_PULLUP);
-	}
-	// If using potentiometers for the triggers, set range
-	else {
-		XInput.setTriggerRange(0, ADC_Max);
-	}
 
 	// Set buttons as inputs, using internal pull-up resistors
-	pinMode(Pin_ButtonA, INPUT_PULLUP);
-	pinMode(Pin_ButtonB, INPUT_PULLUP);
-	pinMode(Pin_ButtonX, INPUT_PULLUP);
-	pinMode(Pin_ButtonY, INPUT_PULLUP);
+	pinMode(Pin_Button_01, INPUT_PULLUP);
+  pinMode(Pin_Button_02, INPUT_PULLUP);
+  pinMode(Pin_Button_03, INPUT_PULLUP);
+  pinMode(Pin_Button_04, INPUT_PULLUP);
+  pinMode(Pin_Button_05, INPUT_PULLUP);
+  pinMode(Pin_Button_06, INPUT_PULLUP);
+  pinMode(Pin_Button_07, INPUT_PULLUP);
+  pinMode(Pin_Button_08, INPUT_PULLUP);
+  pinMode(Pin_Button_09, INPUT_PULLUP);
+  pinMode(Pin_Button_10, INPUT_PULLUP);
+  pinMode(Pin_Button_11, INPUT_PULLUP);
+  pinMode(Pin_Button_12, INPUT_PULLUP);
 
-	pinMode(Pin_ButtonLB, INPUT_PULLUP);
-	pinMode(Pin_ButtonRB, INPUT_PULLUP);
-
-	pinMode(Pin_ButtonBack, INPUT_PULLUP);
-	pinMode(Pin_ButtonStart, INPUT_PULLUP);
-
-	pinMode(Pin_ButtonL3, INPUT_PULLUP);
-	pinMode(Pin_ButtonR3, INPUT_PULLUP);
-
-	pinMode(Pin_DpadUp, INPUT_PULLUP);
-	pinMode(Pin_DpadDown, INPUT_PULLUP);
-	pinMode(Pin_DpadLeft, INPUT_PULLUP);
-	pinMode(Pin_DpadRight, INPUT_PULLUP);
-
-	XInput.setJoystickRange(0, ADC_Max);  // Set joystick range to the ADC
 	XInput.setAutoSend(false);  // Wait for all controls before sending
 
 	XInput.begin();
@@ -125,87 +84,33 @@ void setup() {
 void loop() {
 	// Read pin values and store in variables
 	// (Note the "!" to invert the state, because LOW = pressed)
-	boolean buttonA = !digitalRead(Pin_ButtonA);
-	boolean buttonB = !digitalRead(Pin_ButtonB);
-	boolean buttonX = !digitalRead(Pin_ButtonX);
-	boolean buttonY = !digitalRead(Pin_ButtonY);
-
-	boolean buttonLB = !digitalRead(Pin_ButtonLB);
-	boolean buttonRB = !digitalRead(Pin_ButtonRB);
-
-	boolean buttonBack  = !digitalRead(Pin_ButtonBack);
-	boolean buttonStart = !digitalRead(Pin_ButtonStart);
-
-	boolean buttonL3 = !digitalRead(Pin_ButtonL3);
-	boolean buttonR3 = !digitalRead(Pin_ButtonR3);
-
-	boolean dpadUp    = !digitalRead(Pin_DpadUp);
-	boolean dpadDown  = !digitalRead(Pin_DpadDown);
-	boolean dpadLeft  = !digitalRead(Pin_DpadLeft);
-	boolean dpadRight = !digitalRead(Pin_DpadRight);
-
+	boolean button_01 = !digitalRead(Pin_Button_01);
+	boolean button_02 = !digitalRead(Pin_Button_02);
+	boolean button_03 = !digitalRead(Pin_Button_03);
+	boolean button_04 = !digitalRead(Pin_Button_04);
+	boolean button_05 = !digitalRead(Pin_Button_05);
+	boolean button_06 = !digitalRead(Pin_Button_06);
+	boolean button_07 = !digitalRead(Pin_Button_07);
+	boolean button_08 = !digitalRead(Pin_Button_08);
+	boolean button_09 = !digitalRead(Pin_Button_09);
+	boolean button_10 = !digitalRead(Pin_Button_10);
+	boolean button_11 = !digitalRead(Pin_Button_11);
+	boolean button_12 = !digitalRead(Pin_Button_12);
+	
 	// Set XInput buttons
-	XInput.setButton(BUTTON_A, buttonA);
-	XInput.setButton(BUTTON_B, buttonB);
-	XInput.setButton(BUTTON_X, buttonX);
-	XInput.setButton(BUTTON_Y, buttonY);
+	XInput.setButton(BUTTON_A, button_01);
+	XInput.setButton(BUTTON_B, button_02);
+	XInput.setButton(BUTTON_X, button_03);
+	XInput.setButton(BUTTON_Y, button_04);
 
-	XInput.setButton(BUTTON_LB, buttonLB);
-	XInput.setButton(BUTTON_RB, buttonRB);
+	XInput.setButton(BUTTON_LB, button_05);
+	XInput.setButton(BUTTON_RB, button_06);
 
-	XInput.setButton(BUTTON_BACK, buttonBack);
-	XInput.setButton(BUTTON_START, buttonStart);
-
-	XInput.setButton(BUTTON_L3, buttonL3);
-	XInput.setButton(BUTTON_R3, buttonR3);
+	XInput.setButton(BUTTON_L3, button_07);
+	XInput.setButton(BUTTON_R3, button_08);
 
 	// Set XInput DPAD values
-	XInput.setDpad(dpadUp, dpadDown, dpadLeft, dpadRight);
-
-	// Set XInput trigger values
-	if (UseTriggerButtons == true) {
-		// Read trigger buttons
-		boolean triggerLeft  = !digitalRead(Pin_TriggerL);
-		boolean triggerRight = !digitalRead(Pin_TriggerR);
-
-		// Set the triggers as if they were buttons
-		XInput.setButton(TRIGGER_LEFT, triggerLeft);
-		XInput.setButton(TRIGGER_RIGHT, triggerRight);
-	}
-	else {
-		// Read trigger potentiometer values
-		int triggerLeft  = analogRead(Pin_TriggerL);
-		int triggerRight = analogRead(Pin_TriggerR);
-
-		// Set the trigger values as analog
-		XInput.setTrigger(TRIGGER_LEFT, triggerLeft);
-		XInput.setTrigger(TRIGGER_RIGHT, triggerRight);
-	}
-
-	// Set left joystick
-	if (UseLeftJoystick == true) {
-		int leftJoyX = analogRead(Pin_LeftJoyX);
-		int leftJoyY = analogRead(Pin_LeftJoyY);
-
-		// White lie here... most generic joysticks are typically
-		// inverted by default. If the "Invert" variable is false
-		// then we'll take the opposite value with 'not' (!).
-		boolean invert = !InvertLeftYAxis;
-
-		XInput.setJoystickX(JOY_LEFT, leftJoyX);
-		XInput.setJoystickY(JOY_LEFT, leftJoyY, invert);
-	}
-
-	// Set right joystick
-	if (UseRightJoystick == true) {
-		int rightJoyX = analogRead(Pin_RightJoyX);
-		int rightJoyY = analogRead(Pin_RightJoyY);
-
-		boolean invert = !InvertRightYAxis;
-
-		XInput.setJoystickX(JOY_RIGHT, rightJoyX);
-		XInput.setJoystickY(JOY_RIGHT, rightJoyY, invert);
-	}
+	XInput.setDpad(button_09, button_10, button_11, button_12);
 
 	// Send control data to the computer
 	XInput.send();
