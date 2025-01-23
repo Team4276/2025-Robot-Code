@@ -79,9 +79,9 @@ public class RobotContainer {
 
   // Controller
   private final BetterXboxController driver = new BetterXboxController(0);
-  private final CommandGenericHID keyboard0 = new CommandGenericHID(1);
-  private final CommandGenericHID keyboard1 = new CommandGenericHID(2);
-  private final CommandGenericHID keyboard2 = new CommandGenericHID(3);
+  // private final CommandGenericHID keyboard0 = new CommandGenericHID(1);
+  // private final CommandGenericHID keyboard1 = new CommandGenericHID(2);
+  // private final CommandGenericHID keyboard2 = new CommandGenericHID(3);
 
   private final ScoringHelper scoringHelper = new ScoringHelper();
 
@@ -234,7 +234,7 @@ public class RobotContainer {
     drive.setDefaultCommand(
         drive.run(
             () -> drive.feedTeleopInput(
-                keyboard0.getRawAxis(1), keyboard0.getRawAxis(0), keyboard2.getRawAxis(0))));
+                -driver.getLeftWithDeadband().y, -driver.getLeftWithDeadband().x, -driver.getRightWithDeadband().x)));
 
     // Reset gyro to 0° when A button is pressed
     driver
@@ -249,13 +249,13 @@ public class RobotContainer {
                 drive)
                 .ignoringDisable(true));
 
-    keyboard0
-        .button(1)
-        .whileTrue(
-            Commands.startEnd(
-                () -> drive.setAutoAlignPosition(scoringHelper.getSelectedPose()),
-                drive::disableAutoAlign)
-                .until(drive::isAutoAligned));
+    // keyboard0
+    // .button(1)
+    // .whileTrue(
+    // Commands.startEnd(
+    // () -> drive.setAutoAlignPosition(scoringHelper.getSelectedPose()),
+    // drive::disableAutoAlign)
+    // .until(drive::isAutoAligned));
 
     // Coral Intake Triggers
     driver
@@ -265,7 +265,8 @@ public class RobotContainer {
                 .alongWith(
                     Commands.startEnd(
                         () -> drive.setHeadingGoal(
-                            () -> Rotation2d.fromDegrees(125.0 + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
+                            () -> Rotation2d.fromDegrees(125.0
+                                + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
                         drive::clearHeadingGoal)));
     driver
         .b()
@@ -274,7 +275,8 @@ public class RobotContainer {
                 .alongWith(
                     Commands.startEnd(
                         () -> drive.setHeadingGoal(
-                            () -> Rotation2d.fromDegrees(235.0 + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
+                            () -> Rotation2d.fromDegrees(235.0
+                                + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
                         drive::clearHeadingGoal)));
 
     // Algae Intake Trigger
@@ -295,7 +297,9 @@ public class RobotContainer {
     driver
         .rightTrigger()
         .whileTrue(
-            superstructure.setGoalCommand(scoringHelper.getSuperstructureGoal())
+            Commands
+                .startEnd(() -> superstructure.setGoal(scoringHelper.getSuperstructureGoal()),
+                    () -> superstructure.setGoal(Superstructure.Goal.STOW))
                 .alongWith(
                     Commands.startEnd(
                         () -> drive.setAutoAlignPosition(scoringHelper.getSelectedPose()),
@@ -319,7 +323,8 @@ public class RobotContainer {
         .whileTrue(
             Commands.startEnd(
                 () -> drive.setHeadingGoal(
-                    () -> Rotation2d.fromDegrees(-90.0 + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
+                    () -> Rotation2d.fromDegrees(
+                        -90.0 + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
                 drive::clearHeadingGoal));
   }
 

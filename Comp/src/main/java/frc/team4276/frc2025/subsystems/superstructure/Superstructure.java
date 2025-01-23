@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.Elevator;
 import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffector;
 
-public class Superstructure extends SubsystemBase { //TODO: test logic
+public class Superstructure extends SubsystemBase { // TODO: test logic
   private final Elevator elevator;
   private final EndEffector endeffector;
 
@@ -57,7 +57,7 @@ public class Superstructure extends SubsystemBase { //TODO: test logic
       wantScore = false;
 
       endeffector.setGoal(EndEffector.Goal.SCORE);
-    } else if(scoringTimer.get() > 1.0){
+    } else if (scoringTimer.get() > 1.0) {
       endeffector.setGoal(EndEffector.Goal.IDLE);
     }
 
@@ -126,15 +126,15 @@ public class Superstructure extends SubsystemBase { //TODO: test logic
     return Commands.runOnce(() -> wantScore = true);
   }
 
-  public void acceptCharacterizationInput(double input){
+  public void acceptCharacterizationInput(double input) {
     elevatorCharacterizationInput = input;
   }
 
-  public double getFFCharacterizationVelocity(){
+  public double getFFCharacterizationVelocity() {
     return elevator.getFFCharacterizationVelocity();
   }
 
-  public void endCharacterizaton(){
+  public void endCharacterizaton() {
     elevator.endCharacterizaton();
   }
 }

@@ -46,9 +46,9 @@ public class ScoringHelper extends VirtualSubsystem {
   @Override
   public void periodic() {
     // Update Positions
-    if (buttonBoard.getRawButtonPressed(8)) {
+    if (buttonBoard.getRawButtonPressed(9)) {
       isRight = true;
-    } else if (buttonBoard.getRawButtonPressed(7)) {
+    } else if (buttonBoard.getRawButtonPressed(10)) {
       isRight = false;
     }
 
@@ -69,11 +69,11 @@ public class ScoringHelper extends VirtualSubsystem {
     // Update Level
     if (buttonBoard.getPOV() == 90) {
       level = Goal.L1;
-    } else if (buttonBoard.getPOV() == 180) {
-      level = Goal.L2;
-    } else if (buttonBoard.getPOV() == 0) {
-      level = Goal.L3;
     } else if (buttonBoard.getPOV() == 270) {
+      level = Goal.L2;
+    } else if (buttonBoard.getPOV() == 180) {
+      level = Goal.L3;
+    } else if (buttonBoard.getPOV() == 0) {
       level = Goal.L3;
     }
   }
