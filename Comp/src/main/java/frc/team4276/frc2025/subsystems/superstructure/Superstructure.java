@@ -4,6 +4,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -104,11 +105,13 @@ public class Superstructure extends SubsystemBase { // TODO: test logic
     elevator.periodic();
     endeffector.periodic();
 
+    SmartDashboard.putString("Comp/Superstructure/DesiredGoal", desiredGoal.toString());
+    SmartDashboard.putString("Comp/Superstructure/CurrentGoal", currentGoal.toString());
+
     Logger.recordOutput("Superstructure/DesiredGoal", desiredGoal);
     Logger.recordOutput("Superstructure/CurrentGoal", currentGoal);
   }
 
-  @AutoLogOutput
   public void setGoal(Goal goal) {
     desiredGoal = goal;
   }
@@ -117,7 +120,6 @@ public class Superstructure extends SubsystemBase { // TODO: test logic
     return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW), this);
   }
 
-  @AutoLogOutput
   public Goal getGoal() {
     return currentGoal;
   }

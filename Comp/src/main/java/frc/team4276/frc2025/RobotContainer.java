@@ -104,10 +104,12 @@ public class RobotContainer {
               new ModuleIOSpark(3));
           superstructure = new Superstructure(
               new Elevator(new ElevatorIOSparkMax()),
-              new EndEffector(new EndEffectorIOSparkMax(Ports.ENDEFFECTOR, 40, false, true)),
+              new EndEffector(new EndEffectorIOSparkMax(Ports.ENDEFFECTOR, 40, false,
+                  true)),
               new RollerSensorsIOHardware());
           arm = new Arm(new ArmIOSparkMax());
-          roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40, false, true));
+          roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40,
+              false, true));
           vision = new Vision(
               RobotState.getInstance()::addVisionMeasurement,
               new VisionIOPhotonVision(
@@ -230,11 +232,13 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         drive.run(
             () -> drive.feedTeleopInput(
-                -driver.getLeftWithDeadband().y, -driver.getLeftWithDeadband().x, -driver.getRightWithDeadband().x)));
+                driver.getLeftWithDeadband().y, driver.getLeftWithDeadband().x,
+                driver.getRightWithDeadband().x)));
 
     // Reset gyro to 0° when A button is pressed
     driver

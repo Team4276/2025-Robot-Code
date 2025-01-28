@@ -1,8 +1,12 @@
 package frc.team4276.frc2025;
 
+import org.littletonrobotics.junction.Logger;
+
 import choreo.util.ChoreoAllianceFlipUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
 import frc.team4276.util.VirtualSubsystem;
 
@@ -76,6 +80,19 @@ public class ScoringHelper extends VirtualSubsystem {
     } else if (buttonBoard.getPOV() == 0) {
       level = Goal.L3;
     }
+
+    for (int i = 0; i < 12; i++) {
+      SmartDashboard.putBoolean("Comp/SelectedReef" + i, getSelectedReef() == i);
+    }
+
+    for (int i = 0; i < 4; i++) {
+      SmartDashboard.putBoolean("Comp/SuperstructureGoal" + i, getSuperstructureGoal().ordinal() - 2 == i);
+    }
+
+    Logger.recordOutput("ScoringHelper/SelectedPose", getSelectedPose());
+    Logger.recordOutput("ScoringHelper/IsRight", isRight);
+    Logger.recordOutput("ScoringHelper/Side", side);
+    Logger.recordOutput("ScoringHelper/Level", level);
   }
 
   public Pose2d getSelectedPose() {

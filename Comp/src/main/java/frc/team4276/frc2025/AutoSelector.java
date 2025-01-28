@@ -14,7 +14,7 @@ public class AutoSelector extends VirtualSubsystem {
   private AutoRoutine lastRoutine;
 
   public AutoSelector() {
-    routineChooser = new LoggedDashboardChooser<>("Auto/Routine");
+    routineChooser = new LoggedDashboardChooser<>("Comp/Auto");
     routineChooser.addDefaultOption(defaultRoutine.name(), defaultRoutine);
     lastRoutine = defaultRoutine;
   }
@@ -51,5 +51,6 @@ public class AutoSelector extends VirtualSubsystem {
   }
 
   /** A customizable auto routine associated with a single command. */
-  private static final record AutoRoutine(String name, Command command) {}
+  private static final record AutoRoutine(String name, Command command) {
+  }
 }

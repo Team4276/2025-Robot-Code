@@ -1,0 +1,37 @@
+package frc.team4276.frc2025;
+
+import java.util.function.Supplier;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+public class ElasticUI {
+  private ElasticUI() {
+  }
+
+  public static void putSwerveDrive(Supplier<SwerveModuleState[]> state, Supplier<Rotation2d> angle) {
+    SmartDashboard.putData("Swerve Drive", new Sendable() {
+      @Override
+      public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("SwerveDrive");
+
+        builder.addDoubleProperty("Front Left Angle", () -> state.get()[0].angle.getRadians(), null);
+        builder.addDoubleProperty("Front Left Velocity", () -> state.get()[0].speedMetersPerSecond, null);
+
+        builder.addDoubleProperty("Front Right Angle", () -> state.get()[1].angle.getRadians(), null);
+        builder.addDoubleProperty("Front Right Velocity", () -> state.get()[1].speedMetersPerSecond, null);
+
+        builder.addDoubleProperty("Back Left Angle", () -> state.get()[2].angle.getRadians(), null);
+        builder.addDoubleProperty("Back Left Velocity", () -> state.get()[2].speedMetersPerSecond, null);
+
+        builder.addDoubleProperty("Back Right Angle", () -> state.get()[3].angle.getRadians(), null);
+        builder.addDoubleProperty("Back Right Velocity", () -> state.get()[3].speedMetersPerSecond, null);
+
+        builder.addDoubleProperty("Robot Angle", () -> angle.get().getRadians(), null);
+      }
+    });
+  }
+}
