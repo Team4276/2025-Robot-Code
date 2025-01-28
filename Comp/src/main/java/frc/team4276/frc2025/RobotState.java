@@ -20,14 +20,14 @@ public class RobotState {
       new SwerveModulePosition(),
       new SwerveModulePosition()
   };
-  private Rotation2d lastGyroAngle = new Rotation2d();
+  private Rotation2d lastGyroAngle = Rotation2d.kZero;
 
   private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kinematics, lastGyroAngle,
-      lastWheelPositions, new Pose2d());
+      lastWheelPositions, Pose2d.kZero);
   private SwerveDrivePoseEstimator poseEstimatorVision = new SwerveDrivePoseEstimator(kinematics, lastGyroAngle,
-      lastWheelPositions, new Pose2d());
+      lastWheelPositions, Pose2d.kZero);
 
-  private Pose2d trajectorySetpoint = new Pose2d();
+  private Pose2d trajectorySetpoint = Pose2d.kZero;
 
   private FieldConstants.POIs POIs = FieldConstants.bluePOIs;
 
@@ -43,6 +43,7 @@ public class RobotState {
   }
 
   private RobotState() {
+    ElasticUI.putPoseEstimate(() -> getEstimatedPose());
   }
 
   public FieldConstants.POIs getPOIs() {

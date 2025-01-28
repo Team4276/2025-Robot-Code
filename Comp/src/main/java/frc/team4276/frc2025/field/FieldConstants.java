@@ -13,7 +13,7 @@ public class FieldConstants {
       Units.inchesToMeters(158.5));
 
   public static class POIs {
-    public Translation2d reefCenter = new Translation2d();
+    public Translation2d reefCenter = Translation2d.kZero;
     // starts at the right most post just under the 0 degree line and moves
     // counterclockwise around the reef
     public Pose2d[] reefScoring = new Pose2d[12];

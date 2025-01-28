@@ -2,6 +2,7 @@ package frc.team4276.frc2025;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
@@ -31,6 +32,20 @@ public class ElasticUI {
         builder.addDoubleProperty("Back Right Velocity", () -> state.get()[3].speedMetersPerSecond, null);
 
         builder.addDoubleProperty("Robot Angle", () -> angle.get().getRadians(), null);
+      }
+    });
+  }
+
+  public static void putPoseEstimate(Supplier<Pose2d> estimatedPose) {
+    SmartDashboard.putData("Field", new Sendable() {
+      @Override
+      public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("Field");
+
+        builder.addDoubleArrayProperty("Robot", () -> new double[]{estimatedPose.get().getX(),
+          estimatedPose.get().getY(),
+          estimatedPose.get().getRotation().getDegrees()
+        }, null);
       }
     });
   }

@@ -5,7 +5,6 @@ import org.littletonrobotics.junction.Logger;
 import choreo.util.ChoreoAllianceFlipUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
 import frc.team4276.util.VirtualSubsystem;

@@ -19,7 +19,7 @@ public class AutoAlignController {
   private final double toleranceTime = 0.5;
 
   @AutoLogOutput(key = "AutoAlign/SetpointPose")
-  private Pose2d setpoint = new Pose2d();
+  private Pose2d setpoint = Pose2d.kZero;
 
   private TeleopDriveController teleopDriveController = new TeleopDriveController();
 
@@ -60,7 +60,7 @@ public class AutoAlignController {
 
   private ChassisSpeeds updateContoller(Pose2d currentPose) {
     Translation2d trans = currentPose.getTranslation().minus(setpoint.getTranslation());
-    Translation2d linearOutput = new Translation2d();
+    Translation2d linearOutput = Translation2d.kZero;
     if (trans.getNorm() > 1e-6) {
       linearOutput = new Translation2d(
           translationController.calculate(trans.getNorm(), 0.0), trans.getAngle());

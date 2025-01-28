@@ -26,7 +26,7 @@ public class HeadingController {
     controller.setTolerance(Math.toRadians(toleranceDegrees.get()));
     controller.enableContinuousInput(-Math.PI, Math.PI);
 
-    targetHeadingSupplier = () -> new Rotation2d();
+    targetHeadingSupplier = () -> Rotation2d.kZero;
   }
 
   public void setTarget(Supplier<Rotation2d> targetSupplier) {

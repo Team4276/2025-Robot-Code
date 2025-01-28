@@ -3,15 +3,29 @@
   "grid_size": 128,
   "tabs": [
     {
-      "name": "Teleoperated",
+      "name": "Prep",
+      "grid_layout": {
+        "layouts": [],
+        "containers": []
+      }
+    },
+    {
+      "name": "Auto",
+      "grid_layout": {
+        "layouts": [],
+        "containers": []
+      }
+    },
+    {
+      "name": "Teleop",
       "grid_layout": {
         "layouts": [],
         "containers": [
           {
             "title": "DriveMode",
-            "x": 256.0,
+            "x": 768.0,
             "y": 256.0,
-            "width": 128.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -23,8 +37,8 @@
           },
           {
             "title": "Swerve Drive",
-            "x": 768.0,
-            "y": 0.0,
+            "x": 1408.0,
+            "y": 256.0,
             "width": 256.0,
             "height": 256.0,
             "type": "SwerveDrive",
@@ -34,12 +48,366 @@
               "show_robot_rotation": true,
               "rotation_unit": "Radians"
             }
+          },
+          {
+            "title": "Field",
+            "x": 1408.0,
+            "y": 0.0,
+            "width": 512.0,
+            "height": 256.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/SmartDashboard/Field",
+              "period": 0.02,
+              "field_game": "Crescendo",
+              "robot_width": 0.85,
+              "robot_length": 0.85,
+              "show_other_objects": true,
+              "show_trajectories": true,
+              "field_rotation": 0.0,
+              "robot_color": 4294241590,
+              "trajectory_color": 4294967295
+            }
+          },
+          {
+            "title": "CurrentGoal",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/Superstructure/CurrentGoal",
+              "period": 0.02,
+              "data_type": "string",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "DesiredGoal",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/Superstructure/DesiredGoal",
+              "period": 0.02,
+              "data_type": "string",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "SelectedReef0",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SelectedReef0",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294967040,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SelectedReef1",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SelectedReef1",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294967040,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SelectedReef2",
+            "x": 128.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SelectedReef2",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294967040,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SelectedReef3",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SelectedReef3",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294967040,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SelectedReef4",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SelectedReef4",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294967040,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SelectedReef5",
+            "x": 128.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SelectedReef5",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294967040,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SelectedReef6",
+            "x": 256.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SelectedReef6",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294967040,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SelectedReef7",
+            "x": 384.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SelectedReef7",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294967040,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SelectedReef9",
+            "x": 640.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SelectedReef9",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294967040,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SelectedReef8",
+            "x": 512.0,
+            "y": 384.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SelectedReef8",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294967040,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SelectedReef10",
+            "x": 640.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SelectedReef10",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294967040,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SelectedReef11",
+            "x": 512.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SelectedReef11",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294967040,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SuperstructureGoal0",
+            "x": 1024.0,
+            "y": 384.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SuperstructureGoal0",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294902010,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SuperstructureGoal1",
+            "x": 1024.0,
+            "y": 256.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SuperstructureGoal1",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294902010,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SuperstructureGoal2",
+            "x": 1024.0,
+            "y": 128.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SuperstructureGoal2",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294902010,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "SuperstructureGoal3",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SuperstructureGoal3",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4294902010,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "AtGoal",
+            "x": 256.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/AutoAlign/AtGoal",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4278255360,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "AtGoal",
+            "x": 256.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/Elevator/AtGoal",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4278255360,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
           }
         ]
       }
     },
     {
-      "name": "Autonomous",
+      "name": "Tuning",
       "grid_layout": {
         "layouts": [],
         "containers": []

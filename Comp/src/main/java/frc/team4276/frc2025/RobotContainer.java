@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.frc2025.Constants.RobotType;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
@@ -79,11 +80,13 @@ public class RobotContainer {
 
   // Controller
   private final BetterXboxController driver = new BetterXboxController(0);
-  // private final CommandGenericHID keyboard0 = new CommandGenericHID(1);
-  // private final CommandGenericHID keyboard1 = new CommandGenericHID(2);
-  // private final CommandGenericHID keyboard2 = new CommandGenericHID(3);
+  private final CommandGenericHID keyboard0 = new CommandGenericHID(0);
+  // private final CommandGenericHID keyboard1 = new CommandGenericHID(1);
+  private final CommandGenericHID keyboard2 = new CommandGenericHID(2);
 
   private final ScoringHelper scoringHelper = new ScoringHelper();
+
+  private boolean useKeyboard = true;
 
   // Dashboard inputs
   private final AutoSelector autoSelector = new AutoSelector();
@@ -234,11 +237,21 @@ public class RobotContainer {
   private void configureButtonBindings() {
 
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        drive.run(
-            () -> drive.feedTeleopInput(
-                driver.getLeftWithDeadband().y, driver.getLeftWithDeadband().x,
-                driver.getRightWithDeadband().x)));
+    if(useKeyboard && Constants.getMode() == Mode.SIM){
+      drive.setDefaultCommand(
+          drive.run(
+              () -> drive.feedTeleopInput(
+                  -keyboard0.getRawAxis(1), -keyboard0.getRawAxis(0),
+                  keyboard2.getRawAxis(0))));
+
+    } else {
+      drive.setDefaultCommand(
+          drive.run(
+              () -> drive.feedTeleopInput(
+                  driver.getLeftWithDeadband().y, driver.getLeftWithDeadband().x,
+                  driver.getRightWithDeadband().x)));
+
+    }
 
     // Reset gyro to 0° when A button is pressed
     driver
@@ -249,7 +262,7 @@ public class RobotContainer {
                     .resetPose(
                         new Pose2d(
                             RobotState.getInstance().getEstimatedPose().getTranslation(),
-                            new Rotation2d())),
+                            Rotation2d.kZero)),
                 drive)
                 .ignoringDisable(true));
 

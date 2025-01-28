@@ -132,6 +132,7 @@ public class Elevator extends SubsystemBase { // TODO: config; tune
     return goal;
   }
 
+  @AutoLogOutput
   public boolean atGoal(){
     return MathUtil.isNear(goal.getPosition(), inputs.position, tolerance); 
   }

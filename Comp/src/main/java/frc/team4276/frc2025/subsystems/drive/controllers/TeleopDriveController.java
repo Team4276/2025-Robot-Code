@@ -26,7 +26,7 @@ public class TeleopDriveController {
     // Square magnitude for more precise control
     linearMagnitude = linearMagnitude * linearMagnitude;
 
-    Translation2d linearVelocity = new Translation2d();
+    Translation2d linearVelocity = Translation2d.kZero;
 
     if (linearMagnitude > 1e-6) {
       linearVelocity = new Translation2d(linearMagnitude, new Rotation2d(controllerX, controllerY))
@@ -44,6 +44,6 @@ public class TeleopDriveController {
 
   public ChassisSpeeds update(Rotation2d yaw) {
     return ChassisSpeeds.fromFieldRelativeSpeeds(updateRaw(yaw),
-        ChoreoAllianceFlipUtil.shouldFlip() ? yaw : yaw.plus(Rotation2d.fromDegrees(180)));
+        ChoreoAllianceFlipUtil.shouldFlip() ? yaw : yaw.plus(Rotation2d.k180deg));
   }
 }

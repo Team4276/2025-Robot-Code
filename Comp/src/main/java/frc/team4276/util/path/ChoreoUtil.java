@@ -52,7 +52,7 @@ public class ChoreoUtil {
       var traj =
           PathPlannerPath.fromChoreoTrajectory(name)
               .generateTrajectory(
-                  new ChassisSpeeds(), new Rotation2d(), DriveConstants.driveConfig);
+                  new ChassisSpeeds(), Rotation2d.kZero, DriveConstants.driveConfig);
 
       return ChoreoAllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
     } catch (Exception e) {
@@ -67,7 +67,7 @@ public class ChoreoUtil {
       var traj =
           PathPlannerPath.fromChoreoTrajectory(name, split)
               .generateTrajectory(
-                  new ChassisSpeeds(), new Rotation2d(), DriveConstants.driveConfig);
+                  new ChassisSpeeds(), Rotation2d.kZero, DriveConstants.driveConfig);
 
       return ChoreoAllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
     } catch (Exception e) {
