@@ -48,7 +48,7 @@ public class Arm extends SubsystemBase { // TODO: config; tune
   private final ArmViz goalViz;
   private final ArmViz measuredViz;
 
-  public Arm(ArmIO io) {
+  public Arm(ArmIO io) { // TODO: use wpi feed forwards
     this.io = io;
     io.setBrakeMode(true);
 

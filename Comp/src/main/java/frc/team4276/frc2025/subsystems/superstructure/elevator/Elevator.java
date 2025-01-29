@@ -63,7 +63,7 @@ public class Elevator extends SubsystemBase { // TODO: config; tune
   private boolean wasDisabled = true;
 
   @Override
-  public void periodic() {
+  public void periodic() { // TODO: use wpi feed forwards
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
 

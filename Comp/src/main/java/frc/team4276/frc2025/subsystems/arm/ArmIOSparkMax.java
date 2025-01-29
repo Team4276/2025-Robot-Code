@@ -43,14 +43,14 @@ public class ArmIOSparkMax implements ArmIO {
     leaderConfig
         .absoluteEncoder
         .inverted(invertEncoder)
-        .positionConversionFactor(encoderPositionFactor)
+        .positionConversionFactor(encoderPositionFactor) //TODO: fix units
         .velocityConversionFactor(encoderVelocityFactor)
         .averageDepth(2);
     leaderConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         .positionWrappingEnabled(true)
-        .positionWrappingInputRange(minInput, maxInput)
+        .positionWrappingInputRange(0.0, 2 * Math.PI)
         .pidf(
             kp, ki,
             kd, kff);
