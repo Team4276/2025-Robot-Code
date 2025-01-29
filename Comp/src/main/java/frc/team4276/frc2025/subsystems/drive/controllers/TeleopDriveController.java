@@ -44,6 +44,6 @@ public class TeleopDriveController {
 
   public ChassisSpeeds update(Rotation2d yaw) {
     return ChassisSpeeds.fromFieldRelativeSpeeds(updateRaw(yaw),
-        ChoreoAllianceFlipUtil.shouldFlip() ? yaw : yaw.plus(Rotation2d.k180deg));
+        ChoreoAllianceFlipUtil.shouldFlip() ? yaw.plus(Rotation2d.k180deg) : yaw);
   }
 }
