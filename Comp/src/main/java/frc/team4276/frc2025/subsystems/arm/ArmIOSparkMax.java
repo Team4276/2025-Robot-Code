@@ -13,9 +13,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -35,32 +32,6 @@ public class ArmIOSparkMax implements ArmIO {
     closedLoopController = leaderSpark.getClosedLoopController();
 
     // Configure lead motor
-    var leaderConfig = new SparkMaxConfig();
-    leaderConfig
-        .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(currentLimit)
-        .voltageCompensation(12.0);
-    leaderConfig.absoluteEncoder
-        .inverted(invertEncoder)
-        .positionConversionFactor(encoderPositionFactor) // TODO: fix units
-        .velocityConversionFactor(encoderVelocityFactor)
-        .averageDepth(2);
-    leaderConfig.closedLoop
-        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-        .positionWrappingEnabled(true)
-        .positionWrappingInputRange(0.0, 2 * Math.PI)
-        .pidf(
-            kp, ki,
-            kd, kff);
-    leaderConfig.signals
-        .absoluteEncoderPositionAlwaysOn(true)
-        .absoluteEncoderPositionPeriodMs((int) (1000.0 / readFreq))
-        .absoluteEncoderVelocityAlwaysOn(true)
-        .absoluteEncoderVelocityPeriodMs(20)
-        .appliedOutputPeriodMs(20)
-        .busVoltagePeriodMs(20)
-        .outputCurrentPeriodMs(20);
-
     tryUntilOk(
         leaderSpark,
         5,
@@ -111,7 +82,6 @@ public class ArmIOSparkMax implements ArmIO {
 
   @Override
   public void runCurrent(double amps) {
-    // TODO: impl
   }
 
   @Override
@@ -121,7 +91,6 @@ public class ArmIOSparkMax implements ArmIO {
 
   @Override
   public void setPID(double p, double i, double d) {
-    // TODO: impl
   }
 
   @Override

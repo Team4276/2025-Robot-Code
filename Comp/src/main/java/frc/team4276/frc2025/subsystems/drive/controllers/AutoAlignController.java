@@ -15,19 +15,15 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class AutoAlignController {
-  private static final LoggedTunableNumber translationkP = new LoggedTunableNumber("AutoAlignController/Translation/kP",
-      autoAlignTranslationKp);
-  private static final LoggedTunableNumber translationkD = new LoggedTunableNumber("AutoAlignController/Translation/kD",
-      autoAlignTranslationKd);
-  private static final LoggedTunableNumber translationKTol = new LoggedTunableNumber(
-      "AutoAlignController/Translation/Tolerance", autoAlignTranslationTol);
+  private final LoggedTunableNumber translationkP = new LoggedTunableNumber("AutoAlignController/Translation/kP", 1.0);
+  private final LoggedTunableNumber translationkD = new LoggedTunableNumber("AutoAlignController/Translation/kD", 0.0);
+  private final LoggedTunableNumber translationKTol = new LoggedTunableNumber(
+      "AutoAlignController/Translation/Tolerance", 0.1);
 
-  private static final LoggedTunableNumber rotationkP = new LoggedTunableNumber("AutoAlignController/Rotation/kP",
-      autoAlignRotationKp);
-  private static final LoggedTunableNumber rotationkD = new LoggedTunableNumber("AutoAlignController/Rotation/kD",
-      autoAlignRotationKd);
-  private static final LoggedTunableNumber rotationKTol = new LoggedTunableNumber(
-      "AutoAlignController/Rotation/ToleranceDegrees", autoAlignRotationTol);
+  private final LoggedTunableNumber rotationkP = new LoggedTunableNumber("AutoAlignController/Rotation/kP", 1.0);
+  private final LoggedTunableNumber rotationkD = new LoggedTunableNumber("AutoAlignController/Rotation/kD", 0.0);
+  private final LoggedTunableNumber rotationKTol = new LoggedTunableNumber(
+      "AutoAlignController/Rotation/ToleranceDegrees", 1.0);
 
   private final ProfiledPIDController translationController;
   private final ProfiledPIDController headingController;
@@ -57,7 +53,7 @@ public class AutoAlignController {
     headingController.enableContinuousInput(-Math.PI, Math.PI);
 
     translationController.setTolerance(translationKTol.getAsDouble());
-    headingController.setTolerance(rotationKTol.getAsDouble());
+    headingController.setTolerance(Math.toRadians(rotationKTol.getAsDouble()));
 
     toleranceTimer.restart();
   }
@@ -78,7 +74,7 @@ public class AutoAlignController {
     translationController.setPID(translationkP.getAsDouble(), 0.0, translationkD.getAsDouble());
     translationController.setTolerance(translationKTol.getAsDouble());
     headingController.setPID(rotationkP.getAsDouble(), 0.0, rotationkD.getAsDouble());
-    headingController.setTolerance(rotationKTol.getAsDouble());
+    headingController.setTolerance(Math.toRadians(rotationKTol.getAsDouble()));
 
     Translation2d trans = currentPose.getTranslation().minus(setpoint.getTranslation());
     Translation2d linearOutput = Translation2d.kZero;

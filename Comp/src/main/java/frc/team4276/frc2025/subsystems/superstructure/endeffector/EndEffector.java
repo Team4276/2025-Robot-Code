@@ -7,24 +7,32 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team4276.util.LoggedTunableNumber;
 
 public class EndEffector extends SubsystemBase {
   //TODO: figure out all volatges 
+  private static final LoggedTunableNumber favorVolts = new LoggedTunableNumber("EndEffector/FavorVolts", 0.0);
+  private static final LoggedTunableNumber lagVolts = new LoggedTunableNumber("EndEffector/LagVolts", 0.0);
+
   public enum Goal {
     IDLE(() -> 0.0, () -> 0.0),
-    INTAKE(() -> 0.0, () -> 0.0),
-    SCORE(() -> 0.0, () -> 0.0),
-    FAVOR_LEFT(() -> 0.0, () -> 0.0),
-    FAVOR_RIGHT(() -> 0.0, () -> 0.0);
-
+    INTAKE(new LoggedTunableNumber("EndEffector/IntakeVolts", 0.0)),
+    SCORE(new LoggedTunableNumber("EndEffector/ScoreVolts", 0.0)),
+    FAVOR_LEFT(favorVolts, lagVolts),
+    FAVOR_RIGHT(lagVolts, favorVolts);
 
     private final DoubleSupplier rightVoltageGoal;
     private final DoubleSupplier leftVoltageGoal;
 
-    Goal(DoubleSupplier leftVoltageGoal, DoubleSupplier rightVoltageGoal) { 
+    private Goal(DoubleSupplier leftVoltageGoal, DoubleSupplier rightVoltageGoal) { 
         this.leftVoltageGoal = leftVoltageGoal;
         this.rightVoltageGoal = rightVoltageGoal;
     }
+
+    private Goal(DoubleSupplier voltageGoal) { 
+      this.leftVoltageGoal = voltageGoal;
+      this.rightVoltageGoal = voltageGoal;
+  }
 
     public double getLeftVolts() {
         return leftVoltageGoal.getAsDouble();

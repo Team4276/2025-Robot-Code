@@ -19,9 +19,9 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
   private final SparkMax rightMotor;
   private final Debouncer motorConnectedDebounce = new Debouncer(0.5);
 
-  public EndEffectorIOSparkMax(int id_1,int id_2, int currentLimit, boolean invert, boolean brake) {
-    leftMotor = new SparkMax(id_1, MotorType.kBrushless);
-    rightMotor = new SparkMax(id_2, MotorType.kBrushless);
+  public EndEffectorIOSparkMax(int left_id,int right_id, int currentLimit, boolean invert, boolean brake) {
+    leftMotor = new SparkMax(left_id, MotorType.kBrushless);
+    rightMotor = new SparkMax(right_id, MotorType.kBrushless);
 
     var config = new SparkMaxConfig();
     config

@@ -1,21 +1,16 @@
 package frc.team4276.frc2025.subsystems.drive.controllers;
 
-import static frc.team4276.frc2025.subsystems.drive.DriveConstants.*;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.team4276.util.LoggedTunableNumber;
 import java.util.function.Supplier;
 
 public class HeadingController {
-  private static final LoggedTunableNumber kP =
-      new LoggedTunableNumber("HeadingController/kP", snapKp);
-  private static final LoggedTunableNumber kI =
-      new LoggedTunableNumber("HeadingController/kI", snapKi);
-  private static final LoggedTunableNumber kD =
-      new LoggedTunableNumber("HeadingController/kD", snapKd);
-  private static final LoggedTunableNumber toleranceDegrees =
-      new LoggedTunableNumber("HeadingController/ToleranceDegrees", snapPositionTolerance);
+  private final LoggedTunableNumber kP = new LoggedTunableNumber("HeadingController/kP", 0.5);
+  private final LoggedTunableNumber kI = new LoggedTunableNumber("HeadingController/kI", 0.0);
+  private final LoggedTunableNumber kD = new LoggedTunableNumber("HeadingController/kD", 0.1);
+  private static final LoggedTunableNumber toleranceDegrees = new LoggedTunableNumber(
+      "HeadingController/ToleranceDegrees", 1.0);
   private PIDController controller;
 
   private Supplier<Rotation2d> targetHeadingSupplier;

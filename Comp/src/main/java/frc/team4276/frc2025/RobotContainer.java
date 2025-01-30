@@ -107,7 +107,7 @@ public class RobotContainer {
                     new ModuleIOSpark(3));
             superstructure = new Superstructure(
                     new Elevator(new ElevatorIOSparkMax()),
-                    new EndEffector(new EndEffectorIOSparkMax(Ports.ENDEFFECTOR, -1, 40, false,
+                    new EndEffector(new EndEffectorIOSparkMax(Ports.ENDEFFECTOR_LEFT, Ports.ENDEFFECTOR_RIGHT, 40, false,
                             true)),
                     new RollerSensorsIOHardware());
             arm = new Arm(new ArmIOSparkMax());

@@ -8,6 +8,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team4276.frc2025.Constants;
 import frc.team4276.util.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -34,13 +35,23 @@ public class Elevator extends SubsystemBase { // TODO: config; tune
     }
   }
 
+  private final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Elevator/HomingVolts", 0.0);
+
   private Goal goal = Goal.STOW;
+
+  private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Elevator/maxVel", Math.toRadians(40.0));
+  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", Math.toRadians(20.0));
+
+  private final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.0);
+  private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0.0);
+  private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.0);
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-  private final ElevatorFeedforward ff;
-  private final TrapezoidProfile profile;
+  private ElevatorFeedforward ff = new ElevatorFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), 0.0);
+  private TrapezoidProfile profile = new TrapezoidProfile(
+      new TrapezoidProfile.Constraints(maxVel.getAsDouble(), maxAccel.getAsDouble()));
   private TrapezoidProfile.State setpointState = new TrapezoidProfile.State();
 
   private BooleanSupplier coastOverride;
@@ -57,9 +68,6 @@ public class Elevator extends SubsystemBase { // TODO: config; tune
     this.io = io;
     io.setBrakeMode(true);
 
-    ff = new ElevatorFeedforward(0.0, 0.0, 0.0, 0.0);
-    profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(maxVel, maxAccel));
-
     goalViz = new ElevatorViz("Goal", Color.kGreen);
     measuredViz = new ElevatorViz("Measured", Color.kBlack);
   }
@@ -72,7 +80,7 @@ public class Elevator extends SubsystemBase { // TODO: config; tune
   private boolean wasDisabled = true;
 
   @Override
-  public void periodic() { // TODO: use wpi feed forwards
+  public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
 
@@ -99,6 +107,12 @@ public class Elevator extends SubsystemBase { // TODO: config; tune
 
       setpointState = new TrapezoidProfile.State(inputs.position, 0.0);
 
+      if (Constants.isTuning) {
+        ff = new ElevatorFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), 0.0);
+        profile = new TrapezoidProfile(
+            new TrapezoidProfile.Constraints(maxVel.getAsDouble(), maxAccel.getAsDouble()));
+      }
+
     } else {
       if (wasDisabled) {
         io.setBrakeMode(true);
@@ -119,12 +133,14 @@ public class Elevator extends SubsystemBase { // TODO: config; tune
         isHoming = true;
 
       } else if (isHoming && goal == Goal.STOW) {
-        io.runVolts(0.0); // TODO: tune
+        io.runVolts(homingVolts.getAsDouble());
 
       } else {
         setpointState = profile.calculate(0.02, setpointState, new TrapezoidProfile.State(goal.getPosition(), 0.0));
         io.runSetpoint(setpointState.position, ff.calculate(setpointState.velocity));
         Logger.recordOutput("Elevator/GoalAngle", goal.getPosition());
+        Logger.recordOutput("Elevator/SetpointState/Pos", setpointState.position);
+        Logger.recordOutput("Elevator/SetpointState/Vel", setpointState.velocity);
 
       }
     }

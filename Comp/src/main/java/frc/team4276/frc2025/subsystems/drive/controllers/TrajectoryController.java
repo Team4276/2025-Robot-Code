@@ -1,7 +1,5 @@
 package frc.team4276.frc2025.subsystems.drive.controllers;
 
-import static frc.team4276.frc2025.subsystems.drive.DriveConstants.*;
-
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
@@ -13,28 +11,23 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import frc.team4276.frc2025.RobotState;
-import frc.team4276.frc2025.subsystems.drive.DriveConstants;
 import frc.team4276.util.LoggedTunableNumber;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class TrajectoryController {
-  private static final LoggedTunableNumber translationkP = new LoggedTunableNumber(
-      "TrajectoryController/Translation/kP",
-      autoTranslationKp);
-  private static final LoggedTunableNumber translationkD = new LoggedTunableNumber(
-      "TrajectoryController/Translation/kD",
-      autoTranslationKd);
-  private static final LoggedTunableNumber translationKTol = new LoggedTunableNumber(
-      "TrajectoryController/Translation/Tolerance", autoTranslationTol);
+  private final LoggedTunableNumber translationkP = new LoggedTunableNumber("TrajectoryController/Translation/kP", 4.0);
+  private final LoggedTunableNumber translationkD = new LoggedTunableNumber("TrajectoryController/Translation/kD", 0.0);
+  private final LoggedTunableNumber translationKTol = new LoggedTunableNumber(
+      "TrajectoryController/Translation/Tolerance", 0.1);
 
-  private static final LoggedTunableNumber rotationkP = new LoggedTunableNumber("TrajectoryController/Rotation/kP",
-      autoRotationKp);
-  private static final LoggedTunableNumber rotationkD = new LoggedTunableNumber("TrajectoryController/Rotation/kD",
-      autoRotationKd);
-  private static final LoggedTunableNumber rotationKTol = new LoggedTunableNumber(
-      "TrajectoryController/Rotation/ToleranceDegrees", autoRotationTol);
+  private final LoggedTunableNumber rotationkP = new LoggedTunableNumber("TrajectoryController/Rotation/kP", 0.0);
+  private final LoggedTunableNumber rotationkD = new LoggedTunableNumber("TrajectoryController/Rotation/kD", 0.0);
+  private final LoggedTunableNumber rotationKTol = new LoggedTunableNumber(
+      "TrajectoryController/Rotation/ToleranceDegrees", 1.0);
+
+  private final LoggedTunableNumber maxError = new LoggedTunableNumber("TrajectoryController/maxError", 0.75);
 
   private Trajectory<SwerveSample> trajectory;
   private PathPlannerTrajectory ppTrajectory;
@@ -64,7 +57,7 @@ public class TrajectoryController {
 
     xController.setTolerance(translationKTol.getAsDouble());
     yController.setTolerance(translationKTol.getAsDouble());
-    rotationController.setTolerance(rotationKTol.getAsDouble());
+    rotationController.setTolerance(Math.toRadians(rotationKTol.getAsDouble()));
   }
 
   public void setTrajectory(Trajectory<SwerveSample> traj) {
@@ -86,7 +79,7 @@ public class TrajectoryController {
   public ChassisSpeeds updatePP(Pose2d currentPose) {
     var sampledState = ppTrajectory.sample(getTrajectoryTime());
 
-    if (sampledState.pose.getTranslation().getDistance(currentPose.getTranslation()) > DriveConstants.autoMaxError) {
+    if (sampledState.pose.getTranslation().getDistance(currentPose.getTranslation()) > maxError.getAsDouble()) {
       timeOffset += 0.02;
 
       var dummyState = ppTrajectory.sample(getTrajectoryTime());
@@ -132,10 +125,12 @@ public class TrajectoryController {
   public ChassisSpeeds update(Pose2d currentPose) {
     xController.setPID(translationkP.getAsDouble(), 0.0, translationkD.getAsDouble());
     xController.setTolerance(translationKTol.getAsDouble());
+
     yController.setPID(translationkP.getAsDouble(), 0.0, translationkD.getAsDouble());
     yController.setTolerance(translationKTol.getAsDouble());
+
     rotationController.setPID(rotationkP.getAsDouble(), 0.0, rotationkD.getAsDouble());
-    rotationController.setTolerance(rotationKTol.getAsDouble());
+    rotationController.setTolerance(Math.toRadians(rotationKTol.getAsDouble()));
 
     if (isPPTraj) {
       return updatePP(currentPose);
@@ -152,7 +147,7 @@ public class TrajectoryController {
     currentPose = targetState.getPose();
 
     if (targetState.getPose().getTranslation()
-        .getDistance(currentPose.getTranslation()) > DriveConstants.autoMaxError) {
+        .getDistance(currentPose.getTranslation()) > maxError.getAsDouble()) {
       timeOffset += 0.02;
 
       var dummyState = trajectory.sampleAt(getTrajectoryTime(), false);

@@ -40,11 +40,11 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     // Configure lead motor
     var leaderConfig = new SparkMaxConfig();
     leaderConfig
+        .inverted(invertLeader)
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(currentLimit)
         .voltageCompensation(12.0);
     leaderConfig.encoder
-        .inverted(invertEncoder)
         .positionConversionFactor(encoderPositionFactor)
         .velocityConversionFactor(encoderVelocityFactor);
     leaderConfig.closedLoop
@@ -151,7 +151,6 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
   @Override
   public void runCurrent(double amps) {
-    // TODO: impl
   }
 
   @Override
@@ -161,7 +160,6 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
   @Override
   public void setPID(double p, double i, double d) {
-    // TODO: impl
   }
 
   @Override

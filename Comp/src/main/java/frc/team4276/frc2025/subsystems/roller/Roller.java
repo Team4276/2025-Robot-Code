@@ -9,13 +9,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team4276.util.LoggedTunableNumber;
 
 public class Roller extends SubsystemBase {
   public enum Goal {
     IDLE(() -> 0.0),
-    INTAKE(() -> 12.0),
-    HOLD(() -> 2.0),
-    SCORE(() -> -12.0);
+    INTAKE(new LoggedTunableNumber("Roller/IntakeVolts", 5.0)),
+    HOLD(new LoggedTunableNumber("Roller/HoldVolts", 1.0)),
+    SCORE(new LoggedTunableNumber("Roller/ScoreVolts", -5.0));
 
     private final DoubleSupplier voltageGoal;
 
@@ -76,6 +77,7 @@ public class Roller extends SubsystemBase {
     return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.IDLE), this);
   }
 
+  @AutoLogOutput
   public boolean hasGamePiece(){
     return hasGamePiece;
   }

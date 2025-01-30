@@ -22,14 +22,16 @@ public class RollerIOSparkMax implements RollerIO {
     config
         .smartCurrentLimit(currentLimit)
         .inverted(invert)
-        .idleMode(brake ? IdleMode.kBrake : IdleMode.kBrake);
-    config.signals.appliedOutputPeriodMs(20).busVoltagePeriodMs(20).outputCurrentPeriodMs(20);
+        .idleMode(brake ? IdleMode.kBrake : IdleMode.kCoast);
+    config.signals
+        .appliedOutputPeriodMs(20)
+        .busVoltagePeriodMs(20)
+        .outputCurrentPeriodMs(20);
     tryUntilOk(
         motor,
         5,
-        () ->
-            motor.configure(
-                config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+        () -> motor.configure(
+            config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
 
   @Override
@@ -37,7 +39,7 @@ public class RollerIOSparkMax implements RollerIO {
     sparkStickyFault = false;
     ifOk(
         motor,
-        new DoubleSupplier[] {motor::getAppliedOutput, motor::getBusVoltage},
+        new DoubleSupplier[] { motor::getAppliedOutput, motor::getBusVoltage },
         (values) -> inputs.appliedVoltage = values[0] * values[1]);
     ifOk(motor, motor::getOutputCurrent, (value) -> inputs.supplyCurrentAmps = value);
     ifOk(motor, motor::getMotorTemperature, (value) -> inputs.tempCelsius = value);
@@ -54,4 +56,3 @@ public class RollerIOSparkMax implements RollerIO {
     motor.stopMotor();
   }
 }
-
