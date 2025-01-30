@@ -244,26 +244,32 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-
     // Default command, normal field-relative drive
     if (useKeyboard && Constants.getMode() == Mode.SIM) {
-      drive.setDefaultCommand(
-          drive.run(
-              () -> drive.feedTeleopInput(
-                  -keyboard0.getRawAxis(1), -keyboard0.getRawAxis(0),
-                  keyboard2.getRawAxis(0))));
+        configureKeyBoardBindings();
 
     } else {
-      drive.setDefaultCommand(
-          drive.run(
-              () -> drive.feedTeleopInput(
-                  driver.getLeftWithDeadband().y, driver.getLeftWithDeadband().x,
-                  driver.getRightWithDeadband().x)));
+        configureControllerBindings();
 
     }
-
-    // Reset gyro to 0° when A button is pressed
-    driver
+  }
+  
+  private void configureKeyBoardBindings(){
+    drive.setDefaultCommand(
+        drive.run(
+            () -> drive.feedTeleopInput(
+                -keyboard0.getRawAxis(1), -keyboard0.getRawAxis(0),
+                keyboard2.getRawAxis(0))));
+    
+  }
+  private void configureControllerBindings(){
+    drive.setDefaultCommand(
+        drive.run(
+            () -> drive.feedTeleopInput(
+                driver.getLeftWithDeadband().y, driver.getLeftWithDeadband().x,
+                driver.getRightWithDeadband().x)));
+        // Reset gyro to 0° when A button is pressed
+        driver
         .a()
         .onTrue(
             Commands.runOnce(
