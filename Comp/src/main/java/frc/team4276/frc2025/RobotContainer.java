@@ -29,9 +29,9 @@ import frc.team4276.frc2025.commands.FeedForwardCharacterization;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
 import frc.team4276.frc2025.commands.auto.AutoBuilder;
 import frc.team4276.frc2025.subsystems.arm.Arm;
+import frc.team4276.frc2025.subsystems.arm.Arm.Goal;
 import frc.team4276.frc2025.subsystems.arm.ArmIO;
 import frc.team4276.frc2025.subsystems.arm.ArmIOSparkMax;
-import frc.team4276.frc2025.subsystems.arm.Arm.Goal;
 import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.drive.GyroIO;
 import frc.team4276.frc2025.subsystems.drive.GyroIOADIS;
@@ -97,93 +97,93 @@ public class RobotContainer {
   public RobotContainer() {
     if (Constants.getMode() != Constants.Mode.REPLAY) {
       switch (Constants.getMode()) {
-        case REAL:
-          // Real robot, instantiate hardware IO implementations
-          drive = new Drive(
-              new GyroIOADIS(),
-              new ModuleIOSpark(0),
-              new ModuleIOSpark(1),
-              new ModuleIOSpark(2),
-              new ModuleIOSpark(3));
-          superstructure = new Superstructure(
-              new Elevator(new ElevatorIOSparkMax()),
-              new EndEffector(new EndEffectorIOSparkMax(Ports.ENDEFFECTOR, 40, false,
-                  true)),
-              new RollerSensorsIOHardware());
-          arm = new Arm(new ArmIOSparkMax());
-          roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40,
-              false, true));
-          vision = new Vision(
-              RobotState.getInstance()::addVisionMeasurement,
-              new VisionIOPhotonVision(
-                  VisionConstants.camera0Name, VisionConstants.robotToCamera0),
-              new VisionIOPhotonVision(
-                  VisionConstants.camera1Name, VisionConstants.robotToCamera1));
-          break;
+        case REAL -> {
+            // Real robot, instantiate hardware IO implementations
+            drive = new Drive(
+                    new GyroIOADIS(),
+                    new ModuleIOSpark(0),
+                    new ModuleIOSpark(1),
+                    new ModuleIOSpark(2),
+                    new ModuleIOSpark(3));
+            superstructure = new Superstructure(
+                    new Elevator(new ElevatorIOSparkMax()),
+                    new EndEffector(new EndEffectorIOSparkMax(Ports.ENDEFFECTOR, -1, 40, false,
+                            true)),
+                    new RollerSensorsIOHardware());
+            arm = new Arm(new ArmIOSparkMax());
+            roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40,
+                    false, true));
+            vision = new Vision(
+                    RobotState.getInstance()::addVisionMeasurement,
+                    new VisionIOPhotonVision(
+                            VisionConstants.camera0Name, VisionConstants.robotToCamera0),
+                    new VisionIOPhotonVision(
+                            VisionConstants.camera1Name, VisionConstants.robotToCamera1));
+            }
 
-        case SIM:
-          // Sim robot, instantiate physics sim IO implementations
-          drive = new Drive(
-              new GyroIO() {
-              },
-              new ModuleIOSim(),
-              new ModuleIOSim(),
-              new ModuleIOSim(),
-              new ModuleIOSim());
-          superstructure = new Superstructure(
-              new Elevator(new ElevatorIO() {
-              }),
-              new EndEffector(new EndEffectorIO() {
-              }),
-              new RollerSensorsIO() {
-              });
-          arm = new Arm(new ArmIO() {
-          });
-          roller = new Roller(new RollerIO() {
-          });
-          vision = new Vision(
-              RobotState.getInstance()::addVisionMeasurement,
-              new VisionIOPhotonVisionSim(
-                  VisionConstants.camera0Name,
-                  VisionConstants.robotToCamera0,
-                  RobotState.getInstance()::getEstimatedPose),
-              new VisionIOPhotonVisionSim(
-                  VisionConstants.camera1Name,
-                  VisionConstants.robotToCamera1,
-                  RobotState.getInstance()::getEstimatedPose));
-          break;
+        case SIM -> {
+            // Sim robot, instantiate physics sim IO implementations
+            drive = new Drive(
+                    new GyroIO() {
+                    },
+                    new ModuleIOSim(),
+                    new ModuleIOSim(),
+                    new ModuleIOSim(),
+                    new ModuleIOSim());
+            superstructure = new Superstructure(
+                    new Elevator(new ElevatorIO() {
+                    }),
+                    new EndEffector(new EndEffectorIO() {
+                    }),
+                    new RollerSensorsIO() {
+                    });
+            arm = new Arm(new ArmIO() {
+            });
+            roller = new Roller(new RollerIO() {
+            });
+            vision = new Vision(
+                    RobotState.getInstance()::addVisionMeasurement,
+                    new VisionIOPhotonVisionSim(
+                            VisionConstants.camera0Name,
+                            VisionConstants.robotToCamera0,
+                            RobotState.getInstance()::getEstimatedPose),
+                    new VisionIOPhotonVisionSim(
+                            VisionConstants.camera1Name,
+                            VisionConstants.robotToCamera1,
+                            RobotState.getInstance()::getEstimatedPose));
+            }
 
-        default:
-          // Replayed robot, disable IO implementations
-          drive = new Drive(
-              new GyroIO() {
-              },
-              new ModuleIO() {
-              },
-              new ModuleIO() {
-              },
-              new ModuleIO() {
-              },
-              new ModuleIO() {
-              });
-          superstructure = new Superstructure(
-              new Elevator(new ElevatorIO() {
-              }),
-              new EndEffector(new EndEffectorIO() {
-              }),
-              new RollerSensorsIO() {
-              });
-          arm = new Arm(new ArmIO() {
-          });
-          roller = new Roller(new RollerIO() {
-          });
-          vision = new Vision(
-              RobotState.getInstance()::addVisionMeasurement,
-              new VisionIO() {
-              },
-              new VisionIO() {
-              });
-          break;
+        default -> {
+            // Replayed robot, disable IO implementations
+            drive = new Drive(
+                    new GyroIO() {
+                    },
+                    new ModuleIO() {
+                    },
+                    new ModuleIO() {
+                    },
+                    new ModuleIO() {
+                    },
+                    new ModuleIO() {
+                    });
+            superstructure = new Superstructure(
+                    new Elevator(new ElevatorIO() {
+                    }),
+                    new EndEffector(new EndEffectorIO() {
+                    }),
+                    new RollerSensorsIO() {
+                    });
+            arm = new Arm(new ArmIO() {
+            });
+            roller = new Roller(new RollerIO() {
+            });
+            vision = new Vision(
+                    RobotState.getInstance()::addVisionMeasurement,
+                    new VisionIO() {
+                    },
+                    new VisionIO() {
+                    });
+            }
       }
     }
 

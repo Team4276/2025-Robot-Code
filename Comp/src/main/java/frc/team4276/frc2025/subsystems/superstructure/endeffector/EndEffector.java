@@ -9,22 +9,31 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class EndEffector extends SubsystemBase {
+  //TODO: figure out all volatges 
   public enum Goal {
-    IDLE(() -> 0.0),
-    INTAKE(() -> 0.0),
-    SCORE(() -> 0.0);
+    IDLE(() -> 0.0, () -> 0.0),
+    INTAKE(() -> 0.0, () -> 0.0),
+    SCORE(() -> 0.0, () -> 0.0),
+    FAVOR_LEFT(() -> 0.0, () -> 0.0),
+    FAVOR_RIGHT(() -> 0.0, () -> 0.0);
 
-    private final DoubleSupplier voltageGoal;
 
-    private Goal(DoubleSupplier voltageGoal) {
-      this.voltageGoal = voltageGoal;
+    private final DoubleSupplier rightVoltageGoal;
+    private final DoubleSupplier leftVoltageGoal;
+
+    Goal(DoubleSupplier leftVoltageGoal, DoubleSupplier rightVoltageGoal) { 
+        this.leftVoltageGoal = leftVoltageGoal;
+        this.rightVoltageGoal = rightVoltageGoal;
     }
 
-    private double getVolts() {
-      return voltageGoal.getAsDouble();
+    public double getLeftVolts() {
+        return leftVoltageGoal.getAsDouble();
     }
 
-  }
+    public double getRightVolts() {
+        return rightVoltageGoal.getAsDouble();
+    }
+}
 
   private Goal goal = Goal.IDLE;
 
@@ -44,7 +53,7 @@ public class EndEffector extends SubsystemBase {
       goal = Goal.IDLE;
     }
 
-    io.runVolts(goal.getVolts());
+    io.runVolts(goal.getLeftVolts(), goal.getRightVolts());
     Logger.recordOutput("EndEffector/Goal", goal);
   }
 
