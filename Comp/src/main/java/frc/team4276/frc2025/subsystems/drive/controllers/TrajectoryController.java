@@ -14,10 +14,28 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.subsystems.drive.DriveConstants;
+import frc.team4276.util.LoggedTunableNumber;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class TrajectoryController {
+  private static final LoggedTunableNumber translationkP = new LoggedTunableNumber(
+      "TrajectoryController/Translation/kP",
+      autoTranslationKp);
+  private static final LoggedTunableNumber translationkD = new LoggedTunableNumber(
+      "TrajectoryController/Translation/kD",
+      autoTranslationKd);
+  private static final LoggedTunableNumber translationKTol = new LoggedTunableNumber(
+      "TrajectoryController/Translation/Tolerance", autoTranslationTol);
+
+  private static final LoggedTunableNumber rotationkP = new LoggedTunableNumber("TrajectoryController/Rotation/kP",
+      autoRotationKp);
+  private static final LoggedTunableNumber rotationkD = new LoggedTunableNumber("TrajectoryController/Rotation/kD",
+      autoRotationKd);
+  private static final LoggedTunableNumber rotationKTol = new LoggedTunableNumber(
+      "TrajectoryController/Rotation/ToleranceDegrees", autoRotationTol);
+
   private Trajectory<SwerveSample> trajectory;
   private PathPlannerTrajectory ppTrajectory;
   private boolean isPPTraj = false;
@@ -32,23 +50,21 @@ public class TrajectoryController {
   private final PIDController rotationController;
 
   // private Translation2d[] moduleForces = {
-  //   new Translation2d(), new Translation2d(), new Translation2d(), new Translation2d()
+  // new Translation2d(), new Translation2d(), new Translation2d(), new
+  // Translation2d()
   // };
-  private final double[] moduleForces = {0.0, 0.0, 0.0, 0.0};
-  private final double[] dummyForces = {0.0, 0.0, 0.0, 0.0};
+  private final double[] moduleForces = { 0.0, 0.0, 0.0, 0.0 };
+  private final double[] dummyForces = { 0.0, 0.0, 0.0, 0.0 };
 
   public TrajectoryController() {
-    xController =
-        new PIDController(DriveConstants.autoTranslationKp, 0.0, DriveConstants.autoTranslationKd);
-    yController =
-        new PIDController(DriveConstants.autoTranslationKp, 0.0, DriveConstants.autoTranslationKd);
-    rotationController =
-        new PIDController(DriveConstants.autoRotationKp, 0.0, DriveConstants.autoRotationKd);
+    xController = new PIDController(translationkP.getAsDouble(), 0.0, translationkD.getAsDouble());
+    yController = new PIDController(translationkP.getAsDouble(), 0.0, translationkD.getAsDouble());
+    rotationController = new PIDController(rotationkP.getAsDouble(), 0.0, rotationkD.getAsDouble());
     rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
-    xController.setTolerance(autoTranslationTol);
-    yController.setTolerance(autoTranslationTol);
-    rotationController.setTolerance(autoRotationTol);
+    xController.setTolerance(translationKTol.getAsDouble());
+    yController.setTolerance(translationKTol.getAsDouble());
+    rotationController.setTolerance(rotationKTol.getAsDouble());
   }
 
   public void setTrajectory(Trajectory<SwerveSample> traj) {
@@ -70,8 +86,7 @@ public class TrajectoryController {
   public ChassisSpeeds updatePP(Pose2d currentPose) {
     var sampledState = ppTrajectory.sample(getTrajectoryTime());
 
-    if (sampledState.pose.getTranslation().getDistance(currentPose.getTranslation())
-        > DriveConstants.autoMaxError) {
+    if (sampledState.pose.getTranslation().getDistance(currentPose.getTranslation()) > DriveConstants.autoMaxError) {
       timeOffset += 0.02;
 
       var dummyState = ppTrajectory.sample(getTrajectoryTime());
@@ -80,8 +95,8 @@ public class TrajectoryController {
       sampledState.timeSeconds = dummyState.timeSeconds;
       sampledState.pose = dummyState.pose;
       sampledState.heading = dummyState.heading;
-      sampledState.feedforwards =
-          new DriveFeedforwards(dummyForces, dummyForces, dummyForces, dummyForces, dummyForces);
+      sampledState.feedforwards = new DriveFeedforwards(dummyForces, dummyForces, dummyForces, dummyForces,
+          dummyForces);
     }
 
     RobotState.getInstance().setTrajectorySetpoint(sampledState.pose);
@@ -97,12 +112,11 @@ public class TrajectoryController {
     double thetaError = sampledState.heading.minus(currentPose.getRotation()).getRadians();
     double thetaFeedback = rotationController.calculate(0.0, thetaError);
 
-    ChassisSpeeds outputSpeeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            sampledState.fieldSpeeds.vxMetersPerSecond + xFeedback,
-            sampledState.fieldSpeeds.vyMetersPerSecond + yFeedback,
-            sampledState.fieldSpeeds.omegaRadiansPerSecond + thetaFeedback,
-            currentPose.getRotation());
+    ChassisSpeeds outputSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        sampledState.fieldSpeeds.vxMetersPerSecond + xFeedback,
+        sampledState.fieldSpeeds.vyMetersPerSecond + yFeedback,
+        sampledState.fieldSpeeds.omegaRadiansPerSecond + thetaFeedback,
+        currentPose.getRotation());
 
     Logger.recordOutput("Trajectory/SetpointPose", sampledState.pose);
     Logger.recordOutput("Trajectory/SetpointSpeeds/vx", sampledState.fieldSpeeds.vxMetersPerSecond);
@@ -116,6 +130,13 @@ public class TrajectoryController {
   }
 
   public ChassisSpeeds update(Pose2d currentPose) {
+    xController.setPID(translationkP.getAsDouble(), 0.0, translationkD.getAsDouble());
+    xController.setTolerance(translationKTol.getAsDouble());
+    yController.setPID(translationkP.getAsDouble(), 0.0, translationkD.getAsDouble());
+    yController.setTolerance(translationKTol.getAsDouble());
+    rotationController.setPID(rotationkP.getAsDouble(), 0.0, rotationkD.getAsDouble());
+    rotationController.setTolerance(rotationKTol.getAsDouble());
+
     if (isPPTraj) {
       return updatePP(currentPose);
     }
@@ -130,8 +151,8 @@ public class TrajectoryController {
     SwerveSample targetState = sampledState.get();
     currentPose = targetState.getPose();
 
-    if (targetState.getPose().getTranslation().getDistance(currentPose.getTranslation())
-        > DriveConstants.autoMaxError) {
+    if (targetState.getPose().getTranslation()
+        .getDistance(currentPose.getTranslation()) > DriveConstants.autoMaxError) {
       timeOffset += 0.02;
 
       var dummyState = trajectory.sampleAt(getTrajectoryTime(), false);
@@ -140,27 +161,27 @@ public class TrajectoryController {
         return new ChassisSpeeds();
       }
 
-      targetState =
-          new SwerveSample(
-              dummyState.get().t,
-              dummyState.get().x,
-              dummyState.get().y,
-              dummyState.get().heading,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              dummyForces,
-              dummyForces);
+      targetState = new SwerveSample(
+          dummyState.get().t,
+          dummyState.get().x,
+          dummyState.get().y,
+          dummyState.get().heading,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          dummyForces,
+          dummyForces);
     }
 
     RobotState.getInstance().setTrajectorySetpoint(targetState.getPose());
 
     for (int i = 0; i < 4; i++) {
       // moduleForces[i] =
-      //     new Translation2d(targetState.moduleForcesX()[i], targetState.moduleForcesY()[i]);
+      // new Translation2d(targetState.moduleForcesX()[i],
+      // targetState.moduleForcesY()[i]);
     }
 
     double xError = targetState.x - currentPose.getTranslation().getX();
@@ -168,16 +189,14 @@ public class TrajectoryController {
     double xFeedback = xController.calculate(0.0, xError);
     double yFeedback = yController.calculate(0.0, yError);
     double thetaFF = targetState.omega;
-    double thetaError =
-        Rotation2d.fromRadians(targetState.heading).minus(currentPose.getRotation()).getRadians();
+    double thetaError = Rotation2d.fromRadians(targetState.heading).minus(currentPose.getRotation()).getRadians();
     double thetaFeedback = rotationController.calculate(0.0, thetaError);
 
-    ChassisSpeeds outputSpeeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            targetState.vx + xFeedback,
-            targetState.vy + yFeedback,
-            thetaFF + thetaFeedback,
-            currentPose.getRotation());
+    ChassisSpeeds outputSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        targetState.vx + xFeedback,
+        targetState.vy + yFeedback,
+        thetaFF + thetaFeedback,
+        currentPose.getRotation());
 
     Logger.recordOutput("Trajectory/SetpointPose", targetState.getPose());
     Logger.recordOutput("Trajectory/SetpointSpeeds/vx", targetState.vx);

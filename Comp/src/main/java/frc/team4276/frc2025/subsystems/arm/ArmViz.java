@@ -24,9 +24,8 @@ public class ArmViz {
     mechanism = new LoggedMechanism2d(3.0, 3.0, new Color8Bit(Color.kWhite));
 
     LoggedMechanismRoot2d motorRoot = mechanism.getRoot("motorPivot", 1.0, 0.4);
-    arm =
-        new LoggedMechanismLigament2d(
-            "arm", length, 0.0, 6, new Color8Bit(color));
+    arm = new LoggedMechanismLigament2d(
+        "arm", length, 0.0, 6, new Color8Bit(color));
     motorRoot.append(arm);
   }
 
@@ -37,10 +36,9 @@ public class ArmViz {
     Logger.recordOutput("Arm/Mechanism2d/" + key, mechanism);
 
     // Log 3D poses
-    Pose3d motor =
-        new Pose3d(
-            new Translation3d(armOrigin.getX(), 0, armOrigin.getY()),
-            new Rotation3d(0.0, -angleRads, 0.0));
+    Pose3d motor = new Pose3d(
+        new Translation3d(origin.getX(), 0, origin.getY()),
+        new Rotation3d(0.0, -angleRads, 0.0));
     Logger.recordOutput("Arm/Mechanism3d/" + key, motor);
   }
 }

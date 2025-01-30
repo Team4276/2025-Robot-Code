@@ -9,10 +9,26 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
+import frc.team4276.util.LoggedTunableNumber;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class AutoAlignController {
+  private static final LoggedTunableNumber translationkP = new LoggedTunableNumber("AutoAlignController/Translation/kP",
+      autoAlignTranslationKp);
+  private static final LoggedTunableNumber translationkD = new LoggedTunableNumber("AutoAlignController/Translation/kD",
+      autoAlignTranslationKd);
+  private static final LoggedTunableNumber translationKTol = new LoggedTunableNumber(
+      "AutoAlignController/Translation/Tolerance", autoAlignTranslationTol);
+
+  private static final LoggedTunableNumber rotationkP = new LoggedTunableNumber("AutoAlignController/Rotation/kP",
+      autoAlignRotationKp);
+  private static final LoggedTunableNumber rotationkD = new LoggedTunableNumber("AutoAlignController/Rotation/kD",
+      autoAlignRotationKd);
+  private static final LoggedTunableNumber rotationKTol = new LoggedTunableNumber(
+      "AutoAlignController/Rotation/ToleranceDegrees", autoAlignRotationTol);
+
   private final ProfiledPIDController translationController;
   private final ProfiledPIDController headingController;
   private final Timer toleranceTimer = new Timer();
@@ -29,19 +45,19 @@ public class AutoAlignController {
 
   public AutoAlignController() {
     translationController = new ProfiledPIDController(
-        autoAlignTranslationKp,
+        translationkP.getAsDouble(),
         0,
-        autoAlignTranslationKd,
+        translationkD.getAsDouble(),
         new TrapezoidProfile.Constraints(maxSpeed, maxAccel));
     headingController = new ProfiledPIDController(
-        autoAlignRotationKp,
+        rotationkP.getAsDouble(),
         0,
-        autoAlignRotationKd,
+        rotationkD.getAsDouble(),
         new TrapezoidProfile.Constraints(maxAngularSpeed, maxAngularAccel));
     headingController.enableContinuousInput(-Math.PI, Math.PI);
 
-    translationController.setTolerance(autoAlignTranslationTol);
-    headingController.setTolerance(autoAlignRotationTol);
+    translationController.setTolerance(translationKTol.getAsDouble());
+    headingController.setTolerance(rotationKTol.getAsDouble());
 
     toleranceTimer.restart();
   }
@@ -54,11 +70,16 @@ public class AutoAlignController {
     cancelTheta = false;
   }
 
-  public void feedTeleopInput(double x, double y, double omega){
+  public void feedTeleopInput(double x, double y, double omega) {
     teleopDriveController.feedDriveInput(x, y, omega);
   }
 
   private ChassisSpeeds updateContoller(Pose2d currentPose) {
+    translationController.setPID(translationkP.getAsDouble(), 0.0, translationkD.getAsDouble());
+    translationController.setTolerance(translationKTol.getAsDouble());
+    headingController.setPID(rotationkP.getAsDouble(), 0.0, rotationkD.getAsDouble());
+    headingController.setTolerance(rotationKTol.getAsDouble());
+
     Translation2d trans = currentPose.getTranslation().minus(setpoint.getTranslation());
     Translation2d linearOutput = Translation2d.kZero;
     if (trans.getNorm() > 1e-6) {
@@ -88,22 +109,22 @@ public class AutoAlignController {
   @AutoLogOutput(key = "AutoAlign/Output")
   public ChassisSpeeds update(Pose2d currentPose) {
     ChassisSpeeds controllerSpeeds = updateContoller(currentPose);
-    
+
     var teleopSpeeds = teleopDriveController.updateRaw(currentPose.getRotation());
 
     cancelX = cancelX || Math.abs(teleopSpeeds.vxMetersPerSecond) > 1e-6;
     cancelY = cancelY || Math.abs(teleopSpeeds.vyMetersPerSecond) > 1e-6;
     cancelTheta = cancelTheta || Math.abs(teleopSpeeds.omegaRadiansPerSecond) > 1e-6;
-    
+
     Logger.recordOutput("AutoAlign/CancelX", cancelX);
     Logger.recordOutput("AutoAlign/CancelY", cancelY);
     Logger.recordOutput("AutoAlign/CancelTheta", cancelTheta);
 
     return ChassisSpeeds.fromFieldRelativeSpeeds(
-      cancelX ? teleopSpeeds.vxMetersPerSecond : controllerSpeeds.vxMetersPerSecond, 
-      cancelY ? teleopSpeeds.vyMetersPerSecond : controllerSpeeds.vyMetersPerSecond,
-      cancelTheta ? teleopSpeeds.omegaRadiansPerSecond : controllerSpeeds.omegaRadiansPerSecond,
-      currentPose.getRotation());
+        cancelX ? teleopSpeeds.vxMetersPerSecond : controllerSpeeds.vxMetersPerSecond,
+        cancelY ? teleopSpeeds.vyMetersPerSecond : controllerSpeeds.vyMetersPerSecond,
+        cancelTheta ? teleopSpeeds.omegaRadiansPerSecond : controllerSpeeds.omegaRadiansPerSecond,
+        currentPose.getRotation());
   }
 
   @AutoLogOutput(key = "AutoAlign/AtGoal")

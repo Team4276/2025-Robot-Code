@@ -216,6 +216,15 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoSelector.addRoutine(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    autoSelector.addRoutine(
+        "Arm Simple FF Characterization",
+        new FeedForwardCharacterization(
+            arm, arm::runCharacterization, arm::getFFCharacterizationVelocity));
+    autoSelector.addRoutine(
+        "Elevator Simple FF Characterization",
+        new FeedForwardCharacterization(
+            superstructure, superstructure::acceptCharacterizationInput,
+            superstructure::getFFCharacterizationVelocity));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -237,7 +246,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
 
     // Default command, normal field-relative drive
-    if(useKeyboard && Constants.getMode() == Mode.SIM){
+    if (useKeyboard && Constants.getMode() == Mode.SIM) {
       drive.setDefaultCommand(
           drive.run(
               () -> drive.feedTeleopInput(

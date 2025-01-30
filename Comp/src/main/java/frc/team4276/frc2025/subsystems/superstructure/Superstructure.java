@@ -21,6 +21,8 @@ public class Superstructure extends SubsystemBase { // TODO: test logic
   @AutoLogOutput
   private boolean wantScore = false;
 
+  // TODO: fix scoring helper after l1
+
   public enum Goal {
     STOW,
     INTAKE,

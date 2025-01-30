@@ -52,10 +52,6 @@ public class ElevatorIOSparkMax implements ElevatorIO {
         .pidf(
             kp, ki,
             kd, kff);
-    leaderConfig.closedLoop.maxMotion
-        .allowedClosedLoopError(allowedClosedLoopError)
-        .maxAcceleration(maxAccel)
-        .maxVelocity(maxAccel);
     leaderConfig.signals
         .primaryEncoderPositionAlwaysOn(true)
         .primaryEncoderPositionPeriodMs((int) (1000.0 / readFreq))
@@ -137,7 +133,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   public void runSetpoint(double setpointRads, double ff) {
     closedLoopController.setReference(
         MathUtil.clamp(setpointRads, minInput, maxInput),
-        ControlType.kMAXMotionPositionControl,
+        ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
         ff,
         ArbFFUnits.kVoltage);

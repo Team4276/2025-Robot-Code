@@ -40,28 +40,19 @@ public class ArmIOSparkMax implements ArmIO {
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(currentLimit)
         .voltageCompensation(12.0);
-    leaderConfig
-        .absoluteEncoder
+    leaderConfig.absoluteEncoder
         .inverted(invertEncoder)
-        .positionConversionFactor(encoderPositionFactor) //TODO: fix units
+        .positionConversionFactor(encoderPositionFactor) // TODO: fix units
         .velocityConversionFactor(encoderVelocityFactor)
         .averageDepth(2);
-    leaderConfig
-        .closedLoop
+    leaderConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         .positionWrappingEnabled(true)
         .positionWrappingInputRange(0.0, 2 * Math.PI)
         .pidf(
             kp, ki,
             kd, kff);
-    leaderConfig
-        .closedLoop
-        .maxMotion
-        .allowedClosedLoopError(allowedClosedLoopError)
-        .maxAcceleration(maxAccel)
-        .maxVelocity(maxAccel);
-    leaderConfig
-        .signals
+    leaderConfig.signals
         .absoluteEncoderPositionAlwaysOn(true)
         .absoluteEncoderPositionPeriodMs((int) (1000.0 / readFreq))
         .absoluteEncoderVelocityAlwaysOn(true)
@@ -73,9 +64,8 @@ public class ArmIOSparkMax implements ArmIO {
     tryUntilOk(
         leaderSpark,
         5,
-        () ->
-            leaderSpark.configure(
-                leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+        () -> leaderSpark.configure(
+            leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
 
   @Override
@@ -92,7 +82,7 @@ public class ArmIOSparkMax implements ArmIO {
         (value) -> inputs.velocityRadsPerSec = value);
     ifOk(
         leaderSpark,
-        new DoubleSupplier[] {leaderSpark::getAppliedOutput, leaderSpark::getBusVoltage},
+        new DoubleSupplier[] { leaderSpark::getAppliedOutput, leaderSpark::getBusVoltage },
         (values) -> inputs.appliedVolts[0] = values[0] * values[1]);
     ifOk(leaderSpark, leaderSpark::getOutputCurrent, (value) -> inputs.currentAmps[0] = value);
     ifOk(leaderSpark, leaderSpark::getMotorTemperature, (value) -> inputs.tempCelcius[0] = value);
@@ -103,7 +93,7 @@ public class ArmIOSparkMax implements ArmIO {
   public void runSetpoint(double setpointRads, double ff) {
     closedLoopController.setReference(
         MathUtil.clamp(setpointRads, minInput, maxInput),
-        ControlType.kMAXMotionPositionControl,
+        ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
         ff,
         ArbFFUnits.kVoltage);
