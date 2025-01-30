@@ -3,6 +3,8 @@ package frc.team4276.frc2025.subsystems.superstructure.elevator;
 import static frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorConstants.*;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -37,10 +39,14 @@ public class Elevator extends SubsystemBase { // TODO: config; tune
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
+  private final ElevatorFeedforward ff;
+  private final TrapezoidProfile profile;
+  private TrapezoidProfile.State setpointState = new TrapezoidProfile.State();
+
   private BooleanSupplier coastOverride;
 
   private double characterizationInput = 0.0;
-  
+
   private boolean wantHome = false;
   private boolean isHoming = false;
 
@@ -50,6 +56,9 @@ public class Elevator extends SubsystemBase { // TODO: config; tune
   public Elevator(ElevatorIO io) {
     this.io = io;
     io.setBrakeMode(true);
+
+    ff = new ElevatorFeedforward(0.0, 0.0, 0.0, 0.0);
+    profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(maxVel, maxAccel));
 
     goalViz = new ElevatorViz("Goal", Color.kGreen);
     measuredViz = new ElevatorViz("Measured", Color.kBlack);
@@ -67,11 +76,11 @@ public class Elevator extends SubsystemBase { // TODO: config; tune
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);
 
-    if(inputs.botLimit){
+    if (inputs.botLimit) {
       io.setPosition(homePosition);
       isHoming = false;
 
-    } else if(inputs.topLimit){
+    } else if (inputs.topLimit) {
       io.setPosition(maxPosition);
       isHoming = false;
 
@@ -88,30 +97,33 @@ public class Elevator extends SubsystemBase { // TODO: config; tune
 
       io.setBrakeMode(!coastOverride.getAsBoolean() && hasFlippedCoast);
 
+      setpointState = new TrapezoidProfile.State(inputs.position, 0.0);
+
     } else {
       if (wasDisabled) {
         io.setBrakeMode(true);
         wasDisabled = false;
       }
 
-      hasFlippedCoast = false;      
-      
-      if(goal != Goal.STOW){
+      hasFlippedCoast = false;
+
+      if (goal != Goal.STOW) {
         isHoming = false;
       }
 
-      if(goal == Goal.CHARACTERIZING){
+      if (goal == Goal.CHARACTERIZING) {
         io.runVolts(characterizationInput);
 
       } else if (wantHome && goal == Goal.STOW && atGoal()) {
         wantHome = false;
         isHoming = true;
 
-      } else if(isHoming && goal == Goal.STOW){
-        io.runVolts(0.0);
+      } else if (isHoming && goal == Goal.STOW) {
+        io.runVolts(0.0); // TODO: tune
 
       } else {
-        io.runSetpoint(goal.getPosition());
+        setpointState = profile.calculate(0.02, setpointState, new TrapezoidProfile.State(goal.getPosition(), 0.0));
+        io.runSetpoint(setpointState.position, ff.calculate(setpointState.velocity));
         Logger.recordOutput("Elevator/GoalAngle", goal.getPosition());
 
       }
@@ -133,8 +145,8 @@ public class Elevator extends SubsystemBase { // TODO: config; tune
   }
 
   @AutoLogOutput
-  public boolean atGoal(){
-    return MathUtil.isNear(goal.getPosition(), inputs.position, tolerance); 
+  public boolean atGoal() {
+    return MathUtil.isNear(goal.getPosition(), inputs.position, tolerance);
   }
 
   public void runCharacterization(double output) {
@@ -149,7 +161,7 @@ public class Elevator extends SubsystemBase { // TODO: config; tune
     characterizationInput = 0.0;
   }
 
-  public void requestHome(){
+  public void requestHome() {
     wantHome = true;
   }
 }

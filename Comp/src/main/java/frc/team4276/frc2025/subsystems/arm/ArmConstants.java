@@ -26,12 +26,13 @@ public class ArmConstants {
 
   public static final Rotation2d offset = Rotation2d.fromDegrees(0.0);
 
-  public static final double allowedClosedLoopError = 0.1;
+  public static final double maxAccel = Math.toRadians(20.0);
+  public static final double maxVel = Math.toRadians(40.0);
 
-  public static final double maxAccel = 0.0;
-  public static final double maxVel = 0.0;
-  
-  public static final Translation2d armOrigin = new Translation2d(-0.026301, 0.155575);
+  public static final double kS = 0.0;
+  public static final double kV = 0.0;
+
+  public static final Translation2d origin = new Translation2d(-0.026301, 0.155575);
   public static final double gearRatio = 45.0;
   public static final double length = Units.inchesToMeters(10.939282); // to the bend
 }

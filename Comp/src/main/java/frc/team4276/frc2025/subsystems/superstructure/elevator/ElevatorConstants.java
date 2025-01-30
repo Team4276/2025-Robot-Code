@@ -28,10 +28,10 @@ public class ElevatorConstants {
   public static final double allowedClosedLoopError = 0.1;
 
   public static final double maxAccel = 0.0;
-  public static final double maxVel = 0.0;  
-  
-  public static final double gearRatio = 135.0;
-  public static final Translation2d origin = new Translation2d(-0.026301, 0.155575);
+  public static final double maxVel = 0.0;
+
+  public static final double gearRatio = 25.0;
+  public static final Translation2d origin = new Translation2d(0.0, 0.0);
   public static final double length = 1.0;
 
   public static final double homePosition = 0.0;
