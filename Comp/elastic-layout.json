@@ -1,6 +1,6 @@
 {
   "version": 1.0,
-  "grid_size": 64,
+  "grid_size": 32,
   "tabs": [
     {
       "name": "Prep",
@@ -23,7 +23,7 @@
         "containers": [
           {
             "title": "DriveMode",
-            "x": 1152.0,
+            "x": 1344.0,
             "y": 256.0,
             "width": 192.0,
             "height": 128.0,
@@ -37,8 +37,8 @@
           },
           {
             "title": "Swerve Drive",
-            "x": 704.0,
-            "y": 448.0,
+            "x": 576.0,
+            "y": 0.0,
             "width": 256.0,
             "height": 256.0,
             "type": "SwerveDrive",
@@ -51,10 +51,10 @@
           },
           {
             "title": "Field",
-            "x": 1024.0,
-            "y": 384.0,
-            "width": 512.0,
-            "height": 320.0,
+            "x": 576.0,
+            "y": 256.0,
+            "width": 448.0,
+            "height": 288.0,
             "type": "Field",
             "properties": {
               "topic": "/SmartDashboard/Field",
@@ -71,7 +71,7 @@
           },
           {
             "title": "CurrentGoal",
-            "x": 1152.0,
+            "x": 1344.0,
             "y": 128.0,
             "width": 192.0,
             "height": 128.0,
@@ -85,7 +85,7 @@
           },
           {
             "title": "DesiredGoal",
-            "x": 1152.0,
+            "x": 1344.0,
             "y": 0.0,
             "width": 192.0,
             "height": 128.0,
@@ -99,9 +99,9 @@
           },
           {
             "title": "SelectedReef0",
-            "x": 320.0,
+            "x": 288.0,
             "y": 0.0,
-            "width": 64.0,
+            "width": 96.0,
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
@@ -116,9 +116,9 @@
           },
           {
             "title": "SelectedReef1",
-            "x": 256.0,
+            "x": 192.0,
             "y": 0.0,
-            "width": 64.0,
+            "width": 96.0,
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
@@ -133,9 +133,9 @@
           },
           {
             "title": "SelectedReef2",
-            "x": 128.0,
+            "x": 96.0,
             "y": 128.0,
-            "width": 128.0,
+            "width": 96.0,
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
@@ -152,7 +152,7 @@
             "title": "SelectedReef3",
             "x": 0.0,
             "y": 128.0,
-            "width": 128.0,
+            "width": 96.0,
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
@@ -169,7 +169,7 @@
             "title": "SelectedReef4",
             "x": 0.0,
             "y": 320.0,
-            "width": 128.0,
+            "width": 96.0,
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
@@ -184,9 +184,9 @@
           },
           {
             "title": "SelectedReef5",
-            "x": 128.0,
+            "x": 96.0,
             "y": 320.0,
-            "width": 128.0,
+            "width": 96.0,
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
@@ -201,9 +201,9 @@
           },
           {
             "title": "SelectedReef6",
-            "x": 256.0,
+            "x": 192.0,
             "y": 448.0,
-            "width": 64.0,
+            "width": 96.0,
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
@@ -218,9 +218,9 @@
           },
           {
             "title": "SelectedReef7",
-            "x": 320.0,
+            "x": 288.0,
             "y": 448.0,
-            "width": 64.0,
+            "width": 96.0,
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
@@ -235,9 +235,9 @@
           },
           {
             "title": "SelectedReef9",
-            "x": 512.0,
+            "x": 480.0,
             "y": 320.0,
-            "width": 128.0,
+            "width": 96.0,
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
@@ -254,7 +254,7 @@
             "title": "SelectedReef8",
             "x": 384.0,
             "y": 320.0,
-            "width": 128.0,
+            "width": 96.0,
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
@@ -269,9 +269,9 @@
           },
           {
             "title": "SelectedReef10",
-            "x": 512.0,
+            "x": 480.0,
             "y": 128.0,
-            "width": 128.0,
+            "width": 96.0,
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
@@ -288,7 +288,7 @@
             "title": "SelectedReef11",
             "x": 384.0,
             "y": 128.0,
-            "width": 128.0,
+            "width": 96.0,
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
@@ -303,9 +303,9 @@
           },
           {
             "title": "SuperstructureGoal0",
-            "x": 704.0,
-            "y": 192.0,
-            "width": 128.0,
+            "x": 1024.0,
+            "y": 384.0,
+            "width": 320.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
@@ -320,7 +320,7 @@
           },
           {
             "title": "SuperstructureGoal1",
-            "x": 832.0,
+            "x": 1024.0,
             "y": 256.0,
             "width": 320.0,
             "height": 128.0,
@@ -337,7 +337,7 @@
           },
           {
             "title": "SuperstructureGoal2",
-            "x": 832.0,
+            "x": 1024.0,
             "y": 128.0,
             "width": 320.0,
             "height": 128.0,
@@ -354,7 +354,7 @@
           },
           {
             "title": "SuperstructureGoal3",
-            "x": 832.0,
+            "x": 1024.0,
             "y": 0.0,
             "width": 320.0,
             "height": 128.0,
@@ -371,9 +371,9 @@
           },
           {
             "title": "AtGoal",
-            "x": 256.0,
+            "x": 192.0,
             "y": 320.0,
-            "width": 128.0,
+            "width": 192.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
@@ -388,9 +388,9 @@
           },
           {
             "title": "AtGoal",
-            "x": 256.0,
+            "x": 192.0,
             "y": 192.0,
-            "width": 128.0,
+            "width": 192.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
