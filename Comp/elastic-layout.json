@@ -115,23 +115,6 @@
             }
           },
           {
-            "title": "SelectedReef1",
-            "x": 192.0,
-            "y": 0.0,
-            "width": 96.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/SelectedReef1",
-              "period": 0.02,
-              "data_type": "boolean",
-              "true_color": 4294967040,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
             "title": "SelectedReef2",
             "x": 96.0,
             "y": 128.0,
@@ -401,6 +384,37 @@
               "false_color": 4278190080,
               "true_icon": "None",
               "false_icon": "None"
+            }
+          },
+          {
+            "title": "SelectedReef1",
+            "x": 192.0,
+            "y": 0.0,
+            "width": 96.0,
+            "height": 192.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/SelectedReef1",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4294967040,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "DashboardSelectedReef",
+            "x": 864.0,
+            "y": 96.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/DashboardSelectedReef",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
             }
           }
         ]

@@ -86,7 +86,7 @@ public class RobotContainer {
 
   private final ScoringHelper scoringHelper = new ScoringHelper();
 
-  private boolean useKeyboard = true;
+  private boolean useKeyboard = false;
 
   // Dashboard inputs
   private final AutoSelector autoSelector = new AutoSelector();
@@ -98,92 +98,93 @@ public class RobotContainer {
     if (Constants.getMode() != Constants.Mode.REPLAY) {
       switch (Constants.getMode()) {
         case REAL -> {
-            // Real robot, instantiate hardware IO implementations
-            drive = new Drive(
-                    new GyroIOADIS(),
-                    new ModuleIOSpark(0),
-                    new ModuleIOSpark(1),
-                    new ModuleIOSpark(2),
-                    new ModuleIOSpark(3));
-            superstructure = new Superstructure(
-                    new Elevator(new ElevatorIOSparkMax()),
-                    new EndEffector(new EndEffectorIOSparkMax(Ports.ENDEFFECTOR_LEFT, Ports.ENDEFFECTOR_RIGHT, 40, false,
-                            true)),
-                    new RollerSensorsIOHardware());
-            arm = new Arm(new ArmIOSparkMax());
-            roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40,
-                    false, true));
-            vision = new Vision(
-                    RobotState.getInstance()::addVisionMeasurement,
-                    new VisionIOPhotonVision(
-                            VisionConstants.camera0Name, VisionConstants.robotToCamera0),
-                    new VisionIOPhotonVision(
-                            VisionConstants.camera1Name, VisionConstants.robotToCamera1));
-            }
+          // Real robot, instantiate hardware IO implementations
+          drive = new Drive(
+              new GyroIOADIS(),
+              new ModuleIOSpark(0),
+              new ModuleIOSpark(1),
+              new ModuleIOSpark(2),
+              new ModuleIOSpark(3));
+          superstructure = new Superstructure(
+              new Elevator(new ElevatorIOSparkMax()),
+              new EndEffector(new EndEffectorIOSparkMax(Ports.ENDEFFECTOR_LEFT, Ports.ENDEFFECTOR_RIGHT,
+                  40, false,
+                  true)),
+              new RollerSensorsIOHardware());
+          arm = new Arm(new ArmIOSparkMax());
+          roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40,
+              false, true));
+          vision = new Vision(
+              RobotState.getInstance()::addVisionMeasurement,
+              new VisionIOPhotonVision(
+                  VisionConstants.camera0Name, VisionConstants.robotToCamera0),
+              new VisionIOPhotonVision(
+                  VisionConstants.camera1Name, VisionConstants.robotToCamera1));
+        }
 
         case SIM -> {
-            // Sim robot, instantiate physics sim IO implementations
-            drive = new Drive(
-                    new GyroIO() {
-                    },
-                    new ModuleIOSim(),
-                    new ModuleIOSim(),
-                    new ModuleIOSim(),
-                    new ModuleIOSim());
-            superstructure = new Superstructure(
-                    new Elevator(new ElevatorIO() {
-                    }),
-                    new EndEffector(new EndEffectorIO() {
-                    }),
-                    new RollerSensorsIO() {
-                    });
-            arm = new Arm(new ArmIO() {
-            });
-            roller = new Roller(new RollerIO() {
-            });
-            vision = new Vision(
-                    RobotState.getInstance()::addVisionMeasurement,
-                    new VisionIOPhotonVisionSim(
-                            VisionConstants.camera0Name,
-                            VisionConstants.robotToCamera0,
-                            RobotState.getInstance()::getEstimatedPose),
-                    new VisionIOPhotonVisionSim(
-                            VisionConstants.camera1Name,
-                            VisionConstants.robotToCamera1,
-                            RobotState.getInstance()::getEstimatedPose));
-            }
+          // Sim robot, instantiate physics sim IO implementations
+          drive = new Drive(
+              new GyroIO() {
+              },
+              new ModuleIOSim(),
+              new ModuleIOSim(),
+              new ModuleIOSim(),
+              new ModuleIOSim());
+          superstructure = new Superstructure(
+              new Elevator(new ElevatorIO() {
+              }),
+              new EndEffector(new EndEffectorIO() {
+              }),
+              new RollerSensorsIO() {
+              });
+          arm = new Arm(new ArmIO() {
+          });
+          roller = new Roller(new RollerIO() {
+          });
+          vision = new Vision(
+              RobotState.getInstance()::addVisionMeasurement,
+              new VisionIOPhotonVisionSim(
+                  VisionConstants.camera0Name,
+                  VisionConstants.robotToCamera0,
+                  RobotState.getInstance()::getEstimatedPose),
+              new VisionIOPhotonVisionSim(
+                  VisionConstants.camera1Name,
+                  VisionConstants.robotToCamera1,
+                  RobotState.getInstance()::getEstimatedPose));
+        }
 
         default -> {
-            // Replayed robot, disable IO implementations
-            drive = new Drive(
-                    new GyroIO() {
-                    },
-                    new ModuleIO() {
-                    },
-                    new ModuleIO() {
-                    },
-                    new ModuleIO() {
-                    },
-                    new ModuleIO() {
-                    });
-            superstructure = new Superstructure(
-                    new Elevator(new ElevatorIO() {
-                    }),
-                    new EndEffector(new EndEffectorIO() {
-                    }),
-                    new RollerSensorsIO() {
-                    });
-            arm = new Arm(new ArmIO() {
-            });
-            roller = new Roller(new RollerIO() {
-            });
-            vision = new Vision(
-                    RobotState.getInstance()::addVisionMeasurement,
-                    new VisionIO() {
-                    },
-                    new VisionIO() {
-                    });
-            }
+          // Replayed robot, disable IO implementations
+          drive = new Drive(
+              new GyroIO() {
+              },
+              new ModuleIO() {
+              },
+              new ModuleIO() {
+              },
+              new ModuleIO() {
+              },
+              new ModuleIO() {
+              });
+          superstructure = new Superstructure(
+              new Elevator(new ElevatorIO() {
+              }),
+              new EndEffector(new EndEffectorIO() {
+              }),
+              new RollerSensorsIO() {
+              });
+          arm = new Arm(new ArmIO() {
+          });
+          roller = new Roller(new RollerIO() {
+          });
+          vision = new Vision(
+              RobotState.getInstance()::addVisionMeasurement,
+              new VisionIO() {
+              },
+              new VisionIO() {
+              });
+        }
       }
     }
 
@@ -246,40 +247,20 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     if (useKeyboard && Constants.getMode() == Mode.SIM) {
-        configureKeyBoardBindings();
+      configureKeyBoardBindings();
 
     } else {
-        configureControllerBindings();
+      configureControllerBindings();
 
     }
   }
-  
-  private void configureKeyBoardBindings(){
+
+  private void configureKeyBoardBindings() {
     drive.setDefaultCommand(
         drive.run(
             () -> drive.feedTeleopInput(
                 -keyboard0.getRawAxis(1), -keyboard0.getRawAxis(0),
                 keyboard2.getRawAxis(0))));
-    
-  }
-  private void configureControllerBindings(){
-    drive.setDefaultCommand(
-        drive.run(
-            () -> drive.feedTeleopInput(
-                driver.getLeftWithDeadband().y, driver.getLeftWithDeadband().x,
-                driver.getRightWithDeadband().x)));
-        // Reset gyro to 0° when A button is pressed
-        driver
-        .a()
-        .onTrue(
-            Commands.runOnce(
-                () -> RobotState.getInstance()
-                    .resetPose(
-                        new Pose2d(
-                            RobotState.getInstance().getEstimatedPose().getTranslation(),
-                            Rotation2d.kZero)),
-                drive)
-                .ignoringDisable(true));
 
     // keyboard0
     // .button(1)
@@ -288,6 +269,30 @@ public class RobotContainer {
     // () -> drive.setAutoAlignPosition(scoringHelper.getSelectedPose()),
     // drive::disableAutoAlign)
     // .until(drive::isAutoAligned));
+
+  }
+
+  private void configureControllerBindings() {
+    drive.setDefaultCommand(
+        drive.run(
+            () -> drive.feedTeleopInput(
+                -driver.getLeftWithDeadband().y,
+                -driver.getLeftWithDeadband().x,
+                -driver.getRightWithDeadband().x)));
+
+    // Reset gyro to 0° when A button is pressed
+    driver
+        .a()
+        .onTrue(
+            Commands.runOnce(
+                () -> RobotState.getInstance()
+                    .resetPose(
+                        new Pose2d(
+                            RobotState.getInstance().getEstimatedPose().getTranslation(),
+                            ChoreoAllianceFlipUtil.shouldFlip() ? Rotation2d.k180deg
+                                : Rotation2d.kZero)),
+                drive)
+                .ignoringDisable(false));
 
     // Coral Intake Triggers
     driver

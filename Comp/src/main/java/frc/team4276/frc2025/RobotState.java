@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.team4276.frc2025.field.FieldConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
 
+import choreo.util.ChoreoAllianceFlipUtil;
+
 public class RobotState {
   private SwerveModulePosition[] lastWheelPositions = new SwerveModulePosition[] {
       new SwerveModulePosition(),
@@ -24,12 +26,10 @@ public class RobotState {
 
   private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kinematics, lastGyroAngle,
       lastWheelPositions, Pose2d.kZero);
-  private SwerveDrivePoseEstimator poseEstimatorVision = new SwerveDrivePoseEstimator(kinematics, lastGyroAngle,
+  private SwerveDrivePoseEstimator poseEstimatorOdom = new SwerveDrivePoseEstimator(kinematics, lastGyroAngle,
       lastWheelPositions, Pose2d.kZero);
 
   private Pose2d trajectorySetpoint = Pose2d.kZero;
-
-  private FieldConstants.POIs POIs = FieldConstants.bluePOIs;
 
   private static RobotState mInstance;
 
@@ -47,21 +47,13 @@ public class RobotState {
   }
 
   public FieldConstants.POIs getPOIs() {
-    return POIs;
-  }
-
-  public void setBlue() {
-    POIs = FieldConstants.bluePOIs;
-  }
-
-  public void setRed() {
-    POIs = FieldConstants.redPOIs;
+    return ChoreoAllianceFlipUtil.shouldFlip() ? FieldConstants.redPOIs : FieldConstants.bluePOIs;
   }
 
   /** Resets the current odometry pose. */
   public void resetPose(Pose2d pose) {
+    poseEstimatorOdom.resetPose(pose);
     poseEstimator.resetPose(pose);
-    poseEstimatorVision.resetPose(pose);
   }
 
   public void setTrajectorySetpoint(Pose2d setpoint) {
@@ -80,8 +72,8 @@ public class RobotState {
 
     lastWheelPositions = wheelPositions;
 
+    poseEstimatorOdom.updateWithTime(timestamp, yaw, wheelPositions);
     poseEstimator.updateWithTime(timestamp, yaw, wheelPositions);
-    poseEstimatorVision.updateWithTime(timestamp, yaw, wheelPositions);
   }
 
   /** Adds a new timestamped vision measurement. */
@@ -89,19 +81,24 @@ public class RobotState {
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
-    poseEstimatorVision.addVisionMeasurement(
+    poseEstimator.addVisionMeasurement(
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
   }
 
   @AutoLogOutput(key = "RobotState/EstimatedPose")
   public Pose2d getEstimatedPose() {
     // Temp until i get the sim to be consistent
-    return useTrajectorySetpoint() ? trajectorySetpoint : poseEstimator.getEstimatedPosition();
+    return useTrajectorySetpoint() ? trajectorySetpoint : poseEstimatorOdom.getEstimatedPosition();
   }
 
   @AutoLogOutput(key = "RobotState/EstimatedVisionPose")
-  public Pose2d getEstimatedVisionPose(){
-    return poseEstimatorVision.getEstimatedPosition();
+  public Pose2d getEstimatedVisionPose() {
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  @AutoLogOutput(key = "RobotState/EstimatedOdomPose")
+  public Pose2d getEstimatedOdomPose() {
+    return poseEstimatorOdom.getEstimatedPosition();
   }
 
   private boolean useTrajectorySetpoint() {

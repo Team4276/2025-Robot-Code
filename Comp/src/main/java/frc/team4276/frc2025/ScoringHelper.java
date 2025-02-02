@@ -3,6 +3,7 @@ package frc.team4276.frc2025;
 import org.littletonrobotics.junction.Logger;
 
 import choreo.util.ChoreoAllianceFlipUtil;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -11,6 +12,10 @@ import frc.team4276.util.VirtualSubsystem;
 
 public class ScoringHelper extends VirtualSubsystem {
   private final int[] redScoringTable = {
+      9,
+      8,
+      10,
+      11,
       0,
       1,
       2,
@@ -18,14 +23,14 @@ public class ScoringHelper extends VirtualSubsystem {
       5,
       4,
       7,
-      6,
-      9,
-      8,
-      10,
-      11
+      6
   };
 
   private final int[] blueScoringTable = {
+      3,
+      2,
+      4,
+      5,
       6,
       7,
       8,
@@ -33,11 +38,7 @@ public class ScoringHelper extends VirtualSubsystem {
       11,
       10,
       1,
-      0,
-      3,
-      2,
-      4,
-      5,
+      0
   };
 
   private GenericHID buttonBoard = new GenericHID(2);
@@ -81,8 +82,14 @@ public class ScoringHelper extends VirtualSubsystem {
     }
 
     for (int i = 0; i < 12; i++) {
-      SmartDashboard.putBoolean("Comp/SelectedReef" + i, getSelectedReef() == i);
+      SmartDashboard.putBoolean(
+          "Comp/SelectedReef" + i,
+          getSelectedReef() == i);
     }
+
+    SmartDashboard.putNumber(
+        "Comp/DashboardSelectedReef",
+        (int) MathUtil.inputModulus(getSelectedReef() + (ChoreoAllianceFlipUtil.shouldFlip() ? 6 : 0), 0, 11));
 
     for (int i = 0; i < 4; i++) {
       SmartDashboard.putBoolean("Comp/SuperstructureGoal" + i, getSuperstructureGoal().ordinal() - 2 == i);
@@ -101,7 +108,7 @@ public class ScoringHelper extends VirtualSubsystem {
   private int getSelectedReef() {
     int[] selectedTable = ChoreoAllianceFlipUtil.shouldFlip() ? redScoringTable : blueScoringTable;
 
-    return selectedTable[side * 2 + (isRight ? 1 : 0)];
+    return selectedTable[side * 2 + (isRight ? 0 : 1)];
   }
 
   public Goal getSuperstructureGoal() {
