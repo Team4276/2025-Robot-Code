@@ -1,10 +1,10 @@
 package frc.team4276.frc2025.subsystems.drive.controllers;
 
-import choreo.util.ChoreoAllianceFlipUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.team4276.frc2025.subsystems.drive.DriveConstants;
+import frc.team4276.util.AllianceFlipUtil;
 
 public class TeleopDriveController {
   private static final double LINEAR_VELOCITY_SCALAR = 1.0;
@@ -44,6 +44,6 @@ public class TeleopDriveController {
 
   public ChassisSpeeds update(Rotation2d yaw) {
     return ChassisSpeeds.fromFieldRelativeSpeeds(updateRaw(yaw),
-        ChoreoAllianceFlipUtil.shouldFlip() ? yaw.plus(Rotation2d.k180deg) : yaw);
+        AllianceFlipUtil.apply(yaw));
   }
 }

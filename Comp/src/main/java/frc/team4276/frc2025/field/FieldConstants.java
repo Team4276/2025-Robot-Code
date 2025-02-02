@@ -7,7 +7,7 @@ import edu.wpi.first.math.util.Units;
 
 public class FieldConstants {
   public static final double fieldLength = Units.inchesToMeters(690.875958);
-  public static final double fieldWidth = Units.inchesToMeters(317.000000);
+  public static final double fieldWidth = Units.inchesToMeters(317);
   public static final Translation2d fieldCenter = new Translation2d(
       Units.inchesToMeters(345.437979),
       Units.inchesToMeters(158.5));

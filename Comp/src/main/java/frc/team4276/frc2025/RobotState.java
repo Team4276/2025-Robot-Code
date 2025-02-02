@@ -11,9 +11,9 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.team4276.frc2025.field.FieldConstants;
-import org.littletonrobotics.junction.AutoLogOutput;
+import frc.team4276.util.AllianceFlipUtil;
 
-import choreo.util.ChoreoAllianceFlipUtil;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class RobotState {
   private SwerveModulePosition[] lastWheelPositions = new SwerveModulePosition[] {
@@ -47,7 +47,7 @@ public class RobotState {
   }
 
   public FieldConstants.POIs getPOIs() {
-    return ChoreoAllianceFlipUtil.shouldFlip() ? FieldConstants.redPOIs : FieldConstants.bluePOIs;
+    return AllianceFlipUtil.shouldFlip() ? FieldConstants.redPOIs : FieldConstants.bluePOIs;
   }
 
   /** Resets the current odometry pose. */
@@ -66,7 +66,7 @@ public class RobotState {
     if (yaw == null) {
       // Derive from kinematics
       yaw = lastGyroAngle.rotateBy(
-          new Rotation2d(kinematics.toTwist2d(wheelPositions, lastWheelPositions).dtheta));
+          new Rotation2d(kinematics.toTwist2d(lastWheelPositions, wheelPositions).dtheta));
       lastGyroAngle = yaw;
     }
 
@@ -87,13 +87,7 @@ public class RobotState {
 
   @AutoLogOutput(key = "RobotState/EstimatedPose")
   public Pose2d getEstimatedPose() {
-    // Temp until i get the sim to be consistent
     return useTrajectorySetpoint() ? trajectorySetpoint : poseEstimatorOdom.getEstimatedPosition();
-  }
-
-  @AutoLogOutput(key = "RobotState/EstimatedVisionPose")
-  public Pose2d getEstimatedVisionPose() {
-    return poseEstimator.getEstimatedPosition();
   }
 
   @AutoLogOutput(key = "RobotState/EstimatedOdomPose")

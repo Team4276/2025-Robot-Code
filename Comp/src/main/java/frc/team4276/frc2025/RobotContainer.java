@@ -13,7 +13,6 @@
 
 package frc.team4276.frc2025;
 
-import choreo.util.ChoreoAllianceFlipUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -55,6 +54,7 @@ import frc.team4276.frc2025.subsystems.vision.VisionConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVision;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.BetterXboxController;
 
 /**
@@ -79,14 +79,14 @@ public class RobotContainer {
   private AutoBuilder autoBuilder;
 
   // Controller
+  private boolean useKeyboard = true;
+
   private final BetterXboxController driver = new BetterXboxController(0);
   private final CommandGenericHID keyboard0 = new CommandGenericHID(0);
-  // private final CommandGenericHID keyboard1 = new CommandGenericHID(1);
+  private final CommandGenericHID keyboard1 = new CommandGenericHID(1);
   private final CommandGenericHID keyboard2 = new CommandGenericHID(2);
 
-  private final ScoringHelper scoringHelper = new ScoringHelper();
-
-  private boolean useKeyboard = false;
+  private final ScoringHelper scoringHelper = new ScoringHelper(useKeyboard);
 
   // Dashboard inputs
   private final AutoSelector autoSelector = new AutoSelector();
@@ -193,12 +193,9 @@ public class RobotContainer {
     autoBuilder = new AutoBuilder(drive);
 
     // Set up auto routines
-    autoSelector.addRoutine("Test 1 PP Traj", autoBuilder.TestPPTraj("Demo"));
-    autoSelector.addRoutine("Test 1 Choreo Traj", autoBuilder.TestChoreoTraj("Demo"));
-    autoSelector.addRoutine("Test 2 PP Traj", autoBuilder.TestPPTraj("SimDemo"));
-    autoSelector.addRoutine("Test 2 Choreo Traj", autoBuilder.TestChoreoTraj("SimDemo"));
-    autoSelector.addRoutine("Test 3 PP Traj", autoBuilder.TestPPTraj("BoxTest"));
-    autoSelector.addRoutine("Test 3 Choreo Traj", autoBuilder.TestChoreoTraj("BoxTest"));
+    autoSelector.addRoutine("Test 1 Traj", autoBuilder.testTraj("Demo"));
+    autoSelector.addRoutine("Test 2 Traj", autoBuilder.testTraj("SimDemo"));
+    autoSelector.addRoutine("Test 3 Traj", autoBuilder.testTraj("BoxTest"));
 
     // Set up SysId routines
     autoSelector.addRoutine(
@@ -259,16 +256,17 @@ public class RobotContainer {
     drive.setDefaultCommand(
         drive.run(
             () -> drive.feedTeleopInput(
-                -keyboard0.getRawAxis(1), -keyboard0.getRawAxis(0),
-                keyboard2.getRawAxis(0))));
+                -keyboard0.getRawAxis(1), 
+                -keyboard0.getRawAxis(0),
+                -keyboard2.getRawAxis(0))));
 
-    // keyboard0
-    // .button(1)
-    // .whileTrue(
-    // Commands.startEnd(
-    // () -> drive.setAutoAlignPosition(scoringHelper.getSelectedPose()),
-    // drive::disableAutoAlign)
-    // .until(drive::isAutoAligned));
+    keyboard1
+        .button(6)
+        .whileTrue(
+            Commands.startEnd(
+                () -> drive.setAutoAlignPosition(scoringHelper.getSelectedPose()),
+                drive::disableAutoAlign)
+                .until(drive::isAutoAligned));
 
   }
 
@@ -289,8 +287,7 @@ public class RobotContainer {
                     .resetPose(
                         new Pose2d(
                             RobotState.getInstance().getEstimatedPose().getTranslation(),
-                            ChoreoAllianceFlipUtil.shouldFlip() ? Rotation2d.k180deg
-                                : Rotation2d.kZero)),
+                            AllianceFlipUtil.apply(Rotation2d.kZero))),
                 drive)
                 .ignoringDisable(false));
 
@@ -302,8 +299,7 @@ public class RobotContainer {
                 .alongWith(
                     Commands.startEnd(
                         () -> drive.setHeadingGoal(
-                            () -> Rotation2d.fromDegrees(125.0
-                                + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
+                            () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(125.0))),
                         drive::clearHeadingGoal)));
     driver
         .b()
@@ -312,8 +308,7 @@ public class RobotContainer {
                 .alongWith(
                     Commands.startEnd(
                         () -> drive.setHeadingGoal(
-                            () -> Rotation2d.fromDegrees(235.0
-                                + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
+                            () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(235.0))),
                         drive::clearHeadingGoal)));
 
     // Algae Intake Trigger
@@ -360,8 +355,7 @@ public class RobotContainer {
         .whileTrue(
             Commands.startEnd(
                 () -> drive.setHeadingGoal(
-                    () -> Rotation2d.fromDegrees(
-                        -90.0 + (ChoreoAllianceFlipUtil.shouldFlip() ? 180.0 : 0.0))),
+                    () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(-90.0))),
                 drive::clearHeadingGoal));
   }
 
@@ -371,7 +365,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoBuilder.TestPPTraj("5Coral");
+    return autoBuilder.testTraj("5Coral");
     // new FeedForwardCharacterization(
     // drive, drive::runCharacterization, drive::getFFCharacterizationVelocity);
   }

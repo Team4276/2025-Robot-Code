@@ -16,8 +16,6 @@ package frc.team4276.frc2025.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 import static frc.team4276.frc2025.subsystems.drive.DriveConstants.*;
 
-import choreo.trajectory.SwerveSample;
-import choreo.trajectory.Trajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
@@ -185,8 +183,7 @@ public class Drive extends SubsystemBase {
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.getMode() != Mode.SIM);
 
-    Pose2d currentPose = RobotState.getInstance().getEstimatedVisionPose();
-    currentPose = RobotState.getInstance().getEstimatedPose();
+    Pose2d currentPose = RobotState.getInstance().getEstimatedPose();
 
     switch (mode) {
       case TELEOP:
@@ -292,16 +289,9 @@ public class Drive extends SubsystemBase {
     isHeadingControlled = false;
   }
 
-  public void setTrajectory(Trajectory<SwerveSample> traj) {
+  public void setTrajectory(PathPlannerTrajectory traj) {
     if (DriverStation.isAutonomousEnabled()) {
       trajectoryController.setTrajectory(traj);
-      mode = DriveMode.TRAJECTORY;
-    }
-  }
-
-  public void setPathPlannerTrajectory(PathPlannerTrajectory traj) {
-    if (DriverStation.isAutonomousEnabled()) {
-      trajectoryController.setPathPlannerTrajectory(traj);
       mode = DriveMode.TRAJECTORY;
     }
   }
