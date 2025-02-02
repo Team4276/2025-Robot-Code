@@ -402,20 +402,6 @@
               "true_icon": "None",
               "false_icon": "None"
             }
-          },
-          {
-            "title": "DashboardSelectedReef",
-            "x": 864.0,
-            "y": 96.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/DashboardSelectedReef",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
           }
         ]
       }
@@ -1161,6 +1147,27 @@
           }
         ],
         "containers": []
+      }
+    },
+    {
+      "name": "Sim",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "OverrideFlip",
+            "x": 576.0,
+            "y": 128.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Toggle Switch",
+            "properties": {
+              "topic": "/SmartDashboard/Sim/OverrideFlip",
+              "period": 0.02,
+              "data_type": "boolean"
+            }
+          }
+        ]
       }
     }
   ]
