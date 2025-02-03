@@ -190,7 +190,7 @@ public class RobotContainer {
 
     arm.setCoastOverride(() -> false);
 
-    autoBuilder = new AutoBuilder(drive);
+    autoBuilder = new AutoBuilder(drive, superstructure);
 
     // Set up auto routines
     autoSelector.addRoutine("Test 1 Traj", autoBuilder.testTraj("Demo"));
@@ -365,8 +365,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoBuilder.testTraj("5Coral");
-    // new FeedForwardCharacterization(
-    // drive, drive::runCharacterization, drive::getFFCharacterizationVelocity);
+    return autoBuilder.FiveCoral();
   }
 }

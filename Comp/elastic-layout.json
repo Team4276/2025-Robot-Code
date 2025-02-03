@@ -13,7 +13,21 @@
       "name": "Auto",
       "grid_layout": {
         "layouts": [],
-        "containers": []
+        "containers": [
+          {
+            "title": "Auto",
+            "x": 576.0,
+            "y": 160.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/Auto",
+              "period": 0.02,
+              "sort_options": false
+            }
+          }
+        ]
       }
     },
     {
