@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.team4276.frc2025.AutoSelector.AutoQuestionResponses;
 import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.frc2025.Constants.RobotType;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
@@ -87,6 +88,8 @@ public class RobotContainer {
   private final CommandGenericHID keyboard2 = new CommandGenericHID(2);
 
   private final ScoringHelper scoringHelper = new ScoringHelper(useKeyboard);
+
+  private boolean disableTranslationAutoAlign = false;
 
   // Dashboard inputs
   private final AutoSelector autoSelector = new AutoSelector();
@@ -256,7 +259,7 @@ public class RobotContainer {
     drive.setDefaultCommand(
         drive.run(
             () -> drive.feedTeleopInput(
-                -keyboard0.getRawAxis(1), 
+                -keyboard0.getRawAxis(1),
                 -keyboard0.getRawAxis(0),
                 -keyboard2.getRawAxis(0))));
 
@@ -333,10 +336,22 @@ public class RobotContainer {
                 .startEnd(() -> superstructure.setGoal(scoringHelper.getSuperstructureGoal()),
                     () -> superstructure.setGoal(Superstructure.Goal.STOW))
                 .alongWith(
-                    Commands.startEnd(
-                        () -> drive.setAutoAlignPosition(scoringHelper.getSelectedPose()),
-                        drive::disableAutoAlign)
-                        .until(drive::isAutoAligned)));
+                    Commands.either(
+                        Commands.startEnd(
+                            () -> drive
+                                .setAutoAlignPosition(scoringHelper.getSelectedPose()),
+                            drive::disableAutoAlign),
+                        Commands.startEnd(
+                            () -> drive.setHeadingGoal(() -> scoringHelper.getSelectedPose().getRotation()),
+                            drive::clearHeadingGoal),
+                        () -> disableTranslationAutoAlign)));
+
+    driver
+        .rightStick()
+        .onTrue(
+            Commands.runOnce(() -> {
+              disableTranslationAutoAlign = !disableTranslationAutoAlign;
+            }));
 
     driver
         .rightBumper()
@@ -365,6 +380,11 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoBuilder.FiveCoral();
+    return autoBuilder.CoralScoreAuto(
+        false,
+        AutoQuestionResponses.MIDDLE,
+        AutoQuestionResponses.FAR,
+        AutoQuestionResponses.CLOSE,
+        5, 0.0);
   }
 }

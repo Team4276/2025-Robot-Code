@@ -108,7 +108,7 @@ public class AutoCommands {
     return Commands.waitUntil(() -> yCrossed(yPosition, towardsCenterline));
   }
 
-  public static Command alertCommand(String alert){ // TODO: impl with alerts
+  public static Command alertCommand(String alert) { // TODO: impl with alerts
     return Commands.runOnce(() -> System.out.println("Driving and Intaking"));
   }
 
@@ -120,17 +120,25 @@ public class AutoCommands {
   }
 
   public static Command driveWithSuperstructureCommand(Drive drive, Superstructure superstructure,
-      PathPlannerTrajectory traj, Superstructure.Goal goal) {
+      PathPlannerTrajectory traj, Superstructure.Goal goal, double delay) {
     return followTrajectory(drive, traj)
-        .deadlineFor(superstructure.setGoalCommand(goal))
+        .deadlineFor(
+            Commands.waitSeconds(delay)
+                .andThen(superstructure.setGoalCommand(goal)))
         .withName("DriveWithSuperstructureGoal")
         .alongWith(alertCommand("Driving with Superstructure Goal " + goal));
   }
 
+  public static Command driveAndScoreCommand(Drive drive, Superstructure superstructure,
+      PathPlannerTrajectory traj, Superstructure.Goal goal, double delay) {
+    return driveWithSuperstructureCommand(drive, superstructure, traj, goal, delay)
+        .andThen(scoreCommand(superstructure));
+  }
+
   public static Command driveAndIntakeCommand(Drive drive, Superstructure superstructure, PathPlannerTrajectory traj) {
     return followTrajectory(drive, traj)
-        .andThen(superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
-          .withDeadline(Commands.waitSeconds(intakeWaitTime)))
+        .alongWith(superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
+            .withDeadline(Commands.waitSeconds(intakeWaitTime)))
         .withName("DriveAndIntake")
         .alongWith(alertCommand("Driving and Intaking"));
   }

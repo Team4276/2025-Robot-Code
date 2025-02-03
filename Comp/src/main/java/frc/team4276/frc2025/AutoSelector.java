@@ -7,6 +7,16 @@ import frc.team4276.util.VirtualSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class AutoSelector extends VirtualSubsystem {
+  public static enum AutoQuestionResponses {
+    YES,
+    NO,
+    PROCESSOR_SIDE,
+    MIDDLE,
+    FAR,
+    CLOSE
+
+  }
+
   private static final AutoRoutine defaultRoutine = new AutoRoutine("Do Nothing", Commands.none());
 
   private final LoggedDashboardChooser<AutoRoutine> routineChooser;
