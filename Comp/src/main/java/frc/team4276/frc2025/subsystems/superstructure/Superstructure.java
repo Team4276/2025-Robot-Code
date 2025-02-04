@@ -130,11 +130,11 @@ public class Superstructure extends SubsystemBase { // TODO: test logic
   }
 
   public Command setGoalCommand(Goal goal) {
-    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW));
+    return setGoalCommand(() -> goal);
   }
 
   public Command setGoalCommand(Supplier<Goal> goal) {
-    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW));
+    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW), this);
   }
 
   public Goal getGoal() {

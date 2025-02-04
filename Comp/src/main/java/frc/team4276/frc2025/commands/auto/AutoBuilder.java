@@ -70,7 +70,7 @@ public class AutoBuilder {
 
     if(!isProcessorSide.getAsBoolean()){
       for(var traj : trajs){
-        traj = PPUtil.mirrorLengthWise(traj);
+        traj = PPUtil.mirrorLengthwise(traj);
       }
     }
 

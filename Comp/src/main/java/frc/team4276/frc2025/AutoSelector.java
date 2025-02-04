@@ -21,7 +21,8 @@ public class AutoSelector extends VirtualSubsystem {
     PROCESSOR_SIDE,
     MIDDLE,
     FAR,
-    CLOSE
+    CLOSE,
+    EMPTY
   }
 
   private static final int maxQuestions = 4;
@@ -42,7 +43,11 @@ public class AutoSelector extends VirtualSubsystem {
     routineChooser = new LoggedDashboardChooser<>("Comp/Auto");
     routineChooser.addDefaultOption(defaultRoutine.name(), defaultRoutine);
     lastRoutine = defaultRoutine;
-    lastResponses = List.of();
+    lastResponses = List.of(
+      AutoQuestionResponse.EMPTY,
+      AutoQuestionResponse.EMPTY,
+      AutoQuestionResponse.EMPTY,
+      AutoQuestionResponse.EMPTY);
 
     questionPublishers = new ArrayList<>();
     questionChoosers = new ArrayList<>();
