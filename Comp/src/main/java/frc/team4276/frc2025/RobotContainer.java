@@ -110,19 +110,20 @@ public class RobotContainer {
               new ModuleIOSpark(3));
           superstructure = new Superstructure(
               new Elevator(new ElevatorIOSparkMax()),
-              new EndEffector(new EndEffectorIOSparkMax(Ports.ENDEFFECTOR_LEFT, Ports.ENDEFFECTOR_RIGHT,
+              new EndEffector(new EndEffectorIOSparkMax(Ports.ENDEFFECTOR_LEFT,
+                  Ports.ENDEFFECTOR_RIGHT,
                   40, false,
                   true)),
               new RollerSensorsIOHardware());
-          arm = new Arm(new ArmIOSparkMax());
-          roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40,
-              false, true));
-          vision = new Vision(
-              RobotState.getInstance()::addVisionMeasurement,
-              new VisionIOPhotonVision(
-                  VisionConstants.camera0Name, VisionConstants.robotToCamera0),
-              new VisionIOPhotonVision(
-                  VisionConstants.camera1Name, VisionConstants.robotToCamera1));
+          // arm = new Arm(new ArmIOSparkMax());
+          // roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40,
+          // false, true));
+          // vision = new Vision(
+          // RobotState.getInstance()::addVisionMeasurement,
+          // new VisionIOPhotonVision(
+          // VisionConstants.camera0Name, VisionConstants.robotToCamera0),
+          // new VisionIOPhotonVision(
+          // VisionConstants.camera1Name, VisionConstants.robotToCamera1));
         }
 
         case SIM -> {
@@ -191,9 +192,9 @@ public class RobotContainer {
       }
     }
 
-    arm.setCoastOverride(() -> false);
+    // arm.setCoastOverride(() -> false);
 
-    autoBuilder = new AutoBuilder(drive, superstructure);
+    // autoBuilder = new AutoBuilder(drive, superstructure);
 
     // Set up auto routines
     autoSelector.addRoutine("Test 1 Traj", autoBuilder.testTraj("Demo"));
@@ -217,15 +218,15 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoSelector.addRoutine(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    autoSelector.addRoutine(
-        "Arm Simple FF Characterization",
-        new FeedForwardCharacterization(
-            arm, arm::runCharacterization, arm::getFFCharacterizationVelocity));
-    autoSelector.addRoutine(
-        "Elevator Simple FF Characterization",
-        new FeedForwardCharacterization(
-            superstructure, superstructure::acceptCharacterizationInput,
-            superstructure::getFFCharacterizationVelocity));
+    // autoSelector.addRoutine(
+    // "Arm Simple FF Characterization",
+    // new FeedForwardCharacterization(
+    // arm, arm::runCharacterization, arm::getFFCharacterizationVelocity));
+    // autoSelector.addRoutine(
+    // "Elevator Simple FF Characterization",
+    // new FeedForwardCharacterization(
+    // superstructure, superstructure::acceptCharacterizationInput,
+    // superstructure::getFFCharacterizationVelocity));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -293,6 +294,10 @@ public class RobotContainer {
                             AllianceFlipUtil.apply(Rotation2d.kZero))),
                 drive)
                 .ignoringDisable(false));
+
+    if (true) {
+      return;
+    }
 
     // Coral Intake Triggers
     driver
@@ -380,11 +385,13 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoBuilder.CoralScoreAuto(
-        false,
-        AutoQuestionResponses.MIDDLE,
-        AutoQuestionResponses.FAR,
-        AutoQuestionResponses.CLOSE,
-        5, 0.0);
+    return
+    // autoBuilder.CoralScoreAuto(
+    // false,
+    // AutoQuestionResponses.MIDDLE,
+    // AutoQuestionResponses.FAR,
+    // AutoQuestionResponses.CLOSE,
+    // 5, 0.0);
+    Commands.none();
   }
 }

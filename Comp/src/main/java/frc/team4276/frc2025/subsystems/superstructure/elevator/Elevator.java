@@ -39,8 +39,8 @@ public class Elevator extends SubsystemBase { // TODO: config; tune
 
   private Goal goal = Goal.STOW;
 
-  private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Elevator/maxVel", Math.toRadians(40.0));
-  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", Math.toRadians(20.0));
+  private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Elevator/maxVel", 0.0);
+  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", 0.0);
 
   private final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.0);
   private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0.0);
