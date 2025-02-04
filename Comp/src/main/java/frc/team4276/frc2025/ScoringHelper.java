@@ -183,4 +183,8 @@ public class ScoringHelper extends VirtualSubsystem {
   public Goal getSuperstructureGoal() {
     return level;
   }
+
+  public boolean isRight() {
+    return isRight;
+  }
 }

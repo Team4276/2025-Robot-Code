@@ -2,6 +2,7 @@ package frc.team4276.frc2025.subsystems.drive.controllers;
 
 import static frc.team4276.frc2025.subsystems.drive.DriveConstants.*;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,11 +28,13 @@ public class AutoAlignController {
 
   private final ProfiledPIDController translationController;
   private final ProfiledPIDController headingController;
-  private final Timer toleranceTimer = new Timer();
+  private final Timer translationToleranceTimer = new Timer();
+  private final Timer headingToleranceTimer = new Timer();
   private final double toleranceTime = 0.5;
 
   @AutoLogOutput(key = "AutoAlign/SetpointPose")
   private Pose2d setpoint = Pose2d.kZero;
+  private Pose2d distanceToGoal = Pose2d.kZero;
 
   private TeleopDriveController teleopDriveController = new TeleopDriveController();
 
@@ -55,12 +58,14 @@ public class AutoAlignController {
     translationController.setTolerance(translationKTol.getAsDouble());
     headingController.setTolerance(Math.toRadians(rotationKTol.getAsDouble()));
 
-    toleranceTimer.restart();
+    translationToleranceTimer.restart();
+    headingToleranceTimer.restart();
   }
 
   public void setSetpoint(Pose2d pose) {
     this.setpoint = pose;
-    toleranceTimer.reset();
+    translationToleranceTimer.reset();
+    headingToleranceTimer.reset();
     cancelX = false;
     cancelY = false;
     cancelTheta = false;
@@ -83,12 +88,20 @@ public class AutoAlignController {
           translationController.calculate(trans.getNorm(), 0.0), trans.getAngle());
     }
 
-    double thetaError = setpoint.getRotation().minus(currentPose.getRotation()).getRadians();
+    if (!translationController.atGoal()) {
+      translationToleranceTimer.reset();
+
+    }
+
+    double thetaError = MathUtil.angleModulus(setpoint.getRotation().minus(currentPose.getRotation()).getRadians());
     double omega = headingController.calculate(thetaError, 0.0);
 
-    if (!translationController.atGoal() || !headingController.atGoal()) {
-      toleranceTimer.reset();
+    if (!headingController.atGoal()) {
+      headingToleranceTimer.reset();
+
     }
+
+    distanceToGoal = setpoint.relativeTo(currentPose);
 
     Logger.recordOutput("AutoAlign/DistanceMeasured", trans.getNorm());
     Logger.recordOutput("AutoAlign/DistanceSetpoint", translationController.getSetpoint().position);
@@ -125,6 +138,15 @@ public class AutoAlignController {
 
   @AutoLogOutput(key = "AutoAlign/AtGoal")
   public boolean atGoal() {
-    return toleranceTimer.hasElapsed(toleranceTime);
+    return translationToleranceTimer.hasElapsed(toleranceTime) &&
+        headingToleranceTimer.hasElapsed(toleranceTime);
+  }
+
+  public Pose2d distToGoal() {
+    return distanceToGoal;
+  }
+
+  public boolean isHeadingAligned() {
+    return headingToleranceTimer.hasElapsed(toleranceTime);
   }
 }

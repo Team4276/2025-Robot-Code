@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.team4276.frc2025.AutoSelector.AutoQuestionResponses;
+import frc.team4276.frc2025.AutoSelector.AutoQuestionResponse;
 import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.frc2025.Constants.RobotType;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
@@ -73,8 +73,6 @@ public class RobotContainer {
   private Superstructure superstructure;
   private Arm arm;
   private Roller roller;
-
-  @SuppressWarnings("unused")
   private Vision vision;
 
   private AutoBuilder autoBuilder;
@@ -89,7 +87,7 @@ public class RobotContainer {
 
   private final ScoringHelper scoringHelper = new ScoringHelper(useKeyboard);
 
-  private boolean disableTranslationAutoAlign = false;
+  private boolean disableTranslationAutoAlign = true;
 
   // Dashboard inputs
   private final AutoSelector autoSelector = new AutoSelector();
@@ -194,13 +192,33 @@ public class RobotContainer {
 
     // arm.setCoastOverride(() -> false);
 
-    // autoBuilder = new AutoBuilder(drive, superstructure);
+    configureAutos();
+    configureTuningRoutines();
+    configureButtonBindings();
+
+    // Peace and quiet
+    if (Constants.getType() == RobotType.SIMBOT) {
+      DriverStation.silenceJoystickConnectionWarning(true);
+    }
+  }
+
+  private void configureAutos() {
+    autoBuilder = new AutoBuilder(drive, superstructure);
 
     // Set up auto routines
-    autoSelector.addRoutine("Test 1 Traj", autoBuilder.testTraj("Demo"));
-    autoSelector.addRoutine("Test 2 Traj", autoBuilder.testTraj("SimDemo"));
-    autoSelector.addRoutine("Test 3 Traj", autoBuilder.testTraj("BoxTest"));
+    autoSelector.addRoutine("Test 1 Traj", autoBuilder.testTraj("BoxTest"));
+    autoSelector.addRoutine("Coral Score Auto", autoBuilder.coralScoreAuto(
+      () -> autoSelector.getResponses().get(0) == AutoQuestionResponse.PROCESSOR_SIDE,
+      () -> autoSelector.getResponses().get(1),
+      () -> autoSelector.getResponses().get(2),
+      () -> autoSelector.getResponses().get(3),
+      () -> autoSelector.getCoralInput(),
+      () -> autoSelector.getDelayInput()
+      ));
 
+  }
+
+  private void configureTuningRoutines() {    
     // Set up SysId routines
     autoSelector.addRoutine(
         "Drive Wheel Radius Characterization", new WheelRadiusCharacterization(drive));
@@ -228,13 +246,6 @@ public class RobotContainer {
     // superstructure, superstructure::acceptCharacterizationInput,
     // superstructure::getFFCharacterizationVelocity));
 
-    // Configure the button bindings
-    configureButtonBindings();
-
-    // Peace and quiet
-    if (Constants.getType() == RobotType.SIMBOT) {
-      DriverStation.silenceJoystickConnectionWarning(true);
-    }
   }
 
   /**
@@ -337,31 +348,34 @@ public class RobotContainer {
     driver
         .rightTrigger()
         .whileTrue(
-            Commands
-                .startEnd(() -> superstructure.setGoal(scoringHelper.getSuperstructureGoal()),
-                    () -> superstructure.setGoal(Superstructure.Goal.STOW))
+            superstructure.setGoalCommand(() -> scoringHelper.getSuperstructureGoal())
                 .alongWith(
                     Commands.either(
                         Commands.startEnd(
-                            () -> drive
-                                .setAutoAlignPosition(scoringHelper.getSelectedPose()),
-                            drive::disableAutoAlign),
-                        Commands.startEnd(
                             () -> drive.setHeadingGoal(() -> scoringHelper.getSelectedPose().getRotation()),
                             drive::clearHeadingGoal),
-                        () -> disableTranslationAutoAlign)));
+                        Commands.startEnd(
+                            () -> drive
+                                .setAutoAlignPosition(scoringHelper.getSelectedPose()),
+                            drive::disableAutoAlign)
+                            .alongWith(
+                                Commands
+                                    .waitUntil(() -> drive.getAutoAlignDistanceToGoal().getTranslation().getNorm() < 0.5
+                                        && drive.isAutoHeadingAligned())
+                                    .andThen(() -> vision.setEnableCamera(1, false))),
+                        () -> disableTranslationAutoAlign))
+                .finallyDo(() -> vision.setEnableCamera(1, true)));
 
-    driver
-        .rightStick()
-        .onTrue(
-            Commands.runOnce(() -> {
-              disableTranslationAutoAlign = !disableTranslationAutoAlign;
-            }));
+    // driver
+    // .rightStick()
+    // .onTrue(
+    // Commands.runOnce(() -> {
+    // disableTranslationAutoAlign = !disableTranslationAutoAlign;
+    // }));
 
     driver
         .rightBumper()
-        .onTrue(
-            Commands.runOnce(() -> superstructure.scoreCommand()));
+        .onTrue(superstructure.scoreCommand(false));
 
     // Algae Scoring Triggers
     driver
@@ -373,10 +387,13 @@ public class RobotContainer {
     driver
         .leftBumper()
         .whileTrue(
-            Commands.startEnd(
-                () -> drive.setHeadingGoal(
-                    () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(-90.0))),
-                drive::clearHeadingGoal));
+            Commands.either(
+                superstructure.scoreCommand(true),
+                Commands.startEnd(
+                    () -> drive.setHeadingGoal(
+                        () -> AllianceFlipUtil.apply(Rotation2d.kCW_90deg)),
+                    drive::clearHeadingGoal),
+                driver.rightTrigger()));
   }
 
   /**

@@ -310,6 +310,14 @@ public class Drive extends SubsystemBase {
     mode = DriveMode.AUTO_ALIGN;
   }
 
+  public Pose2d getAutoAlignDistanceToGoal(){
+    return autoAlignController.distToGoal();
+  }
+
+  public boolean isAutoHeadingAligned() {
+    return autoAlignController.isHeadingAligned();
+  }
+
   public boolean isAutoAligned() {
     return autoAlignController.atGoal();
   }

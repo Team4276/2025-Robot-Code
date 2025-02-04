@@ -1,6 +1,7 @@
 package frc.team4276.frc2025.subsystems.superstructure;
 
-import org.littletonrobotics.junction.AutoLogOutput;
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -18,8 +19,8 @@ public class Superstructure extends SubsystemBase { // TODO: test logic
   private final RollerSensorsIO sensorsIO;
   private final RollerSensorsIOInputsAutoLogged sensorsInputs = new RollerSensorsIOInputsAutoLogged();
 
-  @AutoLogOutput
   private boolean wantScore = false;
+  private boolean leftL1 = false;
 
   // TODO: fix scoring helper after l1
 
@@ -32,7 +33,7 @@ public class Superstructure extends SubsystemBase { // TODO: test logic
     CHARACTERIZING
   }
 
-  private Goal desiredGoal = Goal.STOW;
+  private Supplier<Goal> desiredGoal = () -> Goal.STOW;
   private Goal currentGoal = Goal.STOW;
 
   private Timer scoringTimer = new Timer();
@@ -47,7 +48,7 @@ public class Superstructure extends SubsystemBase { // TODO: test logic
     elevator.setCoastOverride(() -> false);
 
     scoringTimer.restart();
-    setDefaultCommand(setGoalCommand(Superstructure.Goal.STOW));
+    setDefaultCommand(setGoalCommand(() -> Superstructure.Goal.STOW));
   }
 
   @Override
@@ -59,12 +60,18 @@ public class Superstructure extends SubsystemBase { // TODO: test logic
       scoringTimer.reset();
       wantScore = false;
 
-      endeffector.setGoal(EndEffector.Goal.SCORE);
+      if(currentGoal == Goal.L1){
+        endeffector.setGoal(leftL1 ? EndEffector.Goal.FAVOR_LEFT : EndEffector.Goal.FAVOR_RIGHT);
+
+      } else {
+        endeffector.setGoal(EndEffector.Goal.SCORE);
+
+      }
     } else if (scoringTimer.get() > 1.0) {
       endeffector.setGoal(EndEffector.Goal.IDLE);
     }
 
-    currentGoal = desiredGoal;
+    currentGoal = desiredGoal.get();
 
     switch (currentGoal) {
       case STOW:
@@ -107,19 +114,27 @@ public class Superstructure extends SubsystemBase { // TODO: test logic
     elevator.periodic();
     endeffector.periodic();
 
-    SmartDashboard.putString("Comp/Superstructure/DesiredGoal", desiredGoal.toString());
+    SmartDashboard.putString("Comp/Superstructure/DesiredGoal", desiredGoal.get().toString());
     SmartDashboard.putString("Comp/Superstructure/CurrentGoal", currentGoal.toString());
 
-    Logger.recordOutput("Superstructure/DesiredGoal", desiredGoal);
+    Logger.recordOutput("Superstructure/DesiredGoal", desiredGoal.get());
     Logger.recordOutput("Superstructure/CurrentGoal", currentGoal);
   }
 
   public void setGoal(Goal goal) {
+    desiredGoal = () -> goal;
+  }
+
+  public void setGoal(Supplier<Goal> goal) {
     desiredGoal = goal;
   }
 
   public Command setGoalCommand(Goal goal) {
-    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW), this);
+    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW));
+  }
+
+  public Command setGoalCommand(Supplier<Goal> goal) {
+    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW));
   }
 
   public Goal getGoal() {
@@ -127,7 +142,14 @@ public class Superstructure extends SubsystemBase { // TODO: test logic
   }
 
   public Command scoreCommand() {
-    return Commands.runOnce(() -> wantScore = true);
+    return scoreCommand(false);
+  }
+
+  public Command scoreCommand(boolean isLeftL1) {
+    return Commands.runOnce(() -> {
+      wantScore = true;
+      leftL1 = isLeftL1;
+    });
   }
 
   public void acceptCharacterizationInput(double input) {

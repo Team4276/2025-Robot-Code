@@ -113,7 +113,11 @@ public class AutoCommands {
   }
 
   public static Command scoreCommand(Superstructure superstructure) {
-    return superstructure.scoreCommand()
+    return scoreCommand(superstructure, false);
+  }
+
+  public static Command scoreCommand(Superstructure superstructure, boolean isLeftL1) {
+    return superstructure.scoreCommand(isLeftL1)
         .alongWith(Commands.waitSeconds(scoreWaitTime))
         .withName("Score")
         .alongWith(alertCommand("Scoring"));
@@ -133,6 +137,12 @@ public class AutoCommands {
       PathPlannerTrajectory traj, Superstructure.Goal goal, double delay) {
     return driveWithSuperstructureCommand(drive, superstructure, traj, goal, delay)
         .andThen(scoreCommand(superstructure));
+  }
+
+  public static Command driveAndScoreL1Command(Drive drive, Superstructure superstructure,
+      PathPlannerTrajectory traj, double delay, boolean isLeftL1) {
+    return driveWithSuperstructureCommand(drive, superstructure, traj, Superstructure.Goal.L1, delay)
+        .andThen(scoreCommand(superstructure, isLeftL1));
   }
 
   public static Command driveAndIntakeCommand(Drive drive, Superstructure superstructure, PathPlannerTrajectory traj) {
