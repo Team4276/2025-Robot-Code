@@ -8,11 +8,14 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkInput;
 import org.littletonrobotics.junction.networktables.LoggedNetworkString;
 
-/** A string chooser for the dashboard where the options can be changed on-the-fly. */
+/**
+ * A string chooser for the dashboard where the options can be changed
+ * on-the-fly.
+ */
 public class SwitchableChooser extends LoggedNetworkInput {
   private static final String placeholder = "<NA>";
 
-  private String[] options = new String[] {placeholder};
+  private String[] options = new String[] { placeholder };
   private String active = placeholder;
 
   private final StringPublisher namePublisher;
@@ -47,7 +50,7 @@ public class SwitchableChooser extends LoggedNetworkInput {
     if (Arrays.equals(options, this.options)) {
       return;
     }
-    this.options = options.length == 0 ? new String[] {placeholder} : options;
+    this.options = options.length == 0 ? new String[] { placeholder } : options;
     optionsPublisher.set(this.options);
     periodic();
   }
@@ -57,6 +60,7 @@ public class SwitchableChooser extends LoggedNetworkInput {
     return active == placeholder ? null : active;
   }
 
+  @Override
   public void periodic() {
     String selected = selectedInput.get();
     active = null;

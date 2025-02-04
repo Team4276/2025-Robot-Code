@@ -1,7 +1,5 @@
 package frc.team4276.util;
 
-import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -41,22 +39,12 @@ public class AllianceFlipUtil {
   }
 
   /**
-   * NOT IMPLEMENTED YET DON"T USE THIS
-   * @param state
-   * @return
-   */
-  public static PathPlannerTrajectoryState apply(PathPlannerTrajectoryState state) { // TODO: impl
-    return shouldFlip() ?
-      state
-        : state;
-  }
-
-  /**
    * For SIM
    * true sets to blue alliance
+   * 
    * @param shouldOverrideFlip
    */
-  public static void overrideFlip(boolean shouldOverrideFlip){
+  public static void overrideFlip(boolean shouldOverrideFlip) {
     overrideFlip = shouldOverrideFlip;
   }
 

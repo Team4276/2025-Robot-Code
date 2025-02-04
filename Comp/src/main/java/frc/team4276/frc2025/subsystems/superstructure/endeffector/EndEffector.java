@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.util.LoggedTunableNumber;
 
 public class EndEffector extends SubsystemBase {
-  //TODO: figure out all volatges 
+  // TODO: figure out all volatges
   private static final LoggedTunableNumber favorVolts = new LoggedTunableNumber("EndEffector/FavorVolts", 0.0);
   private static final LoggedTunableNumber lagVolts = new LoggedTunableNumber("EndEffector/LagVolts", 0.0);
 
@@ -24,24 +24,24 @@ public class EndEffector extends SubsystemBase {
     private final DoubleSupplier rightVoltageGoal;
     private final DoubleSupplier leftVoltageGoal;
 
-    private Goal(DoubleSupplier leftVoltageGoal, DoubleSupplier rightVoltageGoal) { 
-        this.leftVoltageGoal = leftVoltageGoal;
-        this.rightVoltageGoal = rightVoltageGoal;
+    private Goal(DoubleSupplier leftVoltageGoal, DoubleSupplier rightVoltageGoal) {
+      this.leftVoltageGoal = leftVoltageGoal;
+      this.rightVoltageGoal = rightVoltageGoal;
     }
 
-    private Goal(DoubleSupplier voltageGoal) { 
+    private Goal(DoubleSupplier voltageGoal) {
       this.leftVoltageGoal = voltageGoal;
       this.rightVoltageGoal = voltageGoal;
-  }
+    }
 
     public double getLeftVolts() {
-        return leftVoltageGoal.getAsDouble();
+      return leftVoltageGoal.getAsDouble();
     }
 
     public double getRightVolts() {
-        return rightVoltageGoal.getAsDouble();
+      return rightVoltageGoal.getAsDouble();
     }
-}
+  }
 
   private Goal goal = Goal.IDLE;
 

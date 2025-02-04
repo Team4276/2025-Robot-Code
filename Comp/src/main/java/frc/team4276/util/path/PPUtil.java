@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
+import com.pathplanner.lib.util.DriveFeedforwards;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,12 +16,14 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class PPUtil {
   public static PathPlannerTrajectory mirrorLengthwise(PathPlannerTrajectory trajectory) {
-    List<PathPlannerTrajectoryState> mirroredStates = new ArrayList<>(trajectory.getStates().size());
+    List<PathPlannerTrajectoryState> mirroredStates = new ArrayList<>();
     for (var state : trajectory.getStates()) {
       mirroredStates.add(mirrorLengthwise(state));
     }
     return new PathPlannerTrajectory(mirroredStates, trajectory.getEvents());
   }
+
+  private static final double[] dummyList = { 0.0, 0.0, 0.0, 0.0 };
 
   public static PathPlannerTrajectoryState mirrorLengthwise(PathPlannerTrajectoryState state) {
     var flipped = new PathPlannerTrajectoryState();
@@ -28,6 +31,7 @@ public class PPUtil {
     flipped.timeSeconds = state.timeSeconds;
     flipped.linearVelocity = state.linearVelocity;
     flipped.pose = mirrorLengthwise(state.pose);
+    flipped.feedforwards = new DriveFeedforwards(dummyList, dummyList, dummyList, dummyList, dummyList);
     flipped.fieldSpeeds = mirrorLengthwise(state.fieldSpeeds);
     flipped.heading = mirrorLengthwise(state.heading);
 

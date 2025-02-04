@@ -22,8 +22,6 @@ public class Superstructure extends SubsystemBase { // TODO: test logic
   private boolean wantScore = false;
   private boolean leftL1 = false;
 
-  // TODO: fix scoring helper after l1
-
   public enum Goal {
     STOW,
     INTAKE,
@@ -60,7 +58,7 @@ public class Superstructure extends SubsystemBase { // TODO: test logic
       scoringTimer.reset();
       wantScore = false;
 
-      if(currentGoal == Goal.L1){
+      if (currentGoal == Goal.L1) {
         endeffector.setGoal(leftL1 ? EndEffector.Goal.FAVOR_LEFT : EndEffector.Goal.FAVOR_RIGHT);
 
       } else {

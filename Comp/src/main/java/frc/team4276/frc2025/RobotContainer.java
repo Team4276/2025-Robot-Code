@@ -13,6 +13,8 @@
 
 package frc.team4276.frc2025;
 
+import java.util.List;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -145,15 +147,17 @@ public class RobotContainer {
           roller = new Roller(new RollerIO() {
           });
           vision = new Vision(
-              RobotState.getInstance()::addVisionMeasurement,
-              new VisionIOPhotonVisionSim(
-                  VisionConstants.camera0Name,
-                  VisionConstants.robotToCamera0,
-                  RobotState.getInstance()::getEstimatedPose),
-              new VisionIOPhotonVisionSim(
-                  VisionConstants.camera1Name,
-                  VisionConstants.robotToCamera1,
-                  RobotState.getInstance()::getEstimatedPose));
+              RobotState.getInstance()::addVisionMeasurement
+          // ,
+          // new VisionIOPhotonVisionSim(
+          // VisionConstants.camera0Name,
+          // VisionConstants.robotToCamera0,
+          // RobotState.getInstance()::getEstimatedPose),
+          // new VisionIOPhotonVisionSim(
+          // VisionConstants.camera1Name,
+          // VisionConstants.robotToCamera1,
+          // RobotState.getInstance()::getEstimatedPose)
+          );
         }
 
         default -> {
@@ -190,7 +194,7 @@ public class RobotContainer {
       }
     }
 
-    // arm.setCoastOverride(() -> false);
+    arm.setCoastOverride(() -> false);
 
     configureAutos();
     configureTuningRoutines();
@@ -207,13 +211,28 @@ public class RobotContainer {
 
     // Set up auto routines
     autoSelector.addRoutine("Test 1 Traj", autoBuilder.testTraj("BoxTest"));
-    autoSelector.addRoutine("Coral Score Auto", autoBuilder.coralScoreAuto(
-        () -> autoSelector.getResponses().get(0) == AutoQuestionResponse.PROCESSOR_SIDE,
-        () -> autoSelector.getResponses().get(1),
-        () -> autoSelector.getResponses().get(2),
-        () -> autoSelector.getResponses().get(3),
-        () -> autoSelector.getCoralInput(),
-        () -> autoSelector.getDelayInput()));
+    autoSelector.addRoutine("Coral Score Auto",
+        List.of(
+            new AutoSelector.AutoQuestion("Is Processor Side?", List.of(
+                AutoSelector.AutoQuestionResponse.YES,
+                AutoSelector.AutoQuestionResponse.NO)),
+            new AutoSelector.AutoQuestion("Start Position", List.of(
+                AutoSelector.AutoQuestionResponse.MIDDLE,
+                AutoSelector.AutoQuestionResponse.FAR)),
+            new AutoSelector.AutoQuestion("Coral Station", List.of(
+                AutoSelector.AutoQuestionResponse.CLOSE,
+                AutoSelector.AutoQuestionResponse.FAR)),
+            new AutoSelector.AutoQuestion("Reef", List.of(
+                AutoSelector.AutoQuestionResponse.MIDDLE,
+                AutoSelector.AutoQuestionResponse.CLOSE,
+                AutoSelector.AutoQuestionResponse.FAR))),
+        () -> autoBuilder.coralScoreAuto(
+            () -> autoSelector.getResponses().get(0),
+            () -> autoSelector.getResponses().get(1),
+            () -> autoSelector.getResponses().get(2),
+            () -> autoSelector.getResponses().get(3),
+            () -> autoSelector.getCoralInput(),
+            () -> autoSelector.getDelayInput()));
 
   }
 
@@ -409,6 +428,6 @@ public class RobotContainer {
     // AutoQuestionResponses.FAR,
     // AutoQuestionResponses.CLOSE,
     // 5, 0.0);
-    Commands.none();
+    autoSelector.getCommand();
   }
 }

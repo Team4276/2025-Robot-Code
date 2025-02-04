@@ -109,7 +109,7 @@ public class AutoCommands {
   }
 
   public static Command alertCommand(String alert) { // TODO: impl with alerts
-    return Commands.runOnce(() -> System.out.println("Driving and Intaking"));
+    return Commands.runOnce(() -> System.out.println(alert));
   }
 
   public static Command scoreCommand(Superstructure superstructure) {
@@ -146,9 +146,9 @@ public class AutoCommands {
   }
 
   public static Command driveAndIntakeCommand(Drive drive, Superstructure superstructure, PathPlannerTrajectory traj) {
-    return followTrajectory(drive, traj)
-        .alongWith(superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
-            .withDeadline(Commands.waitSeconds(intakeWaitTime)))
+    return superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
+        .raceWith(followTrajectory(drive, traj)
+            .andThen(Commands.waitSeconds(intakeWaitTime)))
         .withName("DriveAndIntake")
         .alongWith(alertCommand("Driving and Intaking"));
   }

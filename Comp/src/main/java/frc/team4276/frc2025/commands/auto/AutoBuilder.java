@@ -3,7 +3,6 @@ package frc.team4276.frc2025.commands.auto;
 import static frc.team4276.frc2025.commands.auto.AutoCommands.*;
 import static frc.team4276.util.path.ChoreoUtil.*;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -40,41 +39,44 @@ public class AutoBuilder {
         .andThen(driveAndScoreCommand(drive, superstructure, toScore, goal, delay));
   }
 
-  private Command cycleL1(PathPlannerTrajectory toIntake, PathPlannerTrajectory toScore, boolean isLeftL1, double delay) {
+  private Command cycleL1(PathPlannerTrajectory toIntake, PathPlannerTrajectory toScore, boolean isLeftL1,
+      double delay) {
     return driveAndIntakeCommand(drive, superstructure, toIntake)
         .andThen(driveAndScoreL1Command(drive, superstructure, toScore, delay, isLeftL1));
   }
 
   public Command coralScoreAuto(
-      BooleanSupplier isProcessorSide,
+      Supplier<AutoQuestionResponse> isProcessorSide,
       Supplier<AutoQuestionResponse> start,
       Supplier<AutoQuestionResponse> station,
       Supplier<AutoQuestionResponse> reef,
       Supplier<Integer> coral,
       DoubleSupplier delay) {
 
-    String pathStart = start + "_start_" + station + "_station";
-    String pathBody = station + "_station_" + reef + "_reef";
+    String pathStart = start.get().toString() + "_start_" + station.get().toString() + "_station";
+    String pathBody = station.get().toString() + "_station_" + reef.get().toString() + "_reef";
 
     PathPlannerTrajectory[] trajs = {
-      getPathPlannerTrajectoryFromChoreo(pathStart, 0),
-      getPathPlannerTrajectoryFromChoreo(pathStart, 1),
-      getPathPlannerTrajectoryFromChoreo(pathBody, 0),
-      getPathPlannerTrajectoryFromChoreo(pathBody, 1),
-      getPathPlannerTrajectoryFromChoreo(pathBody, 2),
-      getPathPlannerTrajectoryFromChoreo(pathBody, 3),
-      getPathPlannerTrajectoryFromChoreo(pathBody, 4),
-      getPathPlannerTrajectoryFromChoreo(pathBody, 5),
-      getPathPlannerTrajectoryFromChoreo(pathBody, 6)
+        getPathPlannerTrajectoryFromChoreo(pathStart, 0),
+        getPathPlannerTrajectoryFromChoreo(pathStart, 1),
+        getPathPlannerTrajectoryFromChoreo(pathBody, 0),
+        getPathPlannerTrajectoryFromChoreo(pathBody, 1),
+        getPathPlannerTrajectoryFromChoreo(pathBody, 2),
+        getPathPlannerTrajectoryFromChoreo(pathBody, 3),
+        getPathPlannerTrajectoryFromChoreo(pathBody, 4),
+        getPathPlannerTrajectoryFromChoreo(pathBody, 5),
+        getPathPlannerTrajectoryFromChoreo(pathBody, 6)
     };
 
-    if(!isProcessorSide.getAsBoolean()){
-      for(var traj : trajs){
-        traj = PPUtil.mirrorLengthwise(traj);
+    if (isProcessorSide.get() == AutoQuestionResponse.NO) {
+      for (int i = 0; i < trajs.length; i++) {
+        trajs[i] = PPUtil.mirrorLengthwise(trajs[i]);
       }
     }
 
     return Commands.sequence(
+        alertCommand("Run path with "
+            + (isProcessorSide.get() == AutoQuestionResponse.YES ? "processor side" : "barge side")),
         resetPose(trajs[0].getInitialPose()),
         Commands.waitSeconds(delay.getAsDouble()),
         driveAndScoreCommand(drive, superstructure, trajs[0], Goal.L2, 0.25),
@@ -85,18 +87,18 @@ public class AutoBuilder {
   }
 
   public Command coralScoreAuto(
-    boolean isProcessorSide,
-    AutoQuestionResponse start,
-    AutoQuestionResponse station,
-    AutoQuestionResponse reef,
-    int coral,
-    double delay){
+      AutoQuestionResponse isProcessorSide,
+      AutoQuestionResponse start,
+      AutoQuestionResponse station,
+      AutoQuestionResponse reef,
+      int coral,
+      double delay) {
     return coralScoreAuto(
-      () -> isProcessorSide, 
-      () -> start,
-      () -> station,
-      () -> reef,
-      () -> coral,
-      () -> delay);
+        () -> isProcessorSide,
+        () -> start,
+        () -> station,
+        () -> reef,
+        () -> coral,
+        () -> delay);
   }
 }
