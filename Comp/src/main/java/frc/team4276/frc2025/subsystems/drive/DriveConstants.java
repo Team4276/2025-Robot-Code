@@ -119,4 +119,6 @@ public class DriveConstants {
       moduleTranslations);
 
   public static final double ffkT = 1.0 / DCMotor.getNeoVortex(1).KtNMPerAmp;
+
+  public static final double disableBackVisionDistance = 0.5; // Cancel secondary camera for more precise alignment
 }

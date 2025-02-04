@@ -208,17 +208,16 @@ public class RobotContainer {
     // Set up auto routines
     autoSelector.addRoutine("Test 1 Traj", autoBuilder.testTraj("BoxTest"));
     autoSelector.addRoutine("Coral Score Auto", autoBuilder.coralScoreAuto(
-      () -> autoSelector.getResponses().get(0) == AutoQuestionResponse.PROCESSOR_SIDE,
-      () -> autoSelector.getResponses().get(1),
-      () -> autoSelector.getResponses().get(2),
-      () -> autoSelector.getResponses().get(3),
-      () -> autoSelector.getCoralInput(),
-      () -> autoSelector.getDelayInput()
-      ));
+        () -> autoSelector.getResponses().get(0) == AutoQuestionResponse.PROCESSOR_SIDE,
+        () -> autoSelector.getResponses().get(1),
+        () -> autoSelector.getResponses().get(2),
+        () -> autoSelector.getResponses().get(3),
+        () -> autoSelector.getCoralInput(),
+        () -> autoSelector.getDelayInput()));
 
   }
 
-  private void configureTuningRoutines() {    
+  private void configureTuningRoutines() {
     // Set up SysId routines
     autoSelector.addRoutine(
         "Drive Wheel Radius Characterization", new WheelRadiusCharacterization(drive));
@@ -352,7 +351,8 @@ public class RobotContainer {
                 .alongWith(
                     Commands.either(
                         Commands.startEnd(
-                            () -> drive.setHeadingGoal(() -> scoringHelper.getSelectedPose().getRotation()),
+                            () -> drive.setHeadingGoal(
+                                () -> scoringHelper.getSelectedPose().getRotation()),
                             drive::clearHeadingGoal),
                         Commands.startEnd(
                             () -> drive
@@ -360,9 +360,9 @@ public class RobotContainer {
                             drive::disableAutoAlign)
                             .alongWith(
                                 Commands
-                                    .waitUntil(() -> drive.getAutoAlignDistanceToGoal().getTranslation().getNorm() < 0.5
-                                        && drive.isAutoHeadingAligned())
-                                    .andThen(() -> vision.setEnableCamera(1, false))),
+                                    .waitUntil(() -> drive.disableBackVision())
+                                    .andThen(() -> vision.setEnableCamera(1,
+                                        false))),
                         () -> disableTranslationAutoAlign))
                 .finallyDo(() -> vision.setEnableCamera(1, true)));
 
