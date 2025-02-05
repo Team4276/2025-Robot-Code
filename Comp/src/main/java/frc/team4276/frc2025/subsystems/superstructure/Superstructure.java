@@ -104,6 +104,7 @@ public class Superstructure extends SubsystemBase { // TODO: test logic
 
       case CHARACTERIZING:
         elevator.runCharacterization(elevatorCharacterizationInput);
+        endeffector.setGoal(endEffectorGoal);
 
       default:
         break;
@@ -160,5 +161,11 @@ public class Superstructure extends SubsystemBase { // TODO: test logic
 
   public void endCharacterizaton() {
     elevator.endCharacterizaton();
+  }
+
+  private EndEffector.Goal endEffectorGoal = EndEffector.Goal.IDLE;
+
+  public void setEndEffectorGoal(EndEffector.Goal goal) {
+    endEffectorGoal = goal;
   }
 }

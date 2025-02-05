@@ -81,6 +81,7 @@ public class RobotContainer {
 
   // Controller
   private boolean useKeyboard = true;
+  private boolean isDemo = true;
 
   private final BetterXboxController driver = new BetterXboxController(0);
   private final CommandGenericHID keyboard0 = new CommandGenericHID(0);
@@ -190,13 +191,14 @@ public class RobotContainer {
               },
               new VisionIO() {
               });
+
         }
       }
     }
 
     arm.setCoastOverride(() -> false);
 
-    configureAutos();
+    // configureAutos();
     configureTuningRoutines();
     configureButtonBindings();
 
@@ -279,10 +281,49 @@ public class RobotContainer {
     if (useKeyboard && Constants.getMode() == Mode.SIM) {
       configureKeyBoardBindings();
 
+    } else if (isDemo) {
+      configureDemoBindings();
+
     } else {
       configureControllerBindings();
 
     }
+  }
+
+  private void configureDemoBindings() {
+    drive.setDefaultCommand(
+        drive.run(
+            () -> drive.feedTeleopInput(
+                -driver.getLeftWithDeadband().y,
+                -driver.getLeftWithDeadband().x,
+                -driver.getRightWithDeadband().x)));
+
+    // Reset gyro to 0° when A button is pressed
+    driver
+        .a()
+        .onTrue(
+            Commands.runOnce(
+                () -> RobotState.getInstance()
+                    .resetPose(
+                        new Pose2d(
+                            RobotState.getInstance().getEstimatedPose().getTranslation(),
+                            AllianceFlipUtil.apply(Rotation2d.kZero))),
+                drive)
+                .ignoringDisable(false));
+
+    superstructure.setDefaultCommand(
+        superstructure.run(() -> superstructure.acceptCharacterizationInput(
+            4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis()))));
+
+    driver
+        .rightBumper()
+        .whileTrue(
+            Commands.runOnce(
+                () -> superstructure.setEndEffectorGoal(EndEffector.Goal.SCORE)))
+        .whileFalse(
+            Commands.runOnce(
+                () -> superstructure.setEndEffectorGoal(EndEffector.Goal.IDLE)));
+
   }
 
   private void configureKeyBoardBindings() {
@@ -428,6 +469,7 @@ public class RobotContainer {
     // AutoQuestionResponses.FAR,
     // AutoQuestionResponses.CLOSE,
     // 5, 0.0);
-    autoSelector.getCommand();
+    // autoSelector.getCommand();
+    Commands.none();
   }
 }

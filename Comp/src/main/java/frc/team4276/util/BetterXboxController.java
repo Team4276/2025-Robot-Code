@@ -48,4 +48,12 @@ public class BetterXboxController extends CommandXboxController {
   public JoystickOutput getLeft() {
     return new JoystickOutput(getLeftX(), getLeftY());
   }
+
+  public boolean getPOVUP() {
+    return getHID().getPOV() == 0;
+  }
+
+  public boolean getPOVDOWN() {
+    return getHID().getPOV() == 180;
+  }
 }
