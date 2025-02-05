@@ -101,4 +101,12 @@ public class AutoBuilder {
         () -> coral,
         () -> delay);
   }
+
+  public Command fast5Piece() {
+    return Commands.none();
+  }
+
+  public Command long5Piece() {
+    return Commands.none();
+  }
 }

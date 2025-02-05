@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.Elevator;
 import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffector;
 
-public class Superstructure extends SubsystemBase { // TODO: test logic
+public class Superstructure extends SubsystemBase {
   private final Elevator elevator;
   private final EndEffector endeffector;
 

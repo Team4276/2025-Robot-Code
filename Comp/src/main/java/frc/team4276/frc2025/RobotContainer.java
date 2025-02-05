@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.team4276.frc2025.AutoSelector.AutoQuestion;
 import frc.team4276.frc2025.AutoSelector.AutoQuestionResponse;
 import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.frc2025.Constants.RobotType;
@@ -215,19 +216,19 @@ public class RobotContainer {
     autoSelector.addRoutine("Test 1 Traj", autoBuilder.testTraj("BoxTest"));
     autoSelector.addRoutine("Coral Score Auto",
         List.of(
-            new AutoSelector.AutoQuestion("Is Processor Side?", List.of(
-                AutoSelector.AutoQuestionResponse.YES,
-                AutoSelector.AutoQuestionResponse.NO)),
-            new AutoSelector.AutoQuestion("Start Position", List.of(
-                AutoSelector.AutoQuestionResponse.MIDDLE,
-                AutoSelector.AutoQuestionResponse.FAR)),
-            new AutoSelector.AutoQuestion("Coral Station", List.of(
-                AutoSelector.AutoQuestionResponse.CLOSE,
-                AutoSelector.AutoQuestionResponse.FAR)),
-            new AutoSelector.AutoQuestion("Reef", List.of(
-                AutoSelector.AutoQuestionResponse.MIDDLE,
-                AutoSelector.AutoQuestionResponse.CLOSE,
-                AutoSelector.AutoQuestionResponse.FAR))),
+            new AutoQuestion("Is Processor Side?", List.of(
+                AutoQuestionResponse.YES,
+                AutoQuestionResponse.NO)),
+            new AutoQuestion("Start Position", List.of(
+                AutoQuestionResponse.MIDDLE,
+                AutoQuestionResponse.FAR)),
+            new AutoQuestion("Coral Station", List.of(
+                AutoQuestionResponse.CLOSE,
+                AutoQuestionResponse.FAR)),
+            new AutoQuestion("Reef", List.of(
+                AutoQuestionResponse.MIDDLE,
+                AutoQuestionResponse.CLOSE,
+                AutoQuestionResponse.FAR))),
         () -> autoBuilder.coralScoreAuto(
             () -> autoSelector.getResponses().get(0),
             () -> autoSelector.getResponses().get(1),
