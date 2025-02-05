@@ -10,18 +10,18 @@ import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.team4276.frc2025.AutoSelector;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.AutoSelector.AutoQuestionResponse;
 import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
-import frc.team4276.util.path.PPUtil;;
 
 public class AutoBuilder {
   private final Drive drive;
   private final Superstructure superstructure;
 
-  public AutoBuilder(Drive drive, Superstructure superstructure) {
+  public AutoBuilder(Drive drive, Superstructure superstructure, AutoSelector autoSelector) {
     this.drive = drive;
     this.superstructure = superstructure;
   }
@@ -56,23 +56,19 @@ public class AutoBuilder {
     String pathStart = start.get().toString() + "_start_" + station.get().toString() + "_station";
     String pathBody = station.get().toString() + "_station_" + reef.get().toString() + "_reef";
 
-    PathPlannerTrajectory[] trajs = {
-        getPathPlannerTrajectoryFromChoreo(pathStart, 0),
-        getPathPlannerTrajectoryFromChoreo(pathStart, 1),
-        getPathPlannerTrajectoryFromChoreo(pathBody, 0),
-        getPathPlannerTrajectoryFromChoreo(pathBody, 1),
-        getPathPlannerTrajectoryFromChoreo(pathBody, 2),
-        getPathPlannerTrajectoryFromChoreo(pathBody, 3),
-        getPathPlannerTrajectoryFromChoreo(pathBody, 4),
-        getPathPlannerTrajectoryFromChoreo(pathBody, 5),
-        getPathPlannerTrajectoryFromChoreo(pathBody, 6)
-    };
+    boolean mirrorLengthwise = isProcessorSide.get() == AutoQuestionResponse.NO;
 
-    if (isProcessorSide.get() == AutoQuestionResponse.NO) {
-      for (int i = 0; i < trajs.length; i++) {
-        trajs[i] = PPUtil.mirrorLengthwise(trajs[i]);
-      }
-    }
+    PathPlannerTrajectory[] trajs = {
+        getPathPlannerTrajectoryFromChoreo(pathStart, mirrorLengthwise, 0),
+        getPathPlannerTrajectoryFromChoreo(pathStart, mirrorLengthwise, 1),
+        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 0),
+        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 1),
+        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 2),
+        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 3),
+        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 4),
+        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 5),
+        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 6)
+    };
 
     return Commands.sequence(
         alertCommand("Run path with "
@@ -87,14 +83,14 @@ public class AutoBuilder {
   }
 
   public Command coralScoreAuto(
-      AutoQuestionResponse isProcessorSide,
+      Supplier<AutoQuestionResponse> isProcessorSide,
       AutoQuestionResponse start,
       AutoQuestionResponse station,
       AutoQuestionResponse reef,
       int coral,
       double delay) {
     return coralScoreAuto(
-        () -> isProcessorSide,
+        isProcessorSide,
         () -> start,
         () -> station,
         () -> reef,
@@ -102,11 +98,13 @@ public class AutoBuilder {
         () -> delay);
   }
 
-  public Command fast5Piece() {
-    return Commands.none();
+  public Command inner5Piece(Supplier<AutoQuestionResponse> isProcessorSide, DoubleSupplier delay) {
+    return coralScoreAuto(isProcessorSide, () -> AutoQuestionResponse.FAR, () -> AutoQuestionResponse.CLOSE,
+        () -> AutoQuestionResponse.MIDDLE, () -> 5, delay);
   }
 
-  public Command long5Piece() {
-    return Commands.none();
+  public Command outter5Piece(Supplier<AutoQuestionResponse> isProcessorSide, DoubleSupplier delay) {
+    return coralScoreAuto(isProcessorSide, () -> AutoQuestionResponse.MIDDLE, () -> AutoQuestionResponse.FAR,
+        () -> AutoQuestionResponse.FAR, () -> 5, delay);
   }
 }

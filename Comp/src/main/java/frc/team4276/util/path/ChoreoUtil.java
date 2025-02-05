@@ -14,7 +14,8 @@ import frc.team4276.util.AllianceFlipUtil;
 import java.util.List;
 
 public class ChoreoUtil {
-  private ChoreoUtil() {}
+  private ChoreoUtil() {
+  }
 
   // Assume swerve sample and if not then we screwed ig
   /** Loads and flips trajectory accordingly */
@@ -38,8 +39,7 @@ public class ChoreoUtil {
   public static Trajectory<SwerveSample> getChoreoSwerveTrajectory(String name, int split) {
     var uncheckedTraj = Choreo.loadTrajectory(name);
     try {
-      var traj =
-          (Trajectory<SwerveSample>) uncheckedTraj.orElseThrow().getSplit(split).orElseThrow();
+      var traj = (Trajectory<SwerveSample>) uncheckedTraj.orElseThrow().getSplit(split).orElseThrow();
 
       return AllianceFlipUtil.shouldFlip() ? traj.flipped() : traj;
     } catch (Exception e) {
@@ -49,11 +49,18 @@ public class ChoreoUtil {
   }
 
   public static PathPlannerTrajectory getPathPlannerTrajectoryFromChoreo(String name) {
+    return getPathPlannerTrajectoryFromChoreo(name, false);
+  }
+
+  public static PathPlannerTrajectory getPathPlannerTrajectoryFromChoreo(String name, boolean mirrorLengthwise) {
     try {
-      var traj =
-          PathPlannerPath.fromChoreoTrajectory(name)
-              .generateTrajectory(
-                  new ChassisSpeeds(), Rotation2d.kZero, DriveConstants.driveConfig);
+      var traj = PathPlannerPath.fromChoreoTrajectory(name)
+          .generateTrajectory(
+              new ChassisSpeeds(), Rotation2d.kZero, DriveConstants.driveConfig);
+
+      if (mirrorLengthwise) {
+        traj = PPUtil.mirrorLengthwise(traj);
+      }
 
       return AllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
     } catch (Exception e) {
@@ -64,11 +71,19 @@ public class ChoreoUtil {
   }
 
   public static PathPlannerTrajectory getPathPlannerTrajectoryFromChoreo(String name, int split) {
+    return getPathPlannerTrajectoryFromChoreo(name, false, split);
+  }
+
+  public static PathPlannerTrajectory getPathPlannerTrajectoryFromChoreo(String name, boolean mirrorLengthwise,
+      int split) {
     try {
-      var traj =
-          PathPlannerPath.fromChoreoTrajectory(name, split)
-              .generateTrajectory(
-                  new ChassisSpeeds(), Rotation2d.kZero, DriveConstants.driveConfig);
+      var traj = PathPlannerPath.fromChoreoTrajectory(name, split)
+          .generateTrajectory(
+              new ChassisSpeeds(), Rotation2d.kZero, DriveConstants.driveConfig);
+
+      if (mirrorLengthwise) {
+        traj = PPUtil.mirrorLengthwise(traj);
+      }
 
       return AllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
     } catch (Exception e) {

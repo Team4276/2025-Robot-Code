@@ -210,10 +210,24 @@ public class RobotContainer {
   }
 
   private void configureAutos() {
-    autoBuilder = new AutoBuilder(drive, superstructure);
+    autoBuilder = new AutoBuilder(drive, superstructure, autoSelector);
 
     // Set up auto routines
     autoSelector.addRoutine("Test 1 Traj", autoBuilder.testTraj("BoxTest"));
+    autoSelector.addRoutine("Inner 5 Coral", List.of(
+        new AutoQuestion("Is Processor Side?", List.of(
+            AutoQuestionResponse.YES,
+            AutoQuestionResponse.NO))),
+        () -> autoBuilder.inner5Piece(
+            () -> autoSelector.getResponses().get(0),
+            () -> autoSelector.getDelayInput()));
+    autoSelector.addRoutine("Outter 5 Coral", List.of(
+        new AutoQuestion("Is Processor Side?", List.of(
+            AutoQuestionResponse.YES,
+            AutoQuestionResponse.NO))),
+        () -> autoBuilder.outter5Piece(
+            () -> autoSelector.getResponses().get(0),
+            () -> autoSelector.getDelayInput()));
     autoSelector.addRoutine("Coral Score Auto",
         List.of(
             new AutoQuestion("Is Processor Side?", List.of(
