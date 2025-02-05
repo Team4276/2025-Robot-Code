@@ -199,7 +199,7 @@ public class RobotContainer {
 
     arm.setCoastOverride(() -> false);
 
-    // configureAutos();
+    configureAutos();
     configureTuningRoutines();
     configureButtonBindings();
 
@@ -470,7 +470,7 @@ public class RobotContainer {
     // AutoQuestionResponses.FAR,
     // AutoQuestionResponses.CLOSE,
     // 5, 0.0);
-    // autoSelector.getCommand();
-    Commands.none();
+    autoSelector.getCommand();
+    // Commands.none();
   }
 }
