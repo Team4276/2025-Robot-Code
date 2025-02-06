@@ -117,9 +117,9 @@ public class RobotContainer {
                   40, false,
                   true)),
               new RollerSensorsIOHardware());
-          // arm = new Arm(new ArmIOSparkMax());
-          // roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40,
-          // false, true));
+          arm = new Arm(new ArmIOSparkMax());
+          roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40,
+              false, true));
           // vision = new Vision(
           // RobotState.getInstance()::addVisionMeasurement,
           // new VisionIOPhotonVision(
@@ -271,15 +271,15 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoSelector.addRoutine(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    // autoSelector.addRoutine(
-    // "Arm Simple FF Characterization",
-    // new FeedForwardCharacterization(
-    // arm, arm::runCharacterization, arm::getFFCharacterizationVelocity));
-    // autoSelector.addRoutine(
-    // "Elevator Simple FF Characterization",
-    // new FeedForwardCharacterization(
-    // superstructure, superstructure::acceptCharacterizationInput,
-    // superstructure::getFFCharacterizationVelocity));
+    autoSelector.addRoutine(
+        "Arm Simple FF Characterization",
+        new FeedForwardCharacterization(
+            arm, arm::runCharacterization, arm::getFFCharacterizationVelocity));
+    autoSelector.addRoutine(
+        "Elevator Simple FF Characterization",
+        new FeedForwardCharacterization(
+            superstructure, superstructure::acceptCharacterizationInput,
+            superstructure::getFFCharacterizationVelocity));
 
   }
 
@@ -478,13 +478,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return
-    // autoBuilder.CoralScoreAuto(
-    // false,
-    // AutoQuestionResponses.MIDDLE,
-    // AutoQuestionResponses.FAR,
-    // AutoQuestionResponses.CLOSE,
-    // 5, 0.0);
-    autoSelector.getCommand();
-    // Commands.none();
+    // autoSelector.getCommand();
+    Commands.none();
   }
 }

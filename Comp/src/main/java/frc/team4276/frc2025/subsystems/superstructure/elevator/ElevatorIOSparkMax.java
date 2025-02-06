@@ -109,7 +109,8 @@ public class ElevatorIOSparkMax implements ElevatorIO {
         (value) -> inputs.velocity = value);
     ifOk(
         leaderSpark,
-        new DoubleSupplier[] { leaderSpark::getAppliedOutput, leaderSpark::getBusVoltage },
+        new DoubleSupplier[] { leaderSpark::getAppliedOutput,
+            leaderSpark::getBusVoltage },
         (values) -> inputs.appliedVolts[0] = values[0] * values[1]);
     ifOk(leaderSpark, leaderSpark::getOutputCurrent, (value) -> inputs.currentAmps[0] = value);
     ifOk(leaderSpark, leaderSpark::getMotorTemperature, (value) -> inputs.tempCelcius[0] = value);

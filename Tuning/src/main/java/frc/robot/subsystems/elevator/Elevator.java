@@ -92,6 +92,6 @@ public class Elevator {
   }
 
   public void periodic(double input) {
-    leaderSpark.setVoltage(input * 4.0);
+    leaderSpark.setVoltage(input * 6.0);
   }
 }

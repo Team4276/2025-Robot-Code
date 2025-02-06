@@ -20,10 +20,12 @@ import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
 public class AutoBuilder {
   private final Drive drive;
   private final Superstructure superstructure;
+  private final AutoSelector autoSelector;
 
   public AutoBuilder(Drive drive, Superstructure superstructure, AutoSelector autoSelector) {
     this.drive = drive;
     this.superstructure = superstructure;
+    this.autoSelector = autoSelector;
   }
 
   public Command testTraj(String name) {

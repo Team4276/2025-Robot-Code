@@ -40,7 +40,7 @@ public class EndEffector {
   }
 
   public void periodic(boolean run) {
-    leftMotor.setVoltage(run ? 8.0 : 0.0);
-    rightMotor.setVoltage(run ? -8.0 : 0.0);
+    leftMotor.setVoltage(run ? 3.0 : 0.0);
+    rightMotor.setVoltage(run ? -10.0 : 0.0);
   }
 }

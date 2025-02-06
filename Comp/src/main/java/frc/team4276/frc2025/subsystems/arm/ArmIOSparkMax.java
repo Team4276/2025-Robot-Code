@@ -63,7 +63,7 @@ public class ArmIOSparkMax implements ArmIO {
   @Override
   public void runSetpoint(double setpointRads, double ff) {
     closedLoopController.setReference(
-        MathUtil.clamp(setpointRads, minInput, maxInput),
+        MathUtil.clamp(setpointRads + offset.getRadians(), minInput, maxInput),
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
         ff,
