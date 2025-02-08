@@ -236,16 +236,12 @@ public class RobotContainer {
         new AutoQuestion("Is Processor Side?", List.of(
             AutoQuestionResponse.YES,
             AutoQuestionResponse.NO))),
-        () -> autoBuilder.inner5Piece(
-            () -> autoSelector.getResponses().get(0),
-            () -> autoSelector.getDelayInput()));
+        () -> autoBuilder.inner5Piece());
     autoSelector.addRoutine("Outter 5 Coral", List.of(
         new AutoQuestion("Is Processor Side?", List.of(
             AutoQuestionResponse.YES,
             AutoQuestionResponse.NO))),
-        () -> autoBuilder.outter5Piece(
-            () -> autoSelector.getResponses().get(0),
-            () -> autoSelector.getDelayInput()));
+        () -> autoBuilder.outter5Piece());
     autoSelector.addRoutine("Coral Score Auto",
         List.of(
             new AutoQuestion("Is Processor Side?", List.of(
@@ -261,13 +257,7 @@ public class RobotContainer {
                 AutoQuestionResponse.MIDDLE,
                 AutoQuestionResponse.CLOSE,
                 AutoQuestionResponse.FAR))),
-        () -> autoBuilder.coralScoreAuto(
-            () -> autoSelector.getResponses().get(0),
-            () -> autoSelector.getResponses().get(1),
-            () -> autoSelector.getResponses().get(2),
-            () -> autoSelector.getResponses().get(3),
-            () -> autoSelector.getCoralInput(),
-            () -> autoSelector.getDelayInput()));
+        () -> autoBuilder.coralScoreAuto(0, 1, 2, 3));
 
   }
 
@@ -464,9 +454,9 @@ public class RobotContainer {
                                 Commands
                                     .waitUntil(() -> drive.disableBackVision())
                                     .andThen(() -> vision.setEnableCamera(1,
-                                        false))),
-                        () -> disableTranslationAutoAlign))
-                .finallyDo(() -> vision.setEnableCamera(1, true)));
+                                        false)))
+                            .finallyDo(() -> vision.setEnableCamera(1, true)),
+                        () -> disableTranslationAutoAlign)));
 
     // driver
     // .rightStick()

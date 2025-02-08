@@ -3,9 +3,6 @@ package frc.team4276.frc2025.commands.auto;
 import static frc.team4276.frc2025.commands.auto.AutoCommands.*;
 import static frc.team4276.util.path.ChoreoUtil.*;
 
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -47,18 +44,27 @@ public class AutoBuilder {
         .andThen(driveAndScoreL1Command(drive, superstructure, toScore, delay, isLeftL1));
   }
 
+  /**
+   * dashboard custom coral auto
+   * 
+   * @param isProcessorSide
+   * @param start
+   * @param station
+   * @param reef
+   * @return
+   */
   public Command coralScoreAuto(
-      Supplier<AutoQuestionResponse> isProcessorSide,
-      Supplier<AutoQuestionResponse> start,
-      Supplier<AutoQuestionResponse> station,
-      Supplier<AutoQuestionResponse> reef,
-      Supplier<Integer> coral,
-      DoubleSupplier delay) {
+      int isProcessorSide,
+      int start,
+      int station,
+      int reef) {
 
-    String pathStart = start.get().toString() + "_start_" + station.get().toString() + "_station";
-    String pathBody = station.get().toString() + "_station_" + reef.get().toString() + "_reef";
+    String pathStart = autoSelector.getResponses().get(start) + "_start_" + autoSelector.getResponses().get(station)
+        + "_station";
+    String pathBody = autoSelector.getResponses().get(station) + "_station_" + autoSelector.getResponses().get(reef)
+        + "_reef";
 
-    boolean mirrorLengthwise = isProcessorSide.get() == AutoQuestionResponse.NO;
+    boolean mirrorLengthwise = autoSelector.getResponses().get(isProcessorSide) == AutoQuestionResponse.NO;
 
     PathPlannerTrajectory[] trajs = {
         getPathPlannerTrajectoryFromChoreo(pathStart, mirrorLengthwise, 0),
@@ -74,39 +80,69 @@ public class AutoBuilder {
 
     return Commands.sequence(
         notificationCommand("Run path with "
-            + (isProcessorSide.get() == AutoQuestionResponse.YES ? "processor side" : "barge side")),
+            + (autoSelector.getResponses().get(isProcessorSide) == AutoQuestionResponse.YES ? "processor side"
+                : "barge side")),
         resetPose(trajs[0].getInitialPose()),
-        Commands.waitSeconds(delay.getAsDouble()),
+        Commands.waitSeconds(autoSelector.getDelayInput()),
         driveAndScoreCommand(drive, superstructure, trajs[0], Goal.L2, 0.25),
-        cycle(trajs[1], trajs[2], Goal.L2, 0.5).onlyIf(() -> coral.get() >= 2),
-        cycleL1(trajs[3], trajs[4], true, 0.5).onlyIf(() -> coral.get() >= 3),
-        cycle(trajs[5], trajs[6], Goal.L2, 0.5).onlyIf(() -> coral.get() >= 4),
-        cycleL1(trajs[7], trajs[8], false, 0.5).onlyIf(() -> coral.get() >= 5));
+        cycle(trajs[1], trajs[2], Goal.L2, 0.5).onlyIf(() -> autoSelector.getCoralInput() >= 2),
+        cycleL1(trajs[3], trajs[4], true, 0.5).onlyIf(() -> autoSelector.getCoralInput() >= 3),
+        cycle(trajs[5], trajs[6], Goal.L2, 0.5).onlyIf(() -> autoSelector.getCoralInput() >= 4),
+        cycleL1(trajs[7], trajs[8], false, 0.5).onlyIf(() -> autoSelector.getCoralInput() >= 5));
   }
 
+  /**
+   * pre made coral auto
+   * 
+   * @param start
+   * @param station
+   * @param reef
+   * @param coral
+   * @return
+   */
   public Command coralScoreAuto(
-      Supplier<AutoQuestionResponse> isProcessorSide,
       AutoQuestionResponse start,
       AutoQuestionResponse station,
       AutoQuestionResponse reef,
-      int coral,
-      DoubleSupplier delay) {
-    return coralScoreAuto(
-        isProcessorSide,
-        () -> start,
-        () -> station,
-        () -> reef,
-        () -> coral,
-        delay);
+      int coral) {
+
+    String pathStart = start.toString() + "_start_" + station.toString() + "_station";
+    String pathBody = station.toString() + "_station_" + reef.toString() + "_reef";
+
+    boolean mirrorLengthwise = autoSelector.getResponses().get(0) == AutoQuestionResponse.NO;
+
+    PathPlannerTrajectory[] trajs = {
+        getPathPlannerTrajectoryFromChoreo(pathStart, mirrorLengthwise, 0),
+        getPathPlannerTrajectoryFromChoreo(pathStart, mirrorLengthwise, 1),
+        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 0),
+        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 1),
+        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 2),
+        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 3),
+        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 4),
+        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 5),
+        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 6)
+    };
+
+    return Commands.sequence(
+        notificationCommand("Run path with "
+            + (autoSelector.getResponses().get(0) == AutoQuestionResponse.YES ? "processor side"
+                : "barge side")),
+        resetPose(trajs[0].getInitialPose()),
+        Commands.waitSeconds(autoSelector.getDelayInput()),
+        driveAndScoreCommand(drive, superstructure, trajs[0], Goal.L2, 0.25),
+        cycle(trajs[1], trajs[2], Goal.L2, 0.5).onlyIf(() -> coral >= 2),
+        cycleL1(trajs[3], trajs[4], true, 0.5).onlyIf(() -> coral >= 3),
+        cycle(trajs[5], trajs[6], Goal.L2, 0.5).onlyIf(() -> coral >= 4),
+        cycleL1(trajs[7], trajs[8], false, 0.5).onlyIf(() -> coral >= 5));
   }
 
-  public Command inner5Piece(Supplier<AutoQuestionResponse> isProcessorSide, DoubleSupplier delay) {
-    return coralScoreAuto(isProcessorSide, AutoQuestionResponse.FAR, AutoQuestionResponse.CLOSE,
-        AutoQuestionResponse.MIDDLE, 5, delay);
+  public Command inner5Piece() {
+    return coralScoreAuto(AutoQuestionResponse.FAR, AutoQuestionResponse.CLOSE,
+        AutoQuestionResponse.MIDDLE, 5);
   }
 
-  public Command outter5Piece(Supplier<AutoQuestionResponse> isProcessorSide, DoubleSupplier delay) {
-    return coralScoreAuto(isProcessorSide, AutoQuestionResponse.MIDDLE, AutoQuestionResponse.FAR,
-        AutoQuestionResponse.FAR, 5, delay);
+  public Command outter5Piece() {
+    return coralScoreAuto(AutoQuestionResponse.MIDDLE, AutoQuestionResponse.FAR,
+        AutoQuestionResponse.FAR, 5);
   }
 }
