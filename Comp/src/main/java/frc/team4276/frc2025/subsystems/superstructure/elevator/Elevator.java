@@ -7,7 +7,6 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.frc2025.Constants;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 
@@ -16,7 +15,7 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Elevator extends SubsystemBase {
+public class Elevator {
   public enum Goal {
     STOW(new LoggedTunableNumber("Elevator/StowPosition", 0.0)),
     L1(new LoggedTunableNumber("Elevator/L1Position", 0.0)),
@@ -44,8 +43,8 @@ public class Elevator extends SubsystemBase {
   private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", 0.0);
 
   private final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.0);
-  private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0.0);
-  private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.0);
+  private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0.0); 
+  private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.0); // 0.08
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
@@ -80,7 +79,6 @@ public class Elevator extends SubsystemBase {
   private boolean hasFlippedCoast = false;
   private boolean wasDisabled = true;
 
-  @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Elevator", inputs);

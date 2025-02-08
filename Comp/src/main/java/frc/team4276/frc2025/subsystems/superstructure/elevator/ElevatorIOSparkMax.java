@@ -56,7 +56,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pidf(
             kp, ki,
-            kd, kff);
+            kd, 0.0);
     leaderConfig.signals
         .primaryEncoderPositionAlwaysOn(true)
         .primaryEncoderPositionPeriodMs((int) (1000.0 / readFreq))
@@ -119,6 +119,8 @@ public class ElevatorIOSparkMax implements ElevatorIO {
         (values) -> inputs.appliedVolts[0] = values[0] * values[1]);
     ifOk(leaderSpark, leaderSpark::getOutputCurrent, (value) -> inputs.currentAmps[0] = value);
     ifOk(leaderSpark, leaderSpark::getMotorTemperature, (value) -> inputs.tempCelcius[0] = value);
+    inputs.topLimit = leaderSpark.getReverseLimitSwitch().isPressed();
+    inputs.botLimit = leaderSpark.getForwardLimitSwitch().isPressed();
     inputs.leaderMotorConnected = leaderConnectedDebounce.calculate(!sparkStickyFault);
 
     // Update follower inputs

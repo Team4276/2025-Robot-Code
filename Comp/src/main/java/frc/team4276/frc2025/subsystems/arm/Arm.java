@@ -46,9 +46,9 @@ public class Arm extends SubsystemBase {
   private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Arm/maxAccel", Math.toRadians(20.0));
 
   private final LoggedTunableNumber kS = new LoggedTunableNumber("Arm/kS", 0.0);
-  private final LoggedTunableNumber kV = new LoggedTunableNumber("Arm/kV", 0.0);
-  private final LoggedTunableNumber kG = new LoggedTunableNumber("Arm/kG", 0.0);
-  private final LoggedTunableNumber kGLoaded = new LoggedTunableNumber("Arm/kGLoaded", 0.0);
+  private final LoggedTunableNumber kV = new LoggedTunableNumber("Arm/kV", 0.0); // 0.88
+  private final LoggedTunableNumber kG = new LoggedTunableNumber("Arm/kG", 0.0); // 0.73
+  private final LoggedTunableNumber kGLoaded = new LoggedTunableNumber("Arm/kGLoaded", 0.0); // 0.44
 
   private final ArmIO io;
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();

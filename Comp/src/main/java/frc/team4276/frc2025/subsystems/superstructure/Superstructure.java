@@ -86,7 +86,6 @@ public class Superstructure extends SubsystemBase {
 
       case L1:
         elevator.setGoal(Elevator.Goal.L1);
-        elevator.requestHome();
 
         break;
 

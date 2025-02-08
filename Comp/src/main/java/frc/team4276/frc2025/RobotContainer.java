@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.team4276.frc2025.AutoSelector.AutoQuestion;
 import frc.team4276.frc2025.AutoSelector.AutoQuestionResponse;
 import frc.team4276.frc2025.Constants.Mode;
-import frc.team4276.frc2025.Constants.RobotType;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
 import frc.team4276.frc2025.commands.auto.AutoBuilder;
@@ -93,12 +92,13 @@ public class RobotContainer {
 
   private final ScoringHelper scoringHelper = new ScoringHelper(useKeyboard);
 
-  private final Alert driverDisconnected =
-      new Alert("Driver controller disconnected (port 0).", AlertType.kWarning);
-  private final Alert operatorDisconnected =
-      new Alert("Operator controller disconnected (port 1).", AlertType.kWarning);
+  private final Alert driverDisconnected = new Alert("Driver controller disconnected (port 0).", AlertType.kWarning);
+  private final Alert operatorDisconnected = new Alert("Operator controller disconnected (port 1).",
+      AlertType.kWarning);
 
   private boolean disableTranslationAutoAlign = true;
+
+  private boolean disableVisionSim = true;
 
   // Dashboard inputs
   private final AutoSelector autoSelector = new AutoSelector();
@@ -155,18 +155,22 @@ public class RobotContainer {
           });
           roller = new Roller(new RollerIO() {
           });
-          vision = new Vision(
-              RobotState.getInstance()::addVisionMeasurement
-          // ,
-          // new VisionIOPhotonVisionSim(
-          // VisionConstants.camera0Name,
-          // VisionConstants.robotToCamera0,
-          // RobotState.getInstance()::getEstimatedPose),
-          // new VisionIOPhotonVisionSim(
-          // VisionConstants.camera1Name,
-          // VisionConstants.robotToCamera1,
-          // RobotState.getInstance()::getEstimatedPose)
-          );
+          if (disableVisionSim) {
+            vision = new Vision(
+                RobotState.getInstance()::addVisionMeasurement);
+          } else {
+            vision = new Vision(
+                RobotState.getInstance()::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.camera0Name,
+                    VisionConstants.robotToCamera0,
+                    RobotState.getInstance()::getEstimatedPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.camera1Name,
+                    VisionConstants.robotToCamera1,
+                    RobotState.getInstance()::getEstimatedPose));
+
+          }
         }
 
         default -> {
@@ -285,6 +289,15 @@ public class RobotContainer {
         new FeedForwardCharacterization(
             superstructure, superstructure::acceptCharacterizationInput,
             superstructure::getFFCharacterizationVelocity));
+    autoSelector.addRoutine(
+        "Arm Simple FF Characterization",
+        new FeedForwardCharacterization(
+            arm, arm::runCharacterization, arm::getFFCharacterizationVelocity, true));
+    autoSelector.addRoutine(
+        "Elevator Simple FF Characterization",
+        new FeedForwardCharacterization(
+            superstructure, superstructure::acceptCharacterizationInput,
+            superstructure::getFFCharacterizationVelocity, true));
 
   }
 
@@ -478,11 +491,11 @@ public class RobotContainer {
 
   public void updateAlerts() {
     // Controller disconnected alerts
-    driverDisconnected.set(useKeyboard ? false :
-        !DriverStation.isJoystickConnected(driver.getHID().getPort())
+    driverDisconnected.set(useKeyboard ? false
+        : !DriverStation.isJoystickConnected(driver.getHID().getPort())
             || !DriverStation.getJoystickIsXbox(driver.getHID().getPort()));
-    operatorDisconnected.set(useKeyboard ? false :
-        !DriverStation.isJoystickConnected(scoringHelper.getButtonBoard().getPort()));
+    operatorDisconnected
+        .set(useKeyboard ? false : !DriverStation.isJoystickConnected(scoringHelper.getButtonBoard().getPort()));
   }
 
   /**
@@ -491,8 +504,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return
-    autoSelector.getCommand();
+    return autoSelector.getCommand();
     // Commands.none();
   }
 }

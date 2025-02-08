@@ -198,7 +198,42 @@
       "name": "Auto",
       "grid_layout": {
         "layouts": [],
-        "containers": []
+        "containers": [
+          {
+            "title": "Field",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 960.0,
+            "height": 448.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/SmartDashboard/Field",
+              "period": 0.02,
+              "field_game": "Crescendo",
+              "robot_width": 0.85,
+              "robot_length": 0.85,
+              "show_other_objects": true,
+              "show_trajectories": true,
+              "field_rotation": 0.0,
+              "robot_color": 4294198070,
+              "trajectory_color": 4294967295
+            }
+          },
+          {
+            "title": "Swerve Drive",
+            "x": 960.0,
+            "y": 0.0,
+            "width": 416.0,
+            "height": 448.0,
+            "type": "SwerveDrive",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve Drive",
+              "period": 0.02,
+              "show_robot_rotation": true,
+              "rotation_unit": "Radians"
+            }
+          }
+        ]
       }
     },
     {

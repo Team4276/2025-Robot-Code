@@ -19,7 +19,6 @@ public class ElevatorConstants {
   public static final double kp = 0.0;
   public static final double ki = 0.0;
   public static final double kd = 0.0;
-  public static final double kff = 0.0;
 
   public static final int readFreq = 50;
 
