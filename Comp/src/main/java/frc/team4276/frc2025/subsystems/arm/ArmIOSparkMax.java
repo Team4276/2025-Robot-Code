@@ -39,6 +39,8 @@ public class ArmIOSparkMax implements ArmIO {
     absoluteEncoder = leaderSpark.getAbsoluteEncoder();
     closedLoopController = leaderSpark.getClosedLoopController();
 
+    leaderConfig = new SparkMaxConfig();
+
     leaderConfig
         .inverted(invertLeader)
         .idleMode(IdleMode.kBrake)

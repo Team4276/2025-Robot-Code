@@ -19,6 +19,7 @@ import static frc.team4276.util.SparkUtil.*;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -28,6 +29,7 @@ import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -50,6 +52,8 @@ public class ModuleIOSpark implements ModuleIO {
   private final SparkMax turnSpark;
   private final RelativeEncoder driveEncoder;
   private final AbsoluteEncoder turnEncoder;
+  private final SparkFlexConfig driveConfig;
+  private final SparkMaxConfig turnConfig;
 
   // Closed loop controllers
   private final SparkClosedLoopController driveController;
@@ -63,6 +67,8 @@ public class ModuleIOSpark implements ModuleIO {
   // Connection debouncers
   private final Debouncer driveConnectedDebounce = new Debouncer(0.5);
   private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
+
+  private boolean brakeModeEnabled = true;
 
   public ModuleIOSpark(int module) {
     zeroRotation = switch (module) {
@@ -96,7 +102,7 @@ public class ModuleIOSpark implements ModuleIO {
     turnController = turnSpark.getClosedLoopController();
 
     // Configure drive motor
-    var driveConfig = new SparkFlexConfig();
+    driveConfig = new SparkFlexConfig();
     driveConfig
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(driveMotorCurrentLimit)
@@ -127,7 +133,7 @@ public class ModuleIOSpark implements ModuleIO {
     tryUntilOk(driveSpark, 5, () -> driveEncoder.setPosition(0.0));
 
     // Configure turn motor
-    var turnConfig = new SparkMaxConfig();
+    turnConfig = new SparkMaxConfig();
     turnConfig
         .inverted(turnInverted)
         .idleMode(IdleMode.kBrake)
@@ -232,5 +238,27 @@ public class ModuleIOSpark implements ModuleIO {
     double setpoint = MathUtil.inputModulus(
         rotation.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
     turnController.setReference(setpoint, ControlType.kPosition);
+  }
+
+  @Override
+  public void setBrakeMode(boolean enabled) {
+    if (brakeModeEnabled == enabled)
+      return;
+    brakeModeEnabled = enabled;
+    new Thread(
+        () -> {
+          tryUntilOk(
+              driveSpark,
+              5,
+              () -> driveSpark.configure(
+                  driveConfig.idleMode(
+                      brakeModeEnabled
+                          ? SparkBaseConfig.IdleMode.kBrake
+                          : SparkBaseConfig.IdleMode.kCoast),
+                  SparkBase.ResetMode.kNoResetSafeParameters,
+                  SparkBase.PersistMode.kNoPersistParameters));
+                })
+        .start();
+      
   }
 }
