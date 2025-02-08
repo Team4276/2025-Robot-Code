@@ -46,7 +46,6 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
 
   @Override
   public void updateInputs(EndEffectorIOInputs inputs) {
-    //TODO: impl
     sparkStickyFault = false;
     ifOk(
         leftMotor,

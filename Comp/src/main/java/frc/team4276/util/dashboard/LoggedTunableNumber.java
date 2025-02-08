@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.team4276.util;
+package frc.team4276.util.dashboard;
 
 import frc.team4276.frc2025.Constants;
 import java.util.Arrays;

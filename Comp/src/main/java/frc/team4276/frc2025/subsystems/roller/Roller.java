@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.team4276.util.LoggedTunableNumber;
+import frc.team4276.util.dashboard.LoggedTunableNumber;
 
 public class Roller extends SubsystemBase {
   public enum Goal {

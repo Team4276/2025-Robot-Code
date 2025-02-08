@@ -12,6 +12,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.team4276.frc2025.field.FieldConstants;
 import frc.team4276.util.AllianceFlipUtil;
+import frc.team4276.util.dashboard.ElasticUI;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 

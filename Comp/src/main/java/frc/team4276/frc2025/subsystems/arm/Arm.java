@@ -9,14 +9,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.frc2025.Constants;
-import frc.team4276.util.LoggedTunableNumber;
+import frc.team4276.util.dashboard.LoggedTunableNumber;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Arm extends SubsystemBase { // TODO: config; tune
+public class Arm extends SubsystemBase {
   public enum Goal {
     STOW(new LoggedTunableNumber("Arm/StowDegrees", 80.0)),
     INTAKE(new LoggedTunableNumber("Arm/IntakeDegrees", 120.0)),

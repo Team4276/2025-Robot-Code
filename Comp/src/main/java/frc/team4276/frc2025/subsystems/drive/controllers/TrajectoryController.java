@@ -10,7 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import frc.team4276.frc2025.RobotState;
-import frc.team4276.util.LoggedTunableNumber;
+import frc.team4276.util.dashboard.LoggedTunableNumber;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;

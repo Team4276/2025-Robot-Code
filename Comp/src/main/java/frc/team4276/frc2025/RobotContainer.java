@@ -17,6 +17,8 @@ import java.util.List;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -90,6 +92,11 @@ public class RobotContainer {
   private final CommandGenericHID keyboard2 = new CommandGenericHID(2);
 
   private final ScoringHelper scoringHelper = new ScoringHelper(useKeyboard);
+
+  private final Alert driverDisconnected =
+      new Alert("Driver controller disconnected (port 0).", AlertType.kWarning);
+  private final Alert operatorDisconnected =
+      new Alert("Operator controller disconnected (port 1).", AlertType.kWarning);
 
   private boolean disableTranslationAutoAlign = true;
 
@@ -204,9 +211,7 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Peace and quiet
-    if (Constants.getType() == RobotType.SIMBOT) {
-      DriverStation.silenceJoystickConnectionWarning(true);
-    }
+    DriverStation.silenceJoystickConnectionWarning(true);
   }
 
   private void configureAutos() {
@@ -471,6 +476,15 @@ public class RobotContainer {
                 driver.rightTrigger()));
   }
 
+  public void updateAlerts() {
+    // Controller disconnected alerts
+    driverDisconnected.set(useKeyboard ? false :
+        !DriverStation.isJoystickConnected(driver.getHID().getPort())
+            || !DriverStation.getJoystickIsXbox(driver.getHID().getPort()));
+    operatorDisconnected.set(useKeyboard ? false :
+        !DriverStation.isJoystickConnected(scoringHelper.getButtonBoard().getPort()));
+  }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -478,7 +492,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return
-    // autoSelector.getCommand();
-    Commands.none();
+    autoSelector.getCommand();
+    // Commands.none();
   }
 }

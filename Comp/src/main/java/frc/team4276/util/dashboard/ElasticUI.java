@@ -1,4 +1,4 @@
-package frc.team4276.frc2025;
+package frc.team4276.util.dashboard;
 
 import java.util.function.Supplier;
 

@@ -13,10 +13,17 @@
 
 package frc.team4276.frc2025;
 
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.team4276.util.VirtualSubsystem;
+import frc.team4276.util.dashboard.Elastic;
+import frc.team4276.util.drivers.VirtualSubsystem;
+
 import java.util.HashMap;
 import java.util.function.BiConsumer;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -39,6 +46,15 @@ import org.littletonrobotics.urcl.URCL;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+  
+  private final Timer canInitialErrorTimer = new Timer();
+  private final Timer canErrorTimer = new Timer();
+  private static final double canErrorTimeThreshold = 0.5; // Seconds to disable alert
+  private final Alert canErrorAlert =
+      new Alert("CAN errors detected, robot may not be controllable.", AlertType.kError);
+
+  private boolean autoMessagePrinted = false;
+  private double autoStart = 0.0;
 
   public Robot() {
     // Record metadata
@@ -111,6 +127,10 @@ public class Robot extends LoggedRobot {
             (Command command) -> {
               logCommandFunction.accept(command, false);
             });
+            
+    // Reset alert timers
+    canInitialErrorTimer.restart();
+    canErrorTimer.restart();
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
@@ -130,6 +150,32 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
+    // Print auto duration
+    if (autonomousCommand != null) {
+      if (!autonomousCommand.isScheduled() && !autoMessagePrinted) {
+        if (DriverStation.isAutonomousEnabled()) {
+          System.out.printf(
+              "*** Auto finished in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
+        } else {
+          System.out.printf(
+              "*** Auto cancelled in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
+        }
+        autoMessagePrinted = true;
+      }
+    }
+
+    // Robot container periodic methods
+    robotContainer.updateAlerts();
+
+    // Check CAN status
+    var canStatus = RobotController.getCANStatus();
+    if (canStatus.transmitErrorCount > 0 || canStatus.receiveErrorCount > 0) {
+      canErrorTimer.restart();
+    }
+    canErrorAlert.set(
+        !canErrorTimer.hasElapsed(canErrorTimeThreshold)
+            && !canInitialErrorTimer.hasElapsed(canErrorTimeThreshold));
 
     // Return to normal thread priority
     Threads.setCurrentThreadPriority(false, 10);
@@ -152,6 +198,10 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     autonomousCommand = robotContainer.getAutonomousCommand();
+    autoMessagePrinted = false;
+    autoStart = Timer.getFPGATimestamp();
+
+    Elastic.selectTab("Auto");
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
@@ -178,7 +228,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    RobotState.getInstance().resetPose(RobotState.getInstance().getTrajectorySetpoint());
+    Elastic.selectTab("Teleop");
   }
 
   /** This function is called periodically during operator control. */

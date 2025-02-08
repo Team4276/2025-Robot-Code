@@ -7,7 +7,7 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.team4276.util.LoggedTunableNumber;
+import frc.team4276.util.dashboard.LoggedTunableNumber;
 
 public class EndEffector extends SubsystemBase {
   private static final LoggedTunableNumber favorVolts = new LoggedTunableNumber("EndEffector/FavorVolts", 10.0);

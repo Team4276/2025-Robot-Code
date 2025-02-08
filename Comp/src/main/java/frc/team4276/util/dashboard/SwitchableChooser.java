@@ -1,4 +1,4 @@
-package frc.team4276.util;
+package frc.team4276.util.dashboard;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringArrayPublisher;

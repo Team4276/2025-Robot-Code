@@ -9,6 +9,9 @@ import frc.team4276.frc2025.field.FieldConstants;
 import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
 import frc.team4276.util.AllianceFlipUtil;
+import frc.team4276.util.dashboard.Elastic;
+import frc.team4276.util.dashboard.Elastic.Notification;
+import frc.team4276.util.dashboard.Elastic.Notification.NotificationLevel;
 
 import java.util.function.Supplier;
 
@@ -108,8 +111,16 @@ public class AutoCommands {
     return Commands.waitUntil(() -> yCrossed(yPosition, towardsCenterline));
   }
 
-  public static Command alertCommand(String alert) { // TODO: impl with alerts
-    return Commands.runOnce(() -> System.out.println(alert));
+  public static Command printCommand(String text) {
+    return Commands.runOnce(() -> System.out.println(text));
+  }
+
+  public static Command notificationCommand(String notification) {
+    return notificationCommand(new Notification(NotificationLevel.INFO, "Auto Action", notification, 3000));
+  }
+
+  public static Command notificationCommand(Notification notification) { // Jank but gud enough for now
+    return Commands.runOnce(() -> Elastic.sendNotification(notification));
   }
 
   public static Command scoreCommand(Superstructure superstructure) {
@@ -120,7 +131,7 @@ public class AutoCommands {
     return superstructure.scoreCommand(isLeftL1)
         .alongWith(Commands.waitSeconds(scoreWaitTime))
         .withName("Score")
-        .alongWith(alertCommand("Scoring"));
+        .alongWith(notificationCommand("Scoring"));
   }
 
   public static Command driveWithSuperstructureCommand(Drive drive, Superstructure superstructure,
@@ -130,7 +141,7 @@ public class AutoCommands {
             Commands.waitSeconds(delay)
                 .andThen(superstructure.setGoalCommand(goal)))
         .withName("DriveWithSuperstructureGoal")
-        .alongWith(alertCommand("Driving with Superstructure Goal " + goal));
+        .alongWith(notificationCommand("Driving with Superstructure Goal " + goal));
   }
 
   public static Command driveAndScoreCommand(Drive drive, Superstructure superstructure,
@@ -141,7 +152,7 @@ public class AutoCommands {
             .andThen(scoreCommand(superstructure))
             .andThen(Commands.waitSeconds(scoreWaitTime)))
         .withName("DriveAndScore")
-        .alongWith(alertCommand("Driving and Scoring"));
+        .alongWith(notificationCommand("Driving and Scoring"));
   }
 
   public static Command driveAndScoreL1Command(Drive drive, Superstructure superstructure,
@@ -152,7 +163,7 @@ public class AutoCommands {
             .andThen(scoreCommand(superstructure, isLeftL1))
             .andThen(Commands.waitSeconds(scoreWaitTime)))
         .withName("DriveAndScore")
-        .alongWith(alertCommand("Driving and Scoring"));
+        .alongWith(notificationCommand("Driving and Scoring"));
   }
 
   public static Command driveAndIntakeCommand(Drive drive, Superstructure superstructure, PathPlannerTrajectory traj) {
@@ -160,6 +171,6 @@ public class AutoCommands {
         .raceWith(followTrajectory(drive, traj)
             .andThen(Commands.waitSeconds(intakeWaitTime)))
         .withName("DriveAndIntake")
-        .alongWith(alertCommand("Driving and Intaking"));
+        .alongWith(notificationCommand("Driving and Intaking"));
   }
 }

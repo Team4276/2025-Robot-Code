@@ -9,13 +9,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.frc2025.Constants;
-import frc.team4276.util.LoggedTunableNumber;
+import frc.team4276.util.dashboard.LoggedTunableNumber;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Elevator extends SubsystemBase { // TODO: config; tune
+public class Elevator extends SubsystemBase {
   public enum Goal {
     STOW(new LoggedTunableNumber("Elevator/StowPosition", 0.0)),
     L1(new LoggedTunableNumber("Elevator/L1Position", 0.0)),

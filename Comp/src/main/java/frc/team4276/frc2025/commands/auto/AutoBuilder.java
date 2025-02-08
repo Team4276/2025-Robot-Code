@@ -73,7 +73,7 @@ public class AutoBuilder {
     };
 
     return Commands.sequence(
-        alertCommand("Run path with "
+      notificationCommand("Run path with "
             + (isProcessorSide.get() == AutoQuestionResponse.YES ? "processor side" : "barge side")),
         resetPose(trajs[0].getInitialPose()),
         Commands.waitSeconds(delay.getAsDouble()),

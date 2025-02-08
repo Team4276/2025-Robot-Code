@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
 import frc.team4276.util.AllianceFlipUtil;
-import frc.team4276.util.VirtualSubsystem;
+import frc.team4276.util.drivers.VirtualSubsystem;
 
 public class ScoringHelper extends VirtualSubsystem {
   private final int[] redScoringTable = {
@@ -186,5 +186,9 @@ public class ScoringHelper extends VirtualSubsystem {
 
   public boolean isRight() {
     return isRight;
+  }
+
+  public GenericHID getButtonBoard(){
+    return buttonBoard1;
   }
 }
