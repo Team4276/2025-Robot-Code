@@ -1,8 +1,5 @@
 package frc.team4276.frc2025.commands;
 
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -10,9 +7,14 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
+
 public class FeedForwardCharacterization extends Command {
   private final double FF_START_DELAY = 2.0; // Secs
   private final double FF_RAMP_RATE = 0.1; // Volts/Sec
+  private final double DIRECTION;
 
   private final List<Double> velocitySamples = new LinkedList<>();
   private final List<Double> voltageSamples = new LinkedList<>();
@@ -23,9 +25,15 @@ public class FeedForwardCharacterization extends Command {
 
   public FeedForwardCharacterization(
       Subsystem subsystem, Consumer<Double> voltageConsumer, Supplier<Double> velocitySupplier) {
+      this(subsystem, voltageConsumer, velocitySupplier, false);
+  }
+
+  public FeedForwardCharacterization(
+      Subsystem subsystem, Consumer<Double> voltageConsumer, Supplier<Double> velocitySupplier, boolean reverse) {
     addRequirements(subsystem);
     this.voltageConsumer = voltageConsumer;
     this.velocitySupplier = velocitySupplier;
+    this.DIRECTION = reverse ? -1.0 : 1.0;
   }
 
   @Override
@@ -40,9 +48,9 @@ public class FeedForwardCharacterization extends Command {
       voltageConsumer.accept(0.0);
 
     } else {
-      double voltage = timer.get() * FF_RAMP_RATE;
+      double voltage = timer.get() * FF_RAMP_RATE * DIRECTION;
       voltageConsumer.accept(voltage);
-      velocitySamples.add(velocitySupplier.get());
+      velocitySamples.add(velocitySupplier.get() * DIRECTION);
       voltageSamples.add(voltage);
     }
   }
