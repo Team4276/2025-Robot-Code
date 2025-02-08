@@ -16,8 +16,6 @@ public interface EndEffectorIO {
     public double RightTempCelsius = 0.0;
 
     public double torqueCurrentAmps = 0.0;
-  
-
   }
 
   default void updateInputs(EndEffectorIOInputs inputs) {}

@@ -16,6 +16,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.LimitSwitchConfig;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
@@ -26,10 +27,14 @@ public class ElevatorIOSparkMax implements ElevatorIO {
   private final SparkBase followerSpark;
   private final RelativeEncoder encoder;
   private final SparkClosedLoopController closedLoopController;
+  private final SparkMaxConfig leaderConfig;
+  private final SparkMaxConfig followerConfig;
 
   // Connection debouncers
   private final Debouncer leaderConnectedDebounce = new Debouncer(0.5);
   private final Debouncer followerConnectedDebounce = new Debouncer(0.5);
+
+  private boolean brakeModeEnabled = true;
 
   public ElevatorIOSparkMax() {
     leaderSpark = new SparkMax(leaderId, MotorType.kBrushless);
@@ -38,10 +43,10 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     closedLoopController = leaderSpark.getClosedLoopController();
 
     // Configure lead motor
-    var leaderConfig = new SparkMaxConfig();
+    leaderConfig = new SparkMaxConfig();
     leaderConfig
         .inverted(invertLeader)
-        .idleMode(IdleMode.kBrake)
+        .idleMode(brakeModeEnabled ? IdleMode.kBrake : IdleMode.kCoast)
         .smartCurrentLimit(currentLimit)
         .voltageCompensation(12.0);
     leaderConfig.encoder
@@ -70,7 +75,7 @@ public class ElevatorIOSparkMax implements ElevatorIO {
     leaderConfig.limitSwitch.apply(limitSwitchConfig);
 
     // Configure follower motor
-    var followerConfig = new SparkMaxConfig();
+    followerConfig = new SparkMaxConfig();
     followerConfig
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(currentLimit)
@@ -156,7 +161,33 @@ public class ElevatorIOSparkMax implements ElevatorIO {
 
   @Override
   public void setBrakeMode(boolean enabled) {
-    // TODO: impl
+    if (brakeModeEnabled == enabled)
+      return;
+    brakeModeEnabled = enabled;
+    new Thread(
+        () -> {
+          tryUntilOk(
+              leaderSpark,
+              5,
+              () -> leaderSpark.configure(
+                  leaderConfig.idleMode(
+                      brakeModeEnabled
+                          ? SparkBaseConfig.IdleMode.kBrake
+                          : SparkBaseConfig.IdleMode.kCoast),
+                  SparkBase.ResetMode.kNoResetSafeParameters,
+                  SparkBase.PersistMode.kNoPersistParameters));
+          tryUntilOk(
+              followerSpark,
+              5,
+              () -> followerSpark.configure(
+                  followerConfig.idleMode(
+                      brakeModeEnabled
+                          ? SparkBaseConfig.IdleMode.kBrake
+                          : SparkBaseConfig.IdleMode.kCoast),
+                  SparkBase.ResetMode.kNoResetSafeParameters,
+                  SparkBase.PersistMode.kNoPersistParameters));
+        })
+        .start();
   }
 
   @Override
