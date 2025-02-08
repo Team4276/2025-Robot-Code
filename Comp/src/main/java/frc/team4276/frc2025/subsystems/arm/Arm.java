@@ -152,6 +152,7 @@ public class Arm extends SubsystemBase {
 
   public void runCharacterization(double output) {
     characterizationInput = output;
+    goal = Goal.CHARACTERIZING;
   }
 
   public double getFFCharacterizationVelocity() {

@@ -14,7 +14,7 @@ public class ArmConstants {
 
   public static final double encoderPositionFactor = 2 * Math.PI;
   public static final double encoderVelocityFactor = 2 * Math.PI / 60;
-  public static final boolean invertEncoder = true;
+  public static final boolean invertEncoder = false;
 
   public static final double kp = 0.0;
   public static final double ki = 0.0;
@@ -25,7 +25,7 @@ public class ArmConstants {
   public static final double minInput = Math.toRadians(70.0);
   public static final double maxInput = Math.toRadians(160.0);
 
-  public static final Rotation2d offset = Rotation2d.fromDegrees(0.0);
+  public static final Rotation2d offset = new Rotation2d(0.4771853).minus(Rotation2d.kCCW_90deg);
 
   public static final Translation2d origin = new Translation2d(-0.026301, 0.155575);
   public static final double gearRatio = 45.0;

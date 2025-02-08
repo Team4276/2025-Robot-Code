@@ -43,8 +43,8 @@ public class Elevator {
   private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", 0.0);
 
   private final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.0);
-  private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0.0); 
-  private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.0); // 0.08
+  private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0.0);
+  private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.0); // 0.09
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
@@ -166,6 +166,7 @@ public class Elevator {
 
   public void runCharacterization(double output) {
     characterizationInput = output;
+    goal = Goal.CHARACTERIZING;
   }
 
   public double getFFCharacterizationVelocity() {

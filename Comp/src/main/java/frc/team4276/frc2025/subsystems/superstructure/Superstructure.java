@@ -1,5 +1,6 @@
 package frc.team4276.frc2025.subsystems.superstructure;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -152,6 +153,7 @@ public class Superstructure extends SubsystemBase {
 
   public void acceptCharacterizationInput(double input) {
     elevatorCharacterizationInput = input;
+    setGoal(Goal.CHARACTERIZING);
   }
 
   public double getFFCharacterizationVelocity() {
@@ -166,5 +168,9 @@ public class Superstructure extends SubsystemBase {
 
   public void setEndEffectorGoal(EndEffector.Goal goal) {
     endEffectorGoal = goal;
+  }
+
+  public void setCoastOverride(BooleanSupplier override) {
+    elevator.setCoastOverride(override);
   }
 }

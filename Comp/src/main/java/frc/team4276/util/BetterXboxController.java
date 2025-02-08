@@ -3,7 +3,8 @@ package frc.team4276.util;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class BetterXboxController extends CommandXboxController {
-  private double DEADBAND = 0.1;
+  private double JOYSTICK_DEADBAND = 0.1;
+  private double TRIGGER_DEADBAND = 0.5;
 
   public BetterXboxController(int port) {
     super(port);
@@ -11,11 +12,11 @@ public class BetterXboxController extends CommandXboxController {
 
   public BetterXboxController(int port, double deadband) {
     super(port);
-    this.DEADBAND = deadband;
+    this.JOYSTICK_DEADBAND = deadband;
   }
 
   public void setDeadband(double deadband) {
-    this.DEADBAND = deadband;
+    this.JOYSTICK_DEADBAND = deadband;
   }
 
   public class JoystickOutput {
@@ -34,7 +35,7 @@ public class BetterXboxController extends CommandXboxController {
   }
 
   public JoystickOutput getRightWithDeadband() {
-    return Math.hypot(getRightX(), getRightY()) < DEADBAND ? new JoystickOutput() : getRight();
+    return Math.hypot(getRightX(), getRightY()) < JOYSTICK_DEADBAND ? new JoystickOutput() : getRight();
   }
 
   public JoystickOutput getRight() {
@@ -42,7 +43,7 @@ public class BetterXboxController extends CommandXboxController {
   }
 
   public JoystickOutput getLeftWithDeadband() {
-    return Math.hypot(getLeftX(), getLeftY()) < DEADBAND ? new JoystickOutput() : getLeft();
+    return Math.hypot(getLeftX(), getLeftY()) < JOYSTICK_DEADBAND ? new JoystickOutput() : getLeft();
   }
 
   public JoystickOutput getLeft() {
@@ -53,7 +54,23 @@ public class BetterXboxController extends CommandXboxController {
     return getHID().getPOV() == 0;
   }
 
+  public boolean getPOVRIGHT() {
+    return getHID().getPOV() == 90;
+  }
+
   public boolean getPOVDOWN() {
     return getHID().getPOV() == 180;
+  }
+
+  public boolean getPOVLEFT() {
+    return getHID().getPOV() == 270;
+  }
+
+  public boolean getLT() {
+    return getLeftTriggerAxis() > TRIGGER_DEADBAND;
+  }
+
+  public boolean getRT() {
+    return getRightTriggerAxis() > TRIGGER_DEADBAND;
   }
 }

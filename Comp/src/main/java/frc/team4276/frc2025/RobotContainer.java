@@ -18,6 +18,7 @@ import java.util.List;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -96,8 +97,11 @@ public class RobotContainer {
   private final Alert operatorDisconnected = new Alert("Operator controller disconnected (port 1).",
       AlertType.kWarning);
 
-  private boolean disableTranslationAutoAlign = true;
+  // Overrides
+  private final DigitalInput elevatorCoastOverride = new DigitalInput(Ports.ELEVATOR_COAST_OVERRIDE);
+  private final DigitalInput armCoastOverride = new DigitalInput(Ports.ARM_COAST_OVERRIDE);
 
+  private boolean disableTranslationAutoAlign = true;
   private boolean disableVisionSim = true;
 
   // Dashboard inputs
@@ -208,14 +212,19 @@ public class RobotContainer {
       }
     }
 
-    arm.setCoastOverride(() -> false);
-
+    configureOverrides();
     configureAutos();
     configureTuningRoutines();
     configureButtonBindings();
 
     // Peace and quiet
     DriverStation.silenceJoystickConnectionWarning(true);
+  }
+
+  private void configureOverrides() {
+    superstructure.setCoastOverride(elevatorCoastOverride::get);
+    arm.setCoastOverride(armCoastOverride::get);
+
   }
 
   private void configureAutos() {
