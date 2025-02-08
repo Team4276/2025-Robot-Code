@@ -14,9 +14,9 @@ import frc.team4276.util.dashboard.LoggedTunableNumber;
 public class Roller extends SubsystemBase {
   public enum Goal {
     IDLE(() -> 0.0),
-    INTAKE(new LoggedTunableNumber("Roller/IntakeVolts", 5.0)),
-    HOLD(new LoggedTunableNumber("Roller/HoldVolts", 1.0)),
-    SCORE(new LoggedTunableNumber("Roller/ScoreVolts", -5.0));
+    INTAKE(new LoggedTunableNumber("Roller/IntakeVolts", 7.0)),
+    HOLD(new LoggedTunableNumber("Roller/HoldVolts", 0.5)),
+    SCORE(new LoggedTunableNumber("Roller/ScoreVolts", -10.0));
 
     private final DoubleSupplier voltageGoal;
 
@@ -39,7 +39,7 @@ public class Roller extends SubsystemBase {
   public Roller(RollerIO io) {
     this.io = io;
 
-    setDefaultCommand(setGoalCommand(Goal.IDLE));
+    setDefaultCommand(setGoalCommand(Goal.HOLD));
   }
 
   @Override
@@ -55,11 +55,17 @@ public class Roller extends SubsystemBase {
       hasGamePiece = true;
     }
 
-    if(goal == Goal.SCORE){
+    if (goal == Goal.SCORE) {
       hasGamePiece = false;
     }
 
-    io.runVolts(goal.getVolts());
+    if (goal == Goal.IDLE) {
+      io.runVolts(hasGamePiece ? Goal.HOLD.getVolts() : Goal.IDLE.getVolts());
+
+    } else {
+      io.runVolts(goal.getVolts());
+
+    }
     Logger.recordOutput("Roller/Goal", goal);
   }
 
@@ -78,7 +84,7 @@ public class Roller extends SubsystemBase {
   }
 
   @AutoLogOutput
-  public boolean hasGamePiece(){
+  public boolean hasGamePiece() {
     return hasGamePiece;
   }
 }

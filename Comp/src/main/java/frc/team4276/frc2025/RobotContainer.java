@@ -34,7 +34,6 @@ import frc.team4276.frc2025.commands.FeedForwardCharacterization;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
 import frc.team4276.frc2025.commands.auto.AutoBuilder;
 import frc.team4276.frc2025.subsystems.arm.Arm;
-import frc.team4276.frc2025.subsystems.arm.Arm.Goal;
 import frc.team4276.frc2025.subsystems.arm.ArmIO;
 import frc.team4276.frc2025.subsystems.arm.ArmIOSparkMax;
 import frc.team4276.frc2025.subsystems.drive.Drive;
@@ -289,11 +288,11 @@ public class RobotContainer {
             superstructure, superstructure::acceptCharacterizationInput,
             superstructure::getFFCharacterizationVelocity));
     autoSelector.addRoutine(
-        "Arm Simple FF Characterization",
+        "(Reverse) Arm Simple FF Characterization",
         new FeedForwardCharacterization(
             arm, arm::runCharacterization, arm::getFFCharacterizationVelocity, true));
     autoSelector.addRoutine(
-        "Elevator Simple FF Characterization",
+        "(Reverse) Elevator Simple FF Characterization",
         new FeedForwardCharacterization(
             superstructure, superstructure::acceptCharacterizationInput,
             superstructure::getFFCharacterizationVelocity, true));
@@ -323,12 +322,19 @@ public class RobotContainer {
   }
 
   private void configureDemoBindings() {
+    // drive.setDefaultCommand(
+    // drive.run(
+    // () -> drive.feedTeleopInput(
+    // -driver.getLeftWithDeadband().y,
+    // -driver.getLeftWithDeadband().x,
+    // -driver.getRightWithDeadband().x)));
+
     drive.setDefaultCommand(
         drive.run(
             () -> drive.feedTeleopInput(
-                -driver.getLeftWithDeadband().y,
-                -driver.getLeftWithDeadband().x,
-                -driver.getRightWithDeadband().x)));
+                0.0,
+                0.0,
+                0.0)));
 
     // Reset gyro to 0° when A button is pressed
     driver
@@ -343,9 +349,23 @@ public class RobotContainer {
                 drive)
                 .ignoringDisable(false));
 
-    superstructure.setDefaultCommand(
-        superstructure.run(() -> superstructure.acceptCharacterizationInput(
+    // superstructure.setDefaultCommand(
+    // superstructure.run(() -> superstructure.acceptCharacterizationInput(
+    // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis()))));
+
+    arm.setDefaultCommand(
+        arm.run(() -> arm.runCharacterization(
             4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis()))));
+
+    driver
+        .leftBumper()
+        .whileTrue(
+            roller.setGoalCommand(Roller.Goal.INTAKE));
+
+    driver
+        .y()
+        .whileTrue(
+            roller.setGoalCommand(Roller.Goal.SCORE));
 
     driver
         .rightBumper()
@@ -355,7 +375,6 @@ public class RobotContainer {
         .whileFalse(
             Commands.runOnce(
                 () -> superstructure.setEndEffectorGoal(EndEffector.Goal.IDLE)));
-
   }
 
   private void configureKeyBoardBindings() {
@@ -429,10 +448,8 @@ public class RobotContainer {
                 roller.setGoalCommand(Roller.Goal.INTAKE)))
         .whileFalse(
             Commands.either(
-                arm.setGoalCommand(Goal.HOLD)
-                    .alongWith(roller.setGoalCommand(Roller.Goal.HOLD)),
-                arm.setGoalCommand(Goal.STOW)
-                    .alongWith(roller.setGoalCommand(Roller.Goal.IDLE)),
+                arm.setGoalCommand(Arm.Goal.HOLD),
+                arm.setGoalCommand(Arm.Goal.STOW),
                 () -> roller.hasGamePiece()));
 
     // Coral Scoring Triggers
@@ -494,7 +511,8 @@ public class RobotContainer {
         : !DriverStation.isJoystickConnected(driver.getHID().getPort())
             || !DriverStation.getJoystickIsXbox(driver.getHID().getPort()));
     operatorDisconnected
-        .set(useKeyboard ? false : !DriverStation.isJoystickConnected(scoringHelper.getButtonBoard().getPort()));
+        .set(useKeyboard ? false
+            : !DriverStation.isJoystickConnected(scoringHelper.getButtonBoard().getPort()));
   }
 
   /**

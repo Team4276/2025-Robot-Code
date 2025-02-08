@@ -47,8 +47,8 @@ public class Arm extends SubsystemBase {
 
   private final LoggedTunableNumber kS = new LoggedTunableNumber("Arm/kS", 0.0);
   private final LoggedTunableNumber kV = new LoggedTunableNumber("Arm/kV", 0.0); // 0.88
-  private final LoggedTunableNumber kG = new LoggedTunableNumber("Arm/kG", 0.0); // 0.73
-  private final LoggedTunableNumber kGLoaded = new LoggedTunableNumber("Arm/kGLoaded", 0.0); // 0.44
+  private final LoggedTunableNumber kG = new LoggedTunableNumber("Arm/kG", 0.0); // 0.44
+  private final LoggedTunableNumber kGLoaded = new LoggedTunableNumber("Arm/kGLoaded", 0.0); // 0.73
 
   private final ArmIO io;
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
@@ -117,7 +117,7 @@ public class Arm extends SubsystemBase {
       hasFlippedCoast = false;
 
       if (goal == Goal.CHARACTERIZING) {
-        io.runVolts(characterizationInput);
+        io.runVolts(characterizationInput + (kG.getAsDouble() * Math.cos(inputs.positionRads)));
       } else {
         setpointState = profile.calculate(0.02, setpointState, new TrapezoidProfile.State(goal.getRads(), 0.0));
         io.runSetpoint(setpointState.position,

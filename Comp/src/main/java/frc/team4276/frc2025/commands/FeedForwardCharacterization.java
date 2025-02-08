@@ -25,7 +25,7 @@ public class FeedForwardCharacterization extends Command {
 
   public FeedForwardCharacterization(
       Subsystem subsystem, Consumer<Double> voltageConsumer, Supplier<Double> velocitySupplier) {
-      this(subsystem, voltageConsumer, velocitySupplier, false);
+    this(subsystem, voltageConsumer, velocitySupplier, false);
   }
 
   public FeedForwardCharacterization(

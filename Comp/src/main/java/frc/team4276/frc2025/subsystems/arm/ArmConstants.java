@@ -22,12 +22,12 @@ public class ArmConstants {
 
   public static final int readFreq = 50;
 
-  public static final double minInput = Math.toRadians(70.0);
-  public static final double maxInput = Math.toRadians(160.0);
+  public static final double minInput = Math.toRadians(20.0);
+  public static final double maxInput = Math.toRadians(110.0);
 
   public static final Rotation2d offset = new Rotation2d(0.4771853).minus(Rotation2d.kCCW_90deg);
 
   public static final Translation2d origin = new Translation2d(-0.026301, 0.155575);
-  public static final double gearRatio = 45.0;
+  public static final double gearRatio = 81.0;
   public static final double length = Units.inchesToMeters(10.939282); // to the bend
 }
