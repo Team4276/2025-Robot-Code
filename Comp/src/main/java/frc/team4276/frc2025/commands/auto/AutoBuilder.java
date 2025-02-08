@@ -73,7 +73,7 @@ public class AutoBuilder {
     };
 
     return Commands.sequence(
-      notificationCommand("Run path with "
+        notificationCommand("Run path with "
             + (isProcessorSide.get() == AutoQuestionResponse.YES ? "processor side" : "barge side")),
         resetPose(trajs[0].getInitialPose()),
         Commands.waitSeconds(delay.getAsDouble()),
@@ -90,23 +90,23 @@ public class AutoBuilder {
       AutoQuestionResponse station,
       AutoQuestionResponse reef,
       int coral,
-      double delay) {
+      DoubleSupplier delay) {
     return coralScoreAuto(
         isProcessorSide,
         () -> start,
         () -> station,
         () -> reef,
         () -> coral,
-        () -> delay);
+        delay);
   }
 
   public Command inner5Piece(Supplier<AutoQuestionResponse> isProcessorSide, DoubleSupplier delay) {
-    return coralScoreAuto(isProcessorSide, () -> AutoQuestionResponse.FAR, () -> AutoQuestionResponse.CLOSE,
-        () -> AutoQuestionResponse.MIDDLE, () -> 5, delay);
+    return coralScoreAuto(isProcessorSide, AutoQuestionResponse.FAR, AutoQuestionResponse.CLOSE,
+        AutoQuestionResponse.MIDDLE, 5, delay);
   }
 
   public Command outter5Piece(Supplier<AutoQuestionResponse> isProcessorSide, DoubleSupplier delay) {
-    return coralScoreAuto(isProcessorSide, () -> AutoQuestionResponse.MIDDLE, () -> AutoQuestionResponse.FAR,
-        () -> AutoQuestionResponse.FAR, () -> 5, delay);
+    return coralScoreAuto(isProcessorSide, AutoQuestionResponse.MIDDLE, AutoQuestionResponse.FAR,
+        AutoQuestionResponse.FAR, 5, delay);
   }
 }
