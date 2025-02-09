@@ -14,6 +14,7 @@ public class ElevatorConstants {
   public static final int currentLimit = 50;
 
   public static final double drumDiameter = 0.04375; // m
+  public static final double drumCircumference = drumDiameter * Math.PI; // m
   public static final double encoderPositionFactor = 1.0;
   public static final double encoderVelocityFactor = 1.0 / 60.0;
   public static final boolean invertEncoder = true;
@@ -24,16 +25,15 @@ public class ElevatorConstants {
 
   public static final int readFreq = 50;
 
-  public static final double minInput = 0.0;
-  public static final double maxInput = 10.0;
+  public static final double minInput = 0.0; // m
+  public static final double maxInput = Units.inchesToMeters(25.5); // m
 
   public static final double gearRatio = 25.0;
-  public static final Translation2d origin = new Translation2d(0.0, 0.0);
+  public static final Translation2d origin = new Translation2d(Units.inchesToMeters(4.750000), Units.inchesToMeters(5.75));
   public static final double length = Units.inchesToMeters(35);
 
-  public static final double homePosition = 0.0;
-  public static final double maxPosition = 1.0;
+  public static final double maxPosition = Units.inchesToMeters(25.5); // m
 
-  public static final double tolerance = 1.0;
+  public static final double tolerance = 1.0; // m
 
 }

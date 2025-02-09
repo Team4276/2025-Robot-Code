@@ -15,7 +15,7 @@ import org.littletonrobotics.junction.Logger;
 public class SlamArm extends SubsystemBase {
   public enum Goal {
     IDLE(() -> 0.0),
-    OUT(new LoggedTunableNumber("SlamArm/OutCurrent", .0)),
+    OUT(new LoggedTunableNumber("SlamArm/OutCurrent", 0.0)),
     IN(new LoggedTunableNumber("SlamArm/InCurrent", 0.0)),
     CUSTOM(new LoggedTunableNumber("SlamArm/CustomCurrent", 0.0));
 

@@ -36,7 +36,7 @@ public class ElevatorViz {
 
     // Log 3D poses
     Pose3d motor = new Pose3d(
-        new Translation3d(origin.getX(), position, origin.getY()),
+        new Translation3d(origin.getX(), 0, origin.getY() + position),
         new Rotation3d(0.0, 0.0, 0.0));
     Logger.recordOutput("Elevator/Mechanism3d/" + key, motor);
   }

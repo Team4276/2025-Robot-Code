@@ -5,6 +5,7 @@ import static frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorCo
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.team4276.frc2025.Constants;
@@ -19,8 +20,8 @@ public class Elevator {
   public enum Goal {
     STOW(new LoggedTunableNumber("Elevator/StowPosition", 0.0)),
     L1(new LoggedTunableNumber("Elevator/L1Position", 0.0)),
-    L2(new LoggedTunableNumber("Elevator/L2Position", 0.0)),
-    L3(new LoggedTunableNumber("Elevator/L3Position", 0.0)),
+    L2(new LoggedTunableNumber("Elevator/L2Position", Units.inchesToMeters(7.7))),
+    L3(new LoggedTunableNumber("Elevator/L3Position", Units.inchesToMeters(23.1))),
     CHARACTERIZING(() -> 0.0),
     CUSTOM(new LoggedTunableNumber("Elevator/CustomSetpoint", 0.0));
 
@@ -30,7 +31,7 @@ public class Elevator {
       this.elevatorSetpointSupplier = elevatorSetpointSupplier;
     }
 
-    private double getPosition() {
+    private double getPositionMetres() {
       return elevatorSetpointSupplier.getAsDouble();
     }
   }
@@ -60,6 +61,10 @@ public class Elevator {
 
   private boolean wantHome = false;
   private boolean isHoming = false;
+  /**
+   * position that reads zero on the elevator
+   */
+  private double homedPosition = 0.0;
 
   private final ElevatorViz goalViz;
   private final ElevatorViz measuredViz;
@@ -84,11 +89,11 @@ public class Elevator {
     Logger.processInputs("Elevator", inputs);
 
     if (inputs.botLimit) {
-      io.setPosition(homePosition);
+      homedPosition = inputs.position;
       isHoming = false;
 
     } else if (inputs.topLimit) {
-      io.setPosition(maxPosition);
+      homedPosition = inputs.position - maxPosition;
       isHoming = false;
 
     }
@@ -104,7 +109,7 @@ public class Elevator {
 
       io.setBrakeMode(!coastOverride.getAsBoolean() && hasFlippedCoast);
 
-      setpointState = new TrapezoidProfile.State(inputs.position, 0.0);
+      setpointState = new TrapezoidProfile.State(getPositionMetres(), 0.0);
 
       if (Constants.isTuning) {
         ff = new ElevatorFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), 0.0);
@@ -135,18 +140,22 @@ public class Elevator {
         io.runVolts(homingVolts.getAsDouble());
 
       } else {
-        setpointState = profile.calculate(0.02, setpointState, new TrapezoidProfile.State(goal.getPosition(), 0.0));
-        io.runSetpoint(setpointState.position, ff.calculate(setpointState.velocity));
-        Logger.recordOutput("Elevator/GoalAngle", goal.getPosition());
-        Logger.recordOutput("Elevator/SetpointState/Pos", setpointState.position);
-        Logger.recordOutput("Elevator/SetpointState/Vel", setpointState.velocity);
+        setpointState = profile.calculate(0.02, setpointState, new TrapezoidProfile.State(goal.getPositionMetres(), 0.0));
+        io.runSetpoint(metresToRotations(MathUtil.clamp(setpointState.position, minInput, maxInput) + homedPosition), ff.calculate(setpointState.velocity));
+        Logger.recordOutput("Elevator/GoalMetres", goal.getPositionMetres());
+        Logger.recordOutput("Elevator/GoalRotations", metresToRotations(goal.getPositionMetres()));
+        Logger.recordOutput("Elevator/SetpointState/PosMetres", setpointState.position);
+        Logger.recordOutput("Elevator/SetpointState/VelMetres", setpointState.velocity);
+        Logger.recordOutput("Elevator/SetpointState/PosRotations", metresToRotations(setpointState.position));
+        Logger.recordOutput("Elevator/SetpointState/VelRotations", metresToRotations(setpointState.velocity));
 
       }
     }
 
-    goalViz.update(goal.getPosition());
-    measuredViz.update(inputs.position);
+    goalViz.update(goal.getPositionMetres());
+    measuredViz.update(getPositionMetres());
     Logger.recordOutput("Elevator/Goal", goal);
+    Logger.recordOutput("Elevator/HomedPositionMetres", homedPosition);
   }
 
   @AutoLogOutput
@@ -161,7 +170,7 @@ public class Elevator {
 
   @AutoLogOutput
   public boolean atGoal() {
-    return MathUtil.isNear(goal.getPosition(), inputs.position, tolerance);
+    return MathUtil.isNear(goal.getPositionMetres(), getPositionMetres(), tolerance);
   }
 
   public void runCharacterization(double output) {
@@ -170,7 +179,7 @@ public class Elevator {
   }
 
   public double getFFCharacterizationVelocity() {
-    return inputs.velocity;
+    return rotationsToMetres(inputs.velocity);
   }
 
   public void endCharacterizaton() {
@@ -179,5 +188,17 @@ public class Elevator {
 
   public void requestHome() {
     wantHome = true;
+  }
+
+  public static double metresToRotations(double metres) {
+    return (metres / drumCircumference) * gearRatio;
+  }
+
+  public static double rotationsToMetres(double rotations) {
+    return (rotations / gearRatio) * drumCircumference;
+  }
+
+  public double getPositionMetres(){
+    return rotationsToMetres(inputs.position) - homedPosition;
   }
 }

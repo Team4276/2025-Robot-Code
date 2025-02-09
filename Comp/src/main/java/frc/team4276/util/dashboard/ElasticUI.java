@@ -1,8 +1,5 @@
 package frc.team4276.util.dashboard;
 
-import static frc.team4276.frc2025.field.FieldConstants.fieldLength;
-import static frc.team4276.frc2025.field.FieldConstants.fieldWidth;
-
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -45,8 +42,12 @@ public class ElasticUI {
       public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("Field");
 
-        builder.addDoubleArrayProperty("Robot", () -> new double[] { estimatedPose.get().getX() - (fieldLength / 2),
-            estimatedPose.get().getY() - (fieldWidth / 2),
+        builder.addDoubleArrayProperty("Robot", () -> new double[] { estimatedPose.get().getX()
+          //  - (fieldLength / 2)
+           ,
+            estimatedPose.get().getY()
+            //  - (fieldWidth / 2)
+            ,
             estimatedPose.get().getRotation().getDegrees()
         }, null);
       }
