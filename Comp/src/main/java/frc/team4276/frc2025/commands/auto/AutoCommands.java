@@ -18,9 +18,9 @@ import java.util.function.Supplier;
 public class AutoCommands {
   private AutoCommands() {
   }
-
-  private static final double scoreWaitTime = 0.5;
-  private static final double intakeWaitTime = 1.0;
+  
+  public static final double scoreWaitTime = 0.5;
+  public static final double intakeWaitTime = 0.5;
 
   public static Command resetPose(Pose2d pose) {
     return Commands.runOnce(() -> RobotState.getInstance().resetPose(pose));

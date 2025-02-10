@@ -571,7 +571,9 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoSelector.getCommand();
+    return 
+    // autoSelector.getCommand();
     // Commands.none();
+    autoBuilder.testNeo();
   }
 }

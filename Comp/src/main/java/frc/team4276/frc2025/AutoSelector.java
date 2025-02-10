@@ -22,7 +22,23 @@ public class AutoSelector extends VirtualSubsystem {
     NO,
     MIDDLE,
     FAR,
-    CLOSE
+    CLOSE,
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    G,
+    H,
+    I,
+    J,
+    K,
+    L,
+    L1_LEFT,
+    L1_RIGHT,
+    L2,
+    L3
   }
 
   private static final int maxQuestions = 4;
@@ -37,17 +53,16 @@ public class AutoSelector extends VirtualSubsystem {
   private final LoggedNetworkNumber delayInput;
 
   private AutoRoutine lastRoutine;
-  private List<AutoQuestionResponse> lastResponses;
+  private List<AutoQuestionResponse> lastResponses = List.of(
+    AutoQuestionResponse.EMPTY,
+    AutoQuestionResponse.EMPTY,
+    AutoQuestionResponse.EMPTY,
+    AutoQuestionResponse.EMPTY);
 
   public AutoSelector() {
     routineChooser = new LoggedDashboardChooser<>("Comp/Auto/RoutineChooser");
     routineChooser.addDefaultOption(defaultRoutine.name(), defaultRoutine);
     lastRoutine = defaultRoutine;
-    lastResponses = List.of(
-        AutoQuestionResponse.EMPTY,
-        AutoQuestionResponse.EMPTY,
-        AutoQuestionResponse.EMPTY,
-        AutoQuestionResponse.EMPTY);
 
     questionPublishers = new ArrayList<>();
     questionChoosers = new ArrayList<>();
@@ -144,10 +159,18 @@ public class AutoSelector extends VirtualSubsystem {
 
     // Update the routine and responses
     lastRoutine = selectedRoutine;
+    var cachedResponses = lastResponses.isEmpty() ? List.of(
+      AutoQuestionResponse.EMPTY,
+      AutoQuestionResponse.EMPTY,
+      AutoQuestionResponse.EMPTY,
+      AutoQuestionResponse.EMPTY) : lastResponses;
     lastResponses = new ArrayList<>();
     for (int i = 0; i < lastRoutine.questions().size(); i++) {
       questionChoosers.get(i).periodic();
       var responseString = questionChoosers.get(i).get();
+      if(cachedResponses.get(i) != responseString){
+        // TODO: stop if invalid auto
+      }
       lastResponses.add(
           responseString == null
               ? lastRoutine.questions().get(i).responses().get(0)
