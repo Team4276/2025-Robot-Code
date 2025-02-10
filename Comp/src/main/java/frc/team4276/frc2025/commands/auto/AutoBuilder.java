@@ -57,7 +57,7 @@ public class AutoBuilder {
    * @param coral
    * @return
    */
-  public Command neoCoralScoreAuto(
+  public Command coralScoreAuto(
       List<AutoQuestionResponse> reefs,
       List<AutoQuestionResponse> levels,
       List<AutoQuestionResponse> stations,
@@ -94,7 +94,7 @@ public class AutoBuilder {
         // TODO: make it an approach auto
         superstructure.setGoalCommand(toGoal(levels.get(i)))
             .raceWith(Commands.waitUntil(superstructure::atGoal).andThen(scoreCommand(superstructure))));
-            
+
       if(i != reefs.size() - 1 && !cancelLastIntake){
         scoringCommands.addCommands(superstructure.setGoalCommand(Goal.INTAKE)
         .withDeadline(followTrajectory(drive, trajs.get((i * 2) + 1)))
@@ -109,18 +109,18 @@ public class AutoBuilder {
         scoringCommands);
   }
 
-  public Command neoCoralScoreAuto(
+  public Command coralScoreAuto(
       List<AutoQuestionResponse> reefs,
       List<AutoQuestionResponse> levels,
       List<AutoQuestionResponse> stations,
       int cancelLastIntake) {
 
-    return neoCoralScoreAuto(reefs, levels, stations,
+    return coralScoreAuto(reefs, levels, stations,
         autoSelector.getResponses().get(cancelLastIntake) == AutoQuestionResponse.YES);
   }
 
   public Command rpAuto() {
-    return neoCoralScoreAuto(
+    return coralScoreAuto(
         List.of(
             AutoQuestionResponse.G),
         List.of(
@@ -131,7 +131,7 @@ public class AutoBuilder {
   }
 
   public Command max5Coral() {
-    return neoCoralScoreAuto(
+    return coralScoreAuto(
         List.of(
             AutoQuestionResponse.F,
             AutoQuestionResponse.A,
@@ -154,7 +154,7 @@ public class AutoBuilder {
   }
 
   public Command safe5Coal() {
-    return neoCoralScoreAuto(
+    return coralScoreAuto(
         List.of(
             AutoQuestionResponse.E,
             AutoQuestionResponse.D,
@@ -195,7 +195,7 @@ public class AutoBuilder {
     }
   }
 
-  public boolean isValidNeoCoralScoreAuto(
+  public boolean isValidCoralScoreAuto(
       List<AutoQuestionResponse> reefs,
       List<AutoQuestionResponse> levels,
       List<AutoQuestionResponse> stations,
