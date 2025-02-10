@@ -234,7 +234,7 @@ public class RobotContainer {
     autoBuilder = new AutoBuilder(drive, superstructure, autoSelector);
 
     // Set up auto routines
-    autoSelector.addRoutine("Test 1 Traj", () -> autoBuilder.testTraj("BoxTest"));
+    autoSelector.addRoutine("Test 1 Traj", () -> autoBuilder.testTraj("z_BoxTest"));
     autoSelector.addRoutine("RP Auto",
         List.of(
             new AutoQuestion("Is Processor Side?", List.of(

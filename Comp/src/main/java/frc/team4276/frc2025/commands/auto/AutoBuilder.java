@@ -76,10 +76,8 @@ public class AutoBuilder {
     boolean mirrorLengthwise = autoSelector.getResponses().get(0) == AutoQuestionResponse.NO;
 
     // Get paths
-    String pathStart = "c_st_" + reefs.get(0).toString() + "_" + stations.get(0);
-
-    trajs.add(getPathPlannerTrajectoryFromChoreo(pathStart, mirrorLengthwise, 0));
-    trajs.add(getPathPlannerTrajectoryFromChoreo(pathStart, mirrorLengthwise, 1));
+    trajs.add(getPathPlannerTrajectoryFromChoreo("c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise));
+    trajs.add(getPathPlannerTrajectoryFromChoreo("c_sc_" + stations.get(0) + "_" + reefs.get(0).toString(), mirrorLengthwise, 1));
 
     for (int i = 1; i < reefs.size(); i++) {
       trajs.add(getPathPlannerTrajectoryFromChoreo("c_sc_" + stations.get(i) + "_" + reefs.get(i).toString(),
