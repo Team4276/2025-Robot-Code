@@ -133,44 +133,4 @@ public class AutoCommands {
         .withName("Score")
         .alongWith(notificationCommand("Scoring"));
   }
-
-  public static Command driveWithSuperstructureCommand(Drive drive, Superstructure superstructure,
-      PathPlannerTrajectory traj, Superstructure.Goal goal, double delay) {
-    return followTrajectory(drive, traj)
-        .deadlineFor(
-            Commands.waitSeconds(delay)
-                .andThen(superstructure.setGoalCommand(goal)))
-        .withName("DriveWithSuperstructureGoal")
-        .alongWith(notificationCommand("Driving with Superstructure Goal " + goal));
-  }
-
-  public static Command driveAndScoreCommand(Drive drive, Superstructure superstructure,
-      PathPlannerTrajectory traj, Superstructure.Goal goal, double delay) {
-    return Commands.sequence(
-      Commands.waitSeconds(delay), superstructure.setGoalCommand(goal))
-        .raceWith(followTrajectory(drive, traj)
-            .andThen(scoreCommand(superstructure))
-            .andThen(Commands.waitSeconds(scoreWaitTime)))
-        .withName("DriveAndScore")
-        .alongWith(notificationCommand("Driving and Scoring"));
-  }
-
-  public static Command driveAndScoreL1Command(Drive drive, Superstructure superstructure,
-      PathPlannerTrajectory traj, double delay, boolean isLeftL1) {
-    return Commands.sequence(
-      Commands.waitSeconds(delay), superstructure.setGoalCommand(Superstructure.Goal.L1))
-        .raceWith(followTrajectory(drive, traj)
-            .andThen(scoreCommand(superstructure, isLeftL1))
-            .andThen(Commands.waitSeconds(scoreWaitTime)))
-        .withName("DriveAndScore")
-        .alongWith(notificationCommand("Driving and Scoring"));
-  }
-
-  public static Command driveAndIntakeCommand(Drive drive, Superstructure superstructure, PathPlannerTrajectory traj) {
-    return superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
-        .raceWith(followTrajectory(drive, traj)
-            .andThen(Commands.waitSeconds(intakeWaitTime)))
-        .withName("DriveAndIntake")
-        .alongWith(notificationCommand("Driving and Intaking"));
-  }
 }

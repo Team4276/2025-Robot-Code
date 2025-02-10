@@ -37,118 +37,17 @@ public class AutoBuilder {
         .andThen(followTrajectory(drive, traj));
   }
 
-  private Command cycle(PathPlannerTrajectory toIntake, PathPlannerTrajectory toScore, Goal goal,
-      double delay) {
-    return driveAndIntakeCommand(drive, superstructure, toIntake)
-        .andThen(driveAndScoreCommand(drive, superstructure, toScore, goal, delay));
-  }
-
-  private Command cycleL1(PathPlannerTrajectory toIntake, PathPlannerTrajectory toScore, boolean isLeftL1,
-      double delay) {
-    return driveAndIntakeCommand(drive, superstructure, toIntake)
-        .andThen(driveAndScoreL1Command(drive, superstructure, toScore, delay, isLeftL1));
-  }
-
-  /**
-   * dashboard custom coral auto
-   * 
-   * @param isProcessorSide
-   * @param start
-   * @param station
-   * @param reef
-   * @return
-   */
-  public Command coralScoreAuto(
-      int isProcessorSide,
-      int start,
-      int station,
-      int reef) {
-
-    String pathStart = autoSelector.getResponses().get(start) + "_start_" + autoSelector.getResponses().get(station)
-        + "_station";
-    String pathBody = autoSelector.getResponses().get(station) + "_station_" + autoSelector.getResponses().get(reef)
-        + "_reef";
-
-    boolean mirrorLengthwise = autoSelector.getResponses().get(isProcessorSide) == AutoQuestionResponse.NO;
-
-    PathPlannerTrajectory[] trajs = {
-        getPathPlannerTrajectoryFromChoreo(pathStart, mirrorLengthwise, 0),
-        getPathPlannerTrajectoryFromChoreo(pathStart, mirrorLengthwise, 1),
-        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 0),
-        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 1),
-        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 2),
-        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 3),
-        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 4),
-        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 5),
-        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 6)
-    };
-
-    return Commands.sequence(
-        notificationCommand("Run path with "
-            + (autoSelector.getResponses().get(isProcessorSide) == AutoQuestionResponse.YES ? "processor side"
-                : "barge side")),
-        resetPose(trajs[0].getInitialPose()),
-        Commands.waitSeconds(autoSelector.getDelayInput()),
-        driveAndScoreCommand(drive, superstructure, trajs[0], Goal.L2, 0.25),
-        cycle(trajs[1], trajs[2], Goal.L2, 0.5).onlyIf(() -> autoSelector.getCoralInput() >= 2),
-        cycleL1(trajs[3], trajs[4], true, 0.5).onlyIf(() -> autoSelector.getCoralInput() >= 3),
-        cycle(trajs[5], trajs[6], Goal.L2, 0.5).onlyIf(() -> autoSelector.getCoralInput() >= 4),
-        cycleL1(trajs[7], trajs[8], false, 0.5).onlyIf(() -> autoSelector.getCoralInput() >= 5));
-  }
-
-  /**
-   * pre made coral auto
-   * 
-   * @param start
-   * @param station
-   * @param reef
-   * @param coral
-   * @return
-   */
-  public Command coralScoreAuto(
-      AutoQuestionResponse start,
-      AutoQuestionResponse station,
-      AutoQuestionResponse reef,
-      int coral) {
-
-    String pathStart = start.toString() + "_start_" + station.toString() + "_station";
-    String pathBody = station.toString() + "_station_" + reef.toString() + "_reef";
-
+  public Command taxiAuto(String name) {
+    // Check if need to flip paths to barge side
     boolean mirrorLengthwise = autoSelector.getResponses().get(0) == AutoQuestionResponse.NO;
 
-    PathPlannerTrajectory[] trajs = {
-        getPathPlannerTrajectoryFromChoreo(pathStart, mirrorLengthwise, 0),
-        getPathPlannerTrajectoryFromChoreo(pathStart, mirrorLengthwise, 1),
-        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 0),
-        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 1),
-        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 2),
-        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 3),
-        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 4),
-        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 5),
-        getPathPlannerTrajectoryFromChoreo(pathBody, mirrorLengthwise, 6)
-    };
+    var traj = getPathPlannerTrajectoryFromChoreo(name, mirrorLengthwise);
 
     return Commands.sequence(
-        notificationCommand("Run path with "
-            + (autoSelector.getResponses().get(0) == AutoQuestionResponse.YES ? "processor side"
-                : "barge side")),
-        resetPose(trajs[0].getInitialPose()),
+        notificationCommand("Run path on " + (mirrorLengthwise ? "barge side" : "processor side")),
+        resetPose(traj.getInitialPose()),
         Commands.waitSeconds(autoSelector.getDelayInput()),
-        driveAndScoreCommand(drive, superstructure, trajs[0], Goal.L1, 0.25),
-        cycle(trajs[1], trajs[2], Goal.L2, 0.5).onlyIf(() -> coral >= 2),
-        cycleL1(trajs[3], trajs[4], true, 0.5).onlyIf(() -> coral >= 3),
-        cycle(trajs[5], trajs[6], Goal.L2, 0.5).onlyIf(() -> coral >= 4),
-        cycleL1(trajs[7], trajs[8], false, 0.5).onlyIf(() -> coral >= 5));
-  }
-
-  public Command inner5Piece() {
-    return coralScoreAuto(AutoQuestionResponse.FAR, AutoQuestionResponse.CLOSE,
-        AutoQuestionResponse.MIDDLE, 5);
-  }
-
-  public Command outter5Piece() {
-    return coralScoreAuto(AutoQuestionResponse.MIDDLE, AutoQuestionResponse.FAR,
-        AutoQuestionResponse.FAR, 5);
+        followTrajectory(drive, traj));
   }
 
   /**
@@ -161,7 +60,8 @@ public class AutoBuilder {
   public Command neoCoralScoreAuto(
       List<AutoQuestionResponse> reefs,
       List<AutoQuestionResponse> levels,
-      List<AutoQuestionResponse> stations) {
+      List<AutoQuestionResponse> stations,
+      boolean cancelLastIntake) {
 
     if (reefs.isEmpty() || levels.isEmpty() || stations.isEmpty()) { // TODO: handle this well
       CommandScheduler.getInstance().schedule(notificationCommand("Error invalid Coral Auto List is Empty"));
@@ -189,14 +89,17 @@ public class AutoBuilder {
     }
 
     for (int i = 0; i < reefs.size(); i++) {
-      scoringCommands.addCommands(Commands.sequence(
-          followTrajectory(drive, trajs.get(i * 2)),
-          // TODO: or make it an approach auto
-          superstructure.setGoalCommand(toGoal(levels.get(i)))
-              .raceWith(Commands.waitUntil(superstructure::atGoal).andThen(scoreCommand(superstructure))),
-          superstructure.setGoalCommand(Goal.INTAKE)
-              .withDeadline(followTrajectory(drive, trajs.get((i * 2) + 1)))
-              .andThen(Commands.waitSeconds(intakeWaitTime))));
+      scoringCommands.addCommands(
+        followTrajectory(drive, trajs.get(i * 2)),
+        // TODO: make it an approach auto
+        superstructure.setGoalCommand(toGoal(levels.get(i)))
+            .raceWith(Commands.waitUntil(superstructure::atGoal).andThen(scoreCommand(superstructure))));
+            
+      if(i != reefs.size() - 1 && !cancelLastIntake){
+        scoringCommands.addCommands(superstructure.setGoalCommand(Goal.INTAKE)
+        .withDeadline(followTrajectory(drive, trajs.get((i * 2) + 1)))
+        .andThen(Commands.waitSeconds(intakeWaitTime)));
+      }
     }
 
     return Commands.sequence(
@@ -206,18 +109,62 @@ public class AutoBuilder {
         scoringCommands);
   }
 
-  public Command testNeo() {
+  public Command neoCoralScoreAuto(
+      List<AutoQuestionResponse> reefs,
+      List<AutoQuestionResponse> levels,
+      List<AutoQuestionResponse> stations,
+      int cancelLastIntake) {
+
+    return neoCoralScoreAuto(reefs, levels, stations,
+        autoSelector.getResponses().get(cancelLastIntake) == AutoQuestionResponse.YES);
+  }
+
+  public Command rpAuto() {
     return neoCoralScoreAuto(
         List.of(
-            AutoQuestionResponse.E,
+            AutoQuestionResponse.G),
+        List.of(
+            AutoQuestionResponse.L1_LEFT),
+        List.of(
+            AutoQuestionResponse.FAR),
+        true);
+  }
+
+  public Command max5Coral() {
+    return neoCoralScoreAuto(
+        List.of(
+            AutoQuestionResponse.F,
             AutoQuestionResponse.A,
             AutoQuestionResponse.B,
             AutoQuestionResponse.E,
-            AutoQuestionResponse.F),
+            AutoQuestionResponse.E),
         List.of(
+            AutoQuestionResponse.L2,
+            AutoQuestionResponse.L2,
+            AutoQuestionResponse.L2,
+            AutoQuestionResponse.L2,
+            AutoQuestionResponse.L1_LEFT),
+        List.of(
+            AutoQuestionResponse.FAR,
+            AutoQuestionResponse.FAR,
+            AutoQuestionResponse.FAR,
+            AutoQuestionResponse.FAR,
+            AutoQuestionResponse.FAR),
+        false);
+  }
+
+  public Command safe5Coal() {
+    return neoCoralScoreAuto(
+        List.of(
+            AutoQuestionResponse.E,
+            AutoQuestionResponse.D,
+            AutoQuestionResponse.C,
+            AutoQuestionResponse.B,
+            AutoQuestionResponse.A),
+        List.of(
+            AutoQuestionResponse.L2,
+            AutoQuestionResponse.L1_RIGHT,
             AutoQuestionResponse.L1_LEFT,
-            AutoQuestionResponse.L2,
-            AutoQuestionResponse.L2,
             AutoQuestionResponse.L2,
             AutoQuestionResponse.L2),
         List.of(
@@ -225,7 +172,8 @@ public class AutoBuilder {
             AutoQuestionResponse.FAR,
             AutoQuestionResponse.FAR,
             AutoQuestionResponse.FAR,
-            AutoQuestionResponse.FAR));
+            AutoQuestionResponse.FAR),
+        false);
   }
 
   private Goal toGoal(AutoQuestionResponse response) {

@@ -235,38 +235,29 @@ public class RobotContainer {
 
     // Set up auto routines
     autoSelector.addRoutine("Test 1 Traj", () -> autoBuilder.testTraj("BoxTest"));
-    autoSelector.addRoutine("Inner 5 Coral", List.of(
-        new AutoQuestion("Is Processor Side?", List.of(
-            AutoQuestionResponse.YES,
-            AutoQuestionResponse.NO))),
-        () -> autoBuilder.inner5Piece());
-    autoSelector.addRoutine("Outter 5 Coral", List.of(
-        new AutoQuestion("Is Processor Side?", List.of(
-            AutoQuestionResponse.YES,
-            AutoQuestionResponse.NO))),
-        () -> autoBuilder.outter5Piece());
-    autoSelector.addRoutine("Coral Score Auto",
-        List.of(
-            new AutoQuestion("Is Processor Side?", List.of(
-                AutoQuestionResponse.YES,
-                AutoQuestionResponse.NO)),
-            new AutoQuestion("Start Position", List.of(
-                AutoQuestionResponse.MIDDLE,
-                AutoQuestionResponse.FAR)),
-            new AutoQuestion("Coral Station", List.of(
-                AutoQuestionResponse.CLOSE,
-                AutoQuestionResponse.FAR)),
-            new AutoQuestion("Reef", List.of(
-                AutoQuestionResponse.MIDDLE,
-                AutoQuestionResponse.CLOSE,
-                AutoQuestionResponse.FAR))),
-        () -> autoBuilder.coralScoreAuto(0, 1, 2, 3));
-    autoSelector.addRoutine("Neo Coral Test Auto",
+    autoSelector.addRoutine("RP Auto",
         List.of(
             new AutoQuestion("Is Processor Side?", List.of(
                 AutoQuestionResponse.YES,
                 AutoQuestionResponse.NO))),
-        () -> autoBuilder.testNeo());
+        () -> autoBuilder.rpAuto());
+    autoSelector.addRoutine("Taxi Wall",
+        List.of(
+            new AutoQuestion("Is Processor Side?", List.of(
+                AutoQuestionResponse.YES,
+                AutoQuestionResponse.NO))),
+        () -> autoBuilder.taxiAuto("t_WALL"));
+    autoSelector.addRoutine("Max 5 Coral",
+        List.of(
+            new AutoQuestion("Is Processor Side?", List.of(
+                AutoQuestionResponse.YES,
+                AutoQuestionResponse.NO))),
+        () -> autoBuilder.max5Coral());
+    autoSelector.addRoutine("Safe 5 Coral", List.of(
+        new AutoQuestion("Is Processor Side?", List.of(
+            AutoQuestionResponse.YES,
+            AutoQuestionResponse.NO))),
+        () -> autoBuilder.safe5Coal());
 
   }
 
