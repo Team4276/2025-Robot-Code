@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team4276.util.AllianceFlipUtil;
 
 public class ElasticUI {
   private ElasticUI() {
@@ -31,7 +32,7 @@ public class ElasticUI {
         builder.addDoubleProperty("Back Right Angle", () -> state.get()[3].angle.getRadians(), null);
         builder.addDoubleProperty("Back Right Velocity", () -> state.get()[3].speedMetersPerSecond, null);
 
-        builder.addDoubleProperty("Robot Angle", () -> angle.get().getRadians(), null);
+        builder.addDoubleProperty("Robot Angle", () -> AllianceFlipUtil.apply(angle.get()).getRadians(), null);
       }
     });
   }

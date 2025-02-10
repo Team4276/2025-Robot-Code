@@ -5,7 +5,6 @@ import static frc.team4276.frc2025.subsystems.drive.DriveConstants.*;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -21,7 +20,7 @@ public class AutoAlignController {
   private final LoggedTunableNumber translationKTol = new LoggedTunableNumber(
       "AutoAlignController/Translation/Tolerance", 0.1);
 
-  private final LoggedTunableNumber rotationkP = new LoggedTunableNumber("AutoAlignController/Rotation/kP", 1.0);
+  private final LoggedTunableNumber rotationkP = new LoggedTunableNumber("AutoAlignController/Rotation/kP", 0.5);
   private final LoggedTunableNumber rotationkD = new LoggedTunableNumber("AutoAlignController/Rotation/kD", 0.0);
   private final LoggedTunableNumber rotationKTol = new LoggedTunableNumber(
       "AutoAlignController/Rotation/ToleranceDegrees", 1.0);
@@ -93,7 +92,7 @@ public class AutoAlignController {
 
     }
 
-    double thetaError = MathUtil.angleModulus(setpoint.getRotation().minus(currentPose.getRotation()).getRadians());
+    double thetaError = MathUtil.angleModulus(currentPose.getRotation().minus(setpoint.getRotation()).getRadians());
     double omega = headingController.calculate(thetaError, 0.0);
 
     if (!headingController.atGoal()) {
@@ -103,13 +102,10 @@ public class AutoAlignController {
 
     distanceToGoal = setpoint.relativeTo(currentPose);
 
-    Logger.recordOutput("AutoAlign/DistanceMeasured", trans.getNorm());
-    Logger.recordOutput("AutoAlign/DistanceSetpoint", translationController.getSetpoint().position);
+    Logger.recordOutput("AutoAlign/DistanceError", trans.getNorm());
     Logger.recordOutput("AutoAlign/ThetaMeasured", currentPose.getRotation().getRadians());
-    Logger.recordOutput("AutoAlign/ThetaSetpoint", headingController.getSetpoint().position);
-    Logger.recordOutput(
-        "AutoAlign/StateSetpoint",
-        new Pose2d(linearOutput, new Rotation2d(headingController.getSetpoint().position)));
+    Logger.recordOutput("AutoAlign/ThetaSetpoint", setpoint.getRotation().getRadians());
+    Logger.recordOutput("AutoAlign/ThetaError", thetaError);
 
     return new ChassisSpeeds(linearOutput.getX(), linearOutput.getY(), omega);
 

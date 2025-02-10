@@ -88,8 +88,8 @@ public class RobotContainer {
   private boolean isDemo = true;
 
   private final BetterXboxController driver = new BetterXboxController(0);
-  private final CommandGenericHID buttonBoard = new CommandGenericHID(0);
-  private final CommandGenericHID keyboard = new CommandGenericHID(0);
+  private final CommandGenericHID buttonBoard = new CommandGenericHID(1);
+  private final CommandGenericHID keyboard = new CommandGenericHID(2);
 
   private final ScoringHelper scoringHelper = new ScoringHelper(buttonBoard, keyboard, useKeyboard);
 
@@ -387,22 +387,24 @@ public class RobotContainer {
                 -keyboard.getRawAxis(2))));
 
     // Coral Intake Triggers
-    driver
+    keyboard
         .button(9)
         .whileTrue(
             superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
                 .alongWith(
-                    DriveCommands.headingAlignCommand(drive, () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(55.0)))));
+                    DriveCommands.headingAlignCommand(drive,
+                        () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(55.0)))));
 
-    driver
+    keyboard
         .button(10)
         .whileTrue(
             superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
                 .alongWith(
-                    DriveCommands.headingAlignCommand(drive, () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(305.0)))));
+                    DriveCommands.headingAlignCommand(drive,
+                        () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(305.0)))));
 
     // Algae Intake Trigger
-    driver
+    keyboard
         .button(11)
         .whileTrue(
             arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(
@@ -414,7 +416,7 @@ public class RobotContainer {
                 () -> roller.hasGamePiece()));
 
     // Coral Scoring Triggers
-    driver
+    keyboard
         .button(12)
         .whileTrue(
             Commands.sequence(
@@ -430,23 +432,16 @@ public class RobotContainer {
                             false)))
                 .finallyDo(() -> vision.setEnableCamera(1, true)));
 
-    // driver
-    // .rightStick()
-    // .onTrue(
-    // Commands.runOnce(() -> {
-    // disableTranslationAutoAlign = !disableTranslationAutoAlign;
-    // }));
-
-    driver
+    keyboard
         .button(13)
         .onTrue(superstructure.scoreCommand(false));
 
     // Algae Scoring Triggers
-    driver
+    keyboard
         .button(15)
         .whileTrue(roller.setGoalCommand(Roller.Goal.SCORE));
 
-    driver
+    keyboard
         .button(14)
         .whileTrue(
             Commands.either(
@@ -454,9 +449,9 @@ public class RobotContainer {
                 arm.setGoalCommand(Arm.Goal.SCORE).alongWith(
                     Commands.startEnd(
                         () -> drive.setHeadingGoal(
-                            () -> AllianceFlipUtil.apply(Rotation2d.kCW_90deg)),
+                            () -> AllianceFlipUtil.apply(Rotation2d.kCCW_90deg)),
                         drive::clearHeadingGoal)),
-                driver.button(12)));
+                keyboard.button(12)));
 
   }
 
@@ -491,14 +486,16 @@ public class RobotContainer {
         .whileTrue(
             superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
                 .alongWith(
-                    DriveCommands.headingAlignCommand(drive, () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(305.0)))));
+                    DriveCommands.headingAlignCommand(drive,
+                        () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(305.0)))));
 
     driver
         .b()
         .whileTrue(
             superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
                 .alongWith(
-                    DriveCommands.headingAlignCommand(drive, () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(55.0)))));
+                    DriveCommands.headingAlignCommand(drive,
+                        () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(55.0)))));
 
     // Algae Intake Trigger
     driver
@@ -516,22 +513,18 @@ public class RobotContainer {
     driver
         .rightTrigger()
         .whileTrue(
-            superstructure.setGoalCommand(() -> scoringHelper.getSuperstructureGoal())
+            Commands.sequence(
+                DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
+                    .until(() -> drive.isAutoAligned()
+                        && (Constants.getType() == RobotType.SIMBOT ? true : superstructure.atGoal())),
+                DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose)
+                    .alongWith(superstructure.setGoalCommand(() -> scoringHelper.getSuperstructureGoal())))
                 .alongWith(
-                    Commands.either(
-                        DriveCommands.headingAlignCommand(drive, scoringHelper.getSelectedAlignPose()::getRotation),
-                        Commands.sequence(
-                            DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
-                                .until(() -> drive.isAutoAligned()
-                                    && (Constants.getType() == RobotType.SIMBOT ? true : superstructure.atGoal())),
-                            DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose))
-                            .alongWith(
-                                Commands
-                                    .waitUntil(() -> drive.disableBackVision())
-                                    .andThen(() -> vision.setEnableCamera(1,
-                                        false)))
-                            .finallyDo(() -> vision.setEnableCamera(1, true)),
-                        () -> disableTranslationAutoAlign)));
+                    Commands
+                        .waitUntil(() -> drive.disableBackVision())
+                        .andThen(() -> vision.setEnableCamera(1,
+                            false)))
+                .finallyDo(() -> vision.setEnableCamera(1, true)));
 
     // driver
     // .rightStick()
@@ -547,19 +540,18 @@ public class RobotContainer {
     // Algae Scoring Triggers
     driver
         .y()
-        .whileTrue(
-            arm.setGoalCommand(Arm.Goal.SCORE)
-                .alongWith(roller.setGoalCommand(Roller.Goal.SCORE)));
+        .whileTrue(roller.setGoalCommand(Roller.Goal.SCORE));
 
     driver
         .leftBumper()
         .whileTrue(
             Commands.either(
                 superstructure.scoreCommand(true),
-                Commands.startEnd(
-                    () -> drive.setHeadingGoal(
-                        () -> AllianceFlipUtil.apply(Rotation2d.kCW_90deg)),
-                    drive::clearHeadingGoal),
+                arm.setGoalCommand(Arm.Goal.SCORE).alongWith(
+                    Commands.startEnd(
+                        () -> drive.setHeadingGoal(
+                            () -> AllianceFlipUtil.apply(Rotation2d.kCCW_90deg)),
+                        drive::clearHeadingGoal)),
                 driver.rightTrigger()));
   }
 
