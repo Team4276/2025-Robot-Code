@@ -3,8 +3,8 @@ package frc.team4276.frc2025;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
 import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.drivers.VirtualSubsystem;
@@ -55,17 +55,17 @@ public class ScoringHelper extends VirtualSubsystem {
     5,
   };
 
-  private GenericHID keyboard1 = new GenericHID(0);
-  private GenericHID buttonBoard1 = new GenericHID(1);
-  private GenericHID keyboard2 = new GenericHID(2);
-
+  private final CommandGenericHID buttonBoard;
+  private final CommandGenericHID keyboard;
   private final boolean useKeyboard;
 
   private boolean isRight = true;
   private Goal level = Goal.L1;
   private int side = 0;
 
-  public ScoringHelper(boolean useKeyboard){
+  public ScoringHelper(CommandGenericHID buttonBoard, CommandGenericHID keyboard, boolean useKeyboard){
+    this.buttonBoard = buttonBoard;
+    this.keyboard = keyboard;
     this.useKeyboard = useKeyboard;
   }
 
@@ -87,7 +87,8 @@ public class ScoringHelper extends VirtualSubsystem {
       SmartDashboard.putBoolean("Comp/SuperstructureGoal" + i, getSuperstructureGoal().ordinal() - 2 == i);
     }
 
-    Logger.recordOutput("ScoringHelper/SelectedPose", getSelectedPose());
+    Logger.recordOutput("ScoringHelper/SelectedAlignPose", getSelectedAlignPose());
+    Logger.recordOutput("ScoringHelper/SelectedScorePose", getSelectedScorePose());
     Logger.recordOutput("ScoringHelper/IsRight", isRight);
     Logger.recordOutput("ScoringHelper/Side", side);
     Logger.recordOutput("ScoringHelper/Level", level);
@@ -95,75 +96,78 @@ public class ScoringHelper extends VirtualSubsystem {
 
   private void updateButtonBoard(){    
     // Update Positions
-    if (buttonBoard1.getRawButtonPressed(9)) {
+    if (buttonBoard.getHID().getRawButtonPressed(9)) {
       isRight = true;
-    } else if (buttonBoard1.getRawButtonPressed(10)) {
+    } else if (buttonBoard.getHID().getRawButtonPressed(10)) {
       isRight = false;
     }
 
-    if (buttonBoard1.getRawButtonPressed(6)) {
+    if (buttonBoard.getHID().getRawButtonPressed(6)) {
       side = 0;
-    } else if (buttonBoard1.getRawButtonPressed(5)) {
+    } else if (buttonBoard.getHID().getRawButtonPressed(5)) {
       side = 1;
-    } else if (buttonBoard1.getRawButtonPressed(4)) {
+    } else if (buttonBoard.getHID().getRawButtonPressed(4)) {
       side = 2;
-    } else if (buttonBoard1.getRawButtonPressed(3)) {
+    } else if (buttonBoard.getHID().getRawButtonPressed(3)) {
       side = 3;
-    } else if (buttonBoard1.getRawButtonPressed(2)) {
+    } else if (buttonBoard.getHID().getRawButtonPressed(2)) {
       side = 4;
-    } else if (buttonBoard1.getRawButtonPressed(1)) {
+    } else if (buttonBoard.getHID().getRawButtonPressed(1)) {
       side = 5;
     }
 
     // Update Level
-    if (buttonBoard1.getPOV() == 90) {
+    if (buttonBoard.getHID().getPOV() == 90) {
       level = Goal.L1;
-    } else if (buttonBoard1.getPOV() == 270) {
+    } else if (buttonBoard.getHID().getPOV() == 270) {
       level = Goal.L2;
-    } else if (buttonBoard1.getPOV() == 180) {
+    } else if (buttonBoard.getHID().getPOV() == 180) {
       level = Goal.L3;
-    } else if (buttonBoard1.getPOV() == 0) {
+    } else if (buttonBoard.getHID().getPOV() == 0) {
       level = Goal.L3;
     }
-
   }
 
   private void updateKeyboard(){
     // Update Positions
-    if (keyboard1.getRawButtonPressed(1)) {
+    if (keyboard.getHID().getRawButtonPressed(1)) {
       isRight = true;
-    } else if (keyboard1.getRawButtonPressed(2)) {
+    } else if (keyboard.getHID().getRawButtonPressed(2)) {
       isRight = false;
     }
 
-    if (keyboard2.getRawButtonPressed(3)) {
+    if (keyboard.getHID().getRawButtonPressed(3)) {
       side = 0;
-    } else if (keyboard2.getRawButtonPressed(4)) {
+    } else if (keyboard.getHID().getRawButtonPressed(4)) {
       side = 1;
-    } else if (keyboard1.getRawButtonPressed(3)) {
+    } else if (keyboard.getHID().getRawButtonPressed(5)) {
       side = 2;
-    } else if (keyboard1.getRawButtonPressed(4)) {
+    } else if (keyboard.getHID().getRawButtonPressed(6)) {
       side = 3;
-    } else if (keyboard2.getRawButtonPressed(1)) {
+    } else if (keyboard.getHID().getRawButtonPressed(7)) {
       side = 4;
-    } else if (keyboard2.getRawButtonPressed(2)) {
+    } else if (keyboard.getHID().getRawButtonPressed(8)) {
       side = 5;
     }
 
     // Update Level
-    if (buttonBoard1.getRawAxis(1) >= 0.5) {
+    if (keyboard.getHID().getPOV() == 90) {
       level = Goal.L1;
-    } else if (buttonBoard1.getRawAxis(0) >= 0.5) {
+    } else if (keyboard.getHID().getPOV() == 180) {
       level = Goal.L2;
-    } else if (buttonBoard1.getRawAxis(1) <= -0.5) {
+    } else if (keyboard.getHID().getPOV() == 270) {
       level = Goal.L3;
-    } else if (buttonBoard1.getRawAxis(0) <= -0.5) {
+    } else if (keyboard.getHID().getPOV() == 0) {
       level = Goal.L3;
     }
   }
 
-  public Pose2d getSelectedPose() {
-    return RobotState.getInstance().getPOIs().reefScoring[getSelectedReef()];
+  public Pose2d getSelectedAlignPose() {
+    return RobotState.getInstance().getPOIs().reefAlign[getSelectedReef()];
+  } 
+
+  public Pose2d getSelectedScorePose() {
+    return RobotState.getInstance().getPOIs().reefScore[getSelectedReef()];
   }  
 
   private int getSelectedTableIndex(){
@@ -186,9 +190,5 @@ public class ScoringHelper extends VirtualSubsystem {
 
   public boolean isRight() {
     return isRight;
-  }
-
-  public GenericHID getButtonBoard(){
-    return buttonBoard1;
   }
 }

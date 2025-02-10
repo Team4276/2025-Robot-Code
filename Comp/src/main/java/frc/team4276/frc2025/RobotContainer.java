@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.team4276.frc2025.AutoSelector.AutoQuestion;
 import frc.team4276.frc2025.AutoSelector.AutoQuestionResponse;
 import frc.team4276.frc2025.Constants.Mode;
+import frc.team4276.frc2025.Constants.RobotType;
+import frc.team4276.frc2025.commands.DriveCommands;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
 import frc.team4276.frc2025.commands.auto.AutoBuilder;
@@ -86,11 +88,10 @@ public class RobotContainer {
   private boolean isDemo = true;
 
   private final BetterXboxController driver = new BetterXboxController(0);
-  private final CommandGenericHID keyboard0 = new CommandGenericHID(0);
-  private final CommandGenericHID keyboard1 = new CommandGenericHID(1);
-  private final CommandGenericHID keyboard2 = new CommandGenericHID(2);
+  private final CommandGenericHID buttonBoard = new CommandGenericHID(0);
+  private final CommandGenericHID keyboard = new CommandGenericHID(0);
 
-  private final ScoringHelper scoringHelper = new ScoringHelper(useKeyboard);
+  private final ScoringHelper scoringHelper = new ScoringHelper(buttonBoard, keyboard, useKeyboard);
 
   private final Alert driverDisconnected = new Alert("Driver controller disconnected (port 0).", AlertType.kWarning);
   private final Alert operatorDisconnected = new Alert("Operator controller disconnected (port 1).",
@@ -381,17 +382,81 @@ public class RobotContainer {
     drive.setDefaultCommand(
         drive.run(
             () -> drive.feedTeleopInput(
-                -keyboard0.getRawAxis(1),
-                -keyboard0.getRawAxis(0),
-                -keyboard2.getRawAxis(0))));
+                -keyboard.getRawAxis(0),
+                -keyboard.getRawAxis(1),
+                -keyboard.getRawAxis(2))));
 
-    keyboard1
-        .button(6)
+    // Coral Intake Triggers
+    driver
+        .button(9)
         .whileTrue(
-            Commands.startEnd(
-                () -> drive.setAutoAlignPosition(scoringHelper.getSelectedPose()),
-                drive::disableAutoAlign)
-                .until(drive::isAutoAligned));
+            superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
+                .alongWith(
+                    DriveCommands.headingAlignCommand(drive, () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(55.0)))));
+
+    driver
+        .button(10)
+        .whileTrue(
+            superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
+                .alongWith(
+                    DriveCommands.headingAlignCommand(drive, () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(305.0)))));
+
+    // Algae Intake Trigger
+    driver
+        .button(11)
+        .whileTrue(
+            arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(
+                roller.setGoalCommand(Roller.Goal.INTAKE)))
+        .whileFalse(
+            Commands.either(
+                arm.setGoalCommand(Arm.Goal.HOLD),
+                arm.setGoalCommand(Arm.Goal.STOW),
+                () -> roller.hasGamePiece()));
+
+    // Coral Scoring Triggers
+    driver
+        .button(12)
+        .whileTrue(
+            Commands.sequence(
+                DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
+                    .until(() -> drive.isAutoAligned()
+                        && (Constants.getType() == RobotType.SIMBOT ? true : superstructure.atGoal())),
+                DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose)
+                    .alongWith(superstructure.setGoalCommand(() -> scoringHelper.getSuperstructureGoal())))
+                .alongWith(
+                    Commands
+                        .waitUntil(() -> drive.disableBackVision())
+                        .andThen(() -> vision.setEnableCamera(1,
+                            false)))
+                .finallyDo(() -> vision.setEnableCamera(1, true)));
+
+    // driver
+    // .rightStick()
+    // .onTrue(
+    // Commands.runOnce(() -> {
+    // disableTranslationAutoAlign = !disableTranslationAutoAlign;
+    // }));
+
+    driver
+        .button(13)
+        .onTrue(superstructure.scoreCommand(false));
+
+    // Algae Scoring Triggers
+    driver
+        .button(15)
+        .whileTrue(roller.setGoalCommand(Roller.Goal.SCORE));
+
+    driver
+        .button(14)
+        .whileTrue(
+            Commands.either(
+                superstructure.scoreCommand(true),
+                arm.setGoalCommand(Arm.Goal.SCORE).alongWith(
+                    Commands.startEnd(
+                        () -> drive.setHeadingGoal(
+                            () -> AllianceFlipUtil.apply(Rotation2d.kCW_90deg)),
+                        drive::clearHeadingGoal)),
+                driver.button(12)));
 
   }
 
@@ -426,19 +491,14 @@ public class RobotContainer {
         .whileTrue(
             superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
                 .alongWith(
-                    Commands.startEnd(
-                        () -> drive.setHeadingGoal(
-                            () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(125.0))),
-                        drive::clearHeadingGoal)));
+                    DriveCommands.headingAlignCommand(drive, () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(305.0)))));
+
     driver
         .b()
         .whileTrue(
             superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
                 .alongWith(
-                    Commands.startEnd(
-                        () -> drive.setHeadingGoal(
-                            () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(235.0))),
-                        drive::clearHeadingGoal)));
+                    DriveCommands.headingAlignCommand(drive, () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(55.0)))));
 
     // Algae Intake Trigger
     driver
@@ -459,14 +519,12 @@ public class RobotContainer {
             superstructure.setGoalCommand(() -> scoringHelper.getSuperstructureGoal())
                 .alongWith(
                     Commands.either(
-                        Commands.startEnd(
-                            () -> drive.setHeadingGoal(
-                                () -> scoringHelper.getSelectedPose().getRotation()),
-                            drive::clearHeadingGoal),
-                        Commands.startEnd(
-                            () -> drive
-                                .setAutoAlignPosition(scoringHelper.getSelectedPose()),
-                            drive::disableAutoAlign)
+                        DriveCommands.headingAlignCommand(drive, scoringHelper.getSelectedAlignPose()::getRotation),
+                        Commands.sequence(
+                            DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
+                                .until(() -> drive.isAutoAligned()
+                                    && (Constants.getType() == RobotType.SIMBOT ? true : superstructure.atGoal())),
+                            DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose))
                             .alongWith(
                                 Commands
                                     .waitUntil(() -> drive.disableBackVision())
@@ -512,7 +570,7 @@ public class RobotContainer {
             || !DriverStation.getJoystickIsXbox(driver.getHID().getPort()));
     operatorDisconnected
         .set(useKeyboard ? false
-            : !DriverStation.isJoystickConnected(scoringHelper.getButtonBoard().getPort()));
+            : !DriverStation.isJoystickConnected(buttonBoard.getHID().getPort()));
   }
 
   /**

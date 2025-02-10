@@ -120,6 +120,10 @@ public class Superstructure extends SubsystemBase {
     Logger.recordOutput("Superstructure/CurrentGoal", currentGoal);
   }
 
+  public boolean atGoal(){
+    return elevator.atGoal();
+  }
+
   public void setGoal(Goal goal) {
     desiredGoal = () -> goal;
   }
