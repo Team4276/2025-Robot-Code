@@ -11,6 +11,7 @@ import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.team4276.frc2025.AutoSelector;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.AutoSelector.AutoQuestionResponse;
@@ -168,13 +169,14 @@ public class AutoBuilder {
       return Commands.none();
     }
 
+    List<PathPlannerTrajectory> trajs = new ArrayList<>();
+    SequentialCommandGroup scoringCommands = new SequentialCommandGroup();
+
     // Check if need to flip paths to barge side
     boolean mirrorLengthwise = autoSelector.getResponses().get(0) == AutoQuestionResponse.NO;
 
     // Get paths
     String pathStart = "c_st_" + reefs.get(0).toString() + "_" + stations.get(0);
-
-    List<PathPlannerTrajectory> trajs = new ArrayList<>();
 
     trajs.add(getPathPlannerTrajectoryFromChoreo(pathStart, mirrorLengthwise, 0));
     trajs.add(getPathPlannerTrajectoryFromChoreo(pathStart, mirrorLengthwise, 1));
@@ -184,44 +186,24 @@ public class AutoBuilder {
           mirrorLengthwise, 0));
       trajs.add(getPathPlannerTrajectoryFromChoreo("c_sc_" + stations.get(i) + "_" + reefs.get(i).toString(),
           mirrorLengthwise, 1));
-
     }
 
-    Iterator iterator = new Iterator();
+    for (int i = 0; i < reefs.size(); i++) {
+      scoringCommands.addCommands(Commands.sequence(
+          followTrajectory(drive, trajs.get(i * 2)),
+          // TODO: or make it an approach auto
+          superstructure.setGoalCommand(toGoal(levels.get(i)))
+              .raceWith(Commands.waitUntil(superstructure::atGoal).andThen(scoreCommand(superstructure))),
+          superstructure.setGoalCommand(Goal.INTAKE)
+              .withDeadline(followTrajectory(drive, trajs.get((i * 2) + 1)))
+              .andThen(Commands.waitSeconds(intakeWaitTime))));
+    }
 
     return Commands.sequence(
-        notificationCommand("Run path with "
-            + (autoSelector.getResponses().get(0) == AutoQuestionResponse.YES ? "processor side"
-                : "barge side")),
+        notificationCommand("Run path on " + (mirrorLengthwise ? "barge side" : "processor side")),
         resetPose(trajs.get(0).getInitialPose()),
         Commands.waitSeconds(autoSelector.getDelayInput()),
-        // driveScoreIntake(trajs.get(0), trajs.get(1), toGoal(levels.get(0))),
-        // driveScoreIntake(trajs.get(2), trajs.get(3), toGoal(levels.get(1))),
-        // driveScoreIntake(trajs.get(4), trajs.get(5), toGoal(levels.get(2))),
-        // driveScoreIntake(trajs.get(6), trajs.get(7), toGoal(levels.get(3))),
-        // driveScoreIntake(trajs.get(8), trajs.get(9), toGoal(levels.get(4))));
-        // TODO: try to fix this broken crap
-        Commands.waitUntil(() -> (iterator.getWithoutIncrement() >= trajs.size() && superstructure.getGoal() == Goal.INTAKE && drive.isTrajectoryCompleted())).deadlineFor( 
-            Commands.sequence(
-                followTrajectory(drive, () -> trajs.get(iterator.get())),
-                // TODO: add proximity checker for trajectories with superstructure stuff
-                // or make it an approach auto
-                superstructure.setGoalCommand(() -> toGoal(levels.get((iterator.getWithoutIncrement() - 1) / 2)))
-                    .raceWith(Commands.waitUntil(superstructure::atGoal).andThen(scoreCommand(superstructure))),
-                superstructure.setGoalCommand(Goal.INTAKE)
-                    .withDeadline(followTrajectory(drive, () -> trajs.get(iterator.get()))
-                        .andThen(Commands.waitSeconds(intakeWaitTime))))
-                .repeatedly()));
-  }
-
-  private Command driveScoreIntake(PathPlannerTrajectory traj1, PathPlannerTrajectory traj2, Goal goal) {
-    return Commands.sequence(
-        followTrajectory(drive, traj1),
-        superstructure.setGoalCommand(goal)
-            .raceWith(Commands.waitUntil(superstructure::atGoal).andThen(scoreCommand(superstructure))),
-        superstructure.setGoalCommand(Goal.INTAKE)
-            .withDeadline(followTrajectory(drive, traj2)
-                .andThen(Commands.waitSeconds(intakeWaitTime))));
+        scoringCommands);
   }
 
   public Command testNeo() {
@@ -263,28 +245,6 @@ public class AutoBuilder {
       default:
         return Goal.STOW;
     }
-  }
-
-  public class Iterator {
-    private int i;
-
-    public Iterator() {
-      i = 0;
-    }
-
-    public Iterator(int startIndex) {
-      i = startIndex;
-    }
-
-    public int get() {
-      i++;
-      return i - 1;
-    }
-
-    public int getWithoutIncrement() {
-      return i;
-    }
-
   }
 
   public boolean isValidNeoCoralScoreAuto(

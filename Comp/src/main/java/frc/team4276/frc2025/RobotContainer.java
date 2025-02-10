@@ -214,7 +214,10 @@ public class RobotContainer {
 
     configureOverrides();
     configureAutos();
-    configureTuningRoutines();
+    if (Constants.isTuning) {
+      configureTuningRoutines();
+
+    }
     configureButtonBindings();
 
     // Peace and quiet
@@ -231,7 +234,7 @@ public class RobotContainer {
     autoBuilder = new AutoBuilder(drive, superstructure, autoSelector);
 
     // Set up auto routines
-    autoSelector.addRoutine("Test 1 Traj", autoBuilder.testTraj("BoxTest"));
+    autoSelector.addRoutine("Test 1 Traj", () -> autoBuilder.testTraj("BoxTest"));
     autoSelector.addRoutine("Inner 5 Coral", List.of(
         new AutoQuestion("Is Processor Side?", List.of(
             AutoQuestionResponse.YES,
@@ -258,43 +261,49 @@ public class RobotContainer {
                 AutoQuestionResponse.CLOSE,
                 AutoQuestionResponse.FAR))),
         () -> autoBuilder.coralScoreAuto(0, 1, 2, 3));
+    autoSelector.addRoutine("Neo Coral Test Auto",
+        List.of(
+            new AutoQuestion("Is Processor Side?", List.of(
+                AutoQuestionResponse.YES,
+                AutoQuestionResponse.NO))),
+        () -> autoBuilder.testNeo());
 
   }
 
   private void configureTuningRoutines() {
     // Set up SysId routines
     autoSelector.addRoutine(
-        "Drive Wheel Radius Characterization", new WheelRadiusCharacterization(drive));
+        "Drive Wheel Radius Characterization", () -> new WheelRadiusCharacterization(drive));
     autoSelector.addRoutine(
         "Drive Simple FF Characterization",
-        new FeedForwardCharacterization(
+        () -> new FeedForwardCharacterization(
             drive, drive::runCharacterization, drive::getFFCharacterizationVelocity));
     autoSelector.addRoutine(
         "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        () -> drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     autoSelector.addRoutine(
         "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        () -> drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     autoSelector.addRoutine(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        "Drive SysId (Dynamic Forward)", () -> drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoSelector.addRoutine(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        "Drive SysId (Dynamic Reverse)", () -> drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     autoSelector.addRoutine(
         "Arm Simple FF Characterization",
-        new FeedForwardCharacterization(
+        () -> new FeedForwardCharacterization(
             arm, arm::runCharacterization, arm::getFFCharacterizationVelocity));
     autoSelector.addRoutine(
         "Elevator Simple FF Characterization",
-        new FeedForwardCharacterization(
+        () -> new FeedForwardCharacterization(
             superstructure, superstructure::acceptCharacterizationInput,
             superstructure::getFFCharacterizationVelocity));
     autoSelector.addRoutine(
         "(Reverse) Arm Simple FF Characterization",
-        new FeedForwardCharacterization(
+        () -> new FeedForwardCharacterization(
             arm, arm::runCharacterization, arm::getFFCharacterizationVelocity, true));
     autoSelector.addRoutine(
         "(Reverse) Elevator Simple FF Characterization",
-        new FeedForwardCharacterization(
+        () -> new FeedForwardCharacterization(
             superstructure, superstructure::acceptCharacterizationInput,
             superstructure::getFFCharacterizationVelocity, true));
 
@@ -571,9 +580,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return 
-    // autoSelector.getCommand();
+    return autoSelector.getCommand();
     // Commands.none();
-    autoBuilder.testNeo();
   }
 }

@@ -80,17 +80,7 @@ public class AutoSelector extends VirtualSubsystem {
     delayInput = new LoggedNetworkNumber("Comp/Auto/Delay", 0.0);
 
   }
-
-  /** Registers a new auto routine that can be selected. */
-  public void addRoutine(String name, Command command) {
-    addRoutine(name, List.of(), command);
-  }
-
-  /** Registers a new auto routine that can be selected. */
-  public void addRoutine(String name, List<AutoQuestion> questions, Command command) {
-    addRoutine(name, questions, () -> command);
-  }
-
+  
   /** Registers a new auto routine that can be selected. */
   public void addRoutine(String name, Supplier<Command> command) {
     addRoutine(name, List.of(), command);
