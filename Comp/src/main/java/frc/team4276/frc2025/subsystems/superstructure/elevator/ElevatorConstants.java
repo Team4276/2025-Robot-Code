@@ -8,7 +8,7 @@ public class ElevatorConstants {
   public static final int leaderId = Ports.ELEVATOR_LEADER;
   public static final int followerId = Ports.ELEVATOR_FOLLOWER;
 
-  public static final boolean invertLeader = false;
+  public static final boolean invertLeader = true;
   public static final boolean invertFollower = true;
 
   public static final int currentLimit = 50;
@@ -29,7 +29,8 @@ public class ElevatorConstants {
   public static final double maxInput = Units.inchesToMeters(25.5); // m
 
   public static final double gearRatio = 25.0;
-  public static final Translation2d origin = new Translation2d(Units.inchesToMeters(4.750000), Units.inchesToMeters(5.75));
+  public static final Translation2d origin = new Translation2d(Units.inchesToMeters(4.750000),
+      Units.inchesToMeters(5.75));
   public static final double length = Units.inchesToMeters(35);
 
   public static final double maxPosition = Units.inchesToMeters(25.5); // m

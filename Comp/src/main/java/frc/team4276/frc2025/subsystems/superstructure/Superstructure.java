@@ -29,7 +29,8 @@ public class Superstructure extends SubsystemBase {
     L1,
     L2,
     L3,
-    CHARACTERIZING
+    CHARACTERIZING,
+    CUSTOM
   }
 
   private Supplier<Goal> desiredGoal = () -> Goal.STOW;
@@ -105,6 +106,10 @@ public class Superstructure extends SubsystemBase {
       case CHARACTERIZING:
         elevator.runCharacterization(elevatorCharacterizationInput);
         endeffector.setGoal(endEffectorGoal);
+        break;
+
+      case CUSTOM:
+        elevator.setGoal(Elevator.Goal.CUSTOM);
 
       default:
         break;
@@ -120,7 +125,7 @@ public class Superstructure extends SubsystemBase {
     Logger.recordOutput("Superstructure/CurrentGoal", currentGoal);
   }
 
-  public boolean atGoal(){
+  public boolean atGoal() {
     return elevator.atGoal();
   }
 
@@ -137,7 +142,7 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command setGoalCommand(Supplier<Goal> goal) {
-    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW), this);
+    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.CHARACTERIZING), this);
   }
 
   public Goal getGoal() {

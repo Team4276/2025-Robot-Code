@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -55,8 +57,7 @@ public class FeedForwardCharacterization extends Command {
     }
   }
 
-  @Override
-  public void end(boolean interrupted) {
+  private void finish() {
     voltageConsumer.accept(0.0);
     timer.stop();
 
@@ -78,5 +79,12 @@ public class FeedForwardCharacterization extends Command {
     System.out.println("********** Drive FF Characterization Results **********");
     System.out.println("\tkS: " + formatter.format(kS));
     System.out.println("\tkV: " + formatter.format(kV));
+    Logger.recordOutput("CharacterizationResult/kS", kS);
+    Logger.recordOutput("CharacterizationResult/kV", kV);
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    new Thread(() -> finish()).start();
   }
 }

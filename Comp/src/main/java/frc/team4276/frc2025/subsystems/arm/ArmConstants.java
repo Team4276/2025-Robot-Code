@@ -25,9 +25,10 @@ public class ArmConstants {
   public static final double minInput = Math.toRadians(20.0);
   public static final double maxInput = Math.toRadians(110.0);
 
-  public static final Rotation2d offset = new Rotation2d(0.4771853).minus(Rotation2d.kCCW_90deg);
+  public static final Rotation2d offset = new Rotation2d(0.533).plus(Rotation2d.kCW_90deg);
 
-  public static final Translation2d origin = new Translation2d(Units.inchesToMeters(-8.25), Units.inchesToMeters(6.991000));
+  public static final Translation2d origin = new Translation2d(Units.inchesToMeters(-8.25),
+      Units.inchesToMeters(6.991000));
   public static final double gearRatio = 81.0;
   public static final double length = Units.inchesToMeters(10.939282); // to the bend
 }

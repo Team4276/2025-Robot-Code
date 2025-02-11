@@ -19,7 +19,7 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
   private final SparkMax rightMotor;
   private final Debouncer motorConnectedDebounce = new Debouncer(0.5);
 
-  public EndEffectorIOSparkMax(int left_id,int right_id, int currentLimit, boolean invert, boolean brake) {
+  public EndEffectorIOSparkMax(int left_id, int right_id, int currentLimit, boolean invert, boolean brake) {
     leftMotor = new SparkMax(left_id, MotorType.kBrushless);
     rightMotor = new SparkMax(right_id, MotorType.kBrushless);
 
@@ -28,20 +28,28 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
         .smartCurrentLimit(currentLimit)
         .inverted(invert)
         .idleMode(brake ? IdleMode.kBrake : IdleMode.kBrake);
-    config.signals.appliedOutputPeriodMs(20).busVoltagePeriodMs(20).outputCurrentPeriodMs(20);
+    config.signals
+        .appliedOutputPeriodMs(20)
+        .busVoltagePeriodMs(20)
+        .outputCurrentPeriodMs(20);
     tryUntilOk(
         leftMotor,
         5,
-        () ->
-            leftMotor.configure(
-                config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
-    config.signals.appliedOutputPeriodMs(20).busVoltagePeriodMs(20).outputCurrentPeriodMs(20);
-      tryUntilOk(
-          rightMotor,
-         5,
-        () ->
-              rightMotor.configure(
-                  config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+        () -> leftMotor.configure(
+            config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+    config
+        .smartCurrentLimit(currentLimit)
+        .inverted(!invert)
+        .idleMode(brake ? IdleMode.kBrake : IdleMode.kBrake);
+    config.signals
+        .appliedOutputPeriodMs(20)
+        .busVoltagePeriodMs(20)
+        .outputCurrentPeriodMs(20);
+    tryUntilOk(
+        rightMotor,
+        5,
+        () -> rightMotor.configure(
+            config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
 
   @Override
@@ -49,17 +57,17 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
     sparkStickyFault = false;
     ifOk(
         leftMotor,
-        new DoubleSupplier[] {leftMotor::getAppliedOutput, leftMotor::getBusVoltage},
+        new DoubleSupplier[] { leftMotor::getAppliedOutput, leftMotor::getBusVoltage },
         (values) -> inputs.leftAppliedVoltage = values[0] * values[1]);
     ifOk(leftMotor, leftMotor::getOutputCurrent, (value) -> inputs.leftSupplyCurrentAmps = value);
     ifOk(leftMotor, leftMotor::getMotorTemperature, (value) -> inputs.leftTempCelsius = value);
     inputs.leftConnected = motorConnectedDebounce.calculate(!sparkStickyFault);
 
     ifOk(
-      rightMotor,
-      
-      new DoubleSupplier[] {rightMotor::getAppliedOutput, rightMotor::getBusVoltage},
-      (values) -> inputs.rightAppliedVoltage = values[0] * values[1]);
+        rightMotor,
+
+        new DoubleSupplier[] { rightMotor::getAppliedOutput, rightMotor::getBusVoltage },
+        (values) -> inputs.rightAppliedVoltage = values[0] * values[1]);
     ifOk(rightMotor, rightMotor::getOutputCurrent, (value) -> inputs.rightSupplyCurrentAmps = value);
     ifOk(rightMotor, rightMotor::getMotorTemperature, (value) -> inputs.RightTempCelsius = value);
     inputs.rightConnected = motorConnectedDebounce.calculate(!sparkStickyFault);
@@ -67,7 +75,7 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
   }
 
   @Override
-  public void runVolts(double leftVolts,double rightVolts ) {
+  public void runVolts(double leftVolts, double rightVolts) {
     leftMotor.setVoltage(leftVolts);
     rightMotor.setVoltage(rightVolts);
   }
@@ -78,4 +86,3 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
     rightMotor.stopMotor();
   }
 }
-

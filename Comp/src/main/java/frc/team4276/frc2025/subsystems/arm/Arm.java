@@ -18,9 +18,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
   public enum Goal {
-    STOW(new LoggedTunableNumber("Arm/StowDegrees", 80.0)),
-    INTAKE(new LoggedTunableNumber("Arm/IntakeDegrees", 120.0)),
-    HOLD(new LoggedTunableNumber("Arm/HoldDegrees", 80.0)),
+    STOW(new LoggedTunableNumber("Arm/StowDegrees", 110.0)),
+    INTAKE(new LoggedTunableNumber("Arm/IntakeDegrees", 60.0)),
+    HOLD(new LoggedTunableNumber("Arm/HoldDegrees", 110.0)),
     SCORE(new LoggedTunableNumber("Arm/ScoreDegrees", 90.0)),
     CHARACTERIZING(() -> 90.0),
     CUSTOM(new LoggedTunableNumber("Arm/CustomSetpoint", 90.0));
@@ -42,13 +42,13 @@ public class Arm extends SubsystemBase {
 
   private Goal goal = Goal.STOW;
 
-  private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Arm/maxVel", Math.toRadians(40.0));
-  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Arm/maxAccel", Math.toRadians(20.0));
+  private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Arm/maxVel", Math.toRadians(10.0));
+  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Arm/maxAccel", Math.toRadians(10.0));
 
-  private final LoggedTunableNumber kS = new LoggedTunableNumber("Arm/kS", 0.0);
-  private final LoggedTunableNumber kV = new LoggedTunableNumber("Arm/kV", 0.0); // 0.88
-  private final LoggedTunableNumber kG = new LoggedTunableNumber("Arm/kG", 0.0); // 0.44
-  private final LoggedTunableNumber kGLoaded = new LoggedTunableNumber("Arm/kGLoaded", 0.0); // 0.73
+  private final LoggedTunableNumber kS = new LoggedTunableNumber("Arm/kS", 0.5);
+  private final LoggedTunableNumber kV = new LoggedTunableNumber("Arm/kV", 1.0);
+  private final LoggedTunableNumber kG = new LoggedTunableNumber("Arm/kG", 0.2);
+  private final LoggedTunableNumber kGLoaded = new LoggedTunableNumber("Arm/kGLoaded", 0.0);
 
   private final ArmIO io;
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
@@ -147,7 +147,7 @@ public class Arm extends SubsystemBase {
   }
 
   public Command setGoalCommand(Goal goal) {
-    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW), this);
+    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.CHARACTERIZING), this);
   }
 
   public void runCharacterization(double output) {

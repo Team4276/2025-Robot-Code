@@ -49,8 +49,7 @@ public class ArmIOSparkMax implements ArmIO {
     leaderConfig.absoluteEncoder
         .inverted(invertEncoder)
         .positionConversionFactor(encoderPositionFactor)
-        .velocityConversionFactor(encoderVelocityFactor)
-        .averageDepth(2);
+        .velocityConversionFactor(encoderVelocityFactor);
     leaderConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         .positionWrappingEnabled(true)
@@ -82,7 +81,8 @@ public class ArmIOSparkMax implements ArmIO {
     ifOk(
         leaderSpark,
         absoluteEncoder::getPosition,
-        (value) -> inputs.positionRads = new Rotation2d(value).minus(offset).getRadians());
+        (value) -> inputs.positionRads = MathUtil.inputModulus(new Rotation2d(value).minus(offset).getRadians(), 0.0,
+            2 * Math.PI));
     ifOk(
         leaderSpark,
         absoluteEncoder::getVelocity,
@@ -99,7 +99,7 @@ public class ArmIOSparkMax implements ArmIO {
   @Override
   public void runSetpoint(double setpointRads, double ff) {
     closedLoopController.setReference(
-        MathUtil.angleModulus(MathUtil.clamp(setpointRads, minInput, maxInput) + offset.getRadians()),
+        MathUtil.inputModulus(MathUtil.clamp(setpointRads, minInput, maxInput) + offset.getRadians(), 0.0, 2 * Math.PI),
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
         ff,
@@ -137,7 +137,7 @@ public class ArmIOSparkMax implements ArmIO {
                           : SparkBaseConfig.IdleMode.kCoast),
                   SparkBase.ResetMode.kNoResetSafeParameters,
                   SparkBase.PersistMode.kNoPersistParameters));
-                })
+        })
         .start();
   }
 

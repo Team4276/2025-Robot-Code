@@ -38,7 +38,7 @@ public class ArmViz {
     // Log 3D poses
     Pose3d motor = new Pose3d(
         new Translation3d(origin.getX(), 0, origin.getY()),
-        new Rotation3d(0.0, -angleRads, 0.0));
+        new Rotation3d(0.0, angleRads + Math.PI, 0.0));
     Logger.recordOutput("Arm/Mechanism3d/" + key, motor);
   }
 }

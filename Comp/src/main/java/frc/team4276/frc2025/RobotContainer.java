@@ -84,7 +84,7 @@ public class RobotContainer {
   private AutoBuilder autoBuilder;
 
   // Controller
-  private boolean useKeyboard = true;
+  private boolean useKeyboard = false;
   private boolean isDemo = true;
 
   private final BetterXboxController driver = new BetterXboxController(0);
@@ -131,12 +131,14 @@ public class RobotContainer {
           arm = new Arm(new ArmIOSparkMax());
           roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40,
               false, true));
-          // vision = new Vision(
-          // RobotState.getInstance()::addVisionMeasurement,
+          vision = new Vision(
+              RobotState.getInstance()::addVisionMeasurement
+          // ,
           // new VisionIOPhotonVision(
           // VisionConstants.camera0Name, VisionConstants.robotToCamera0),
           // new VisionIOPhotonVision(
-          // VisionConstants.camera1Name, VisionConstants.robotToCamera1));
+          // VisionConstants.camera1Name, VisionConstants.robotToCamera1)
+          );
         }
 
         case SIM -> {
@@ -350,9 +352,18 @@ public class RobotContainer {
                 drive)
                 .ignoringDisable(false));
 
-    // superstructure.setDefaultCommand(
-    // superstructure.run(() -> superstructure.acceptCharacterizationInput(
-    // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis()))));
+    superstructure.setDefaultCommand(
+        superstructure.run(() -> superstructure.acceptCharacterizationInput(
+            // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
+            0.0)));
+
+    // driver
+    // .povDown()
+    // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.CUSTOM));
+
+    driver
+        .povDown()
+        .whileTrue(arm.setGoalCommand(Arm.Goal.CUSTOM));
 
     arm.setDefaultCommand(
         arm.run(() -> arm.runCharacterization(
@@ -372,7 +383,7 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(
             Commands.runOnce(
-                () -> superstructure.setEndEffectorGoal(EndEffector.Goal.SCORE)))
+                () -> superstructure.setEndEffectorGoal(EndEffector.Goal.INTAKE)))
         .whileFalse(
             Commands.runOnce(
                 () -> superstructure.setEndEffectorGoal(EndEffector.Goal.IDLE)));

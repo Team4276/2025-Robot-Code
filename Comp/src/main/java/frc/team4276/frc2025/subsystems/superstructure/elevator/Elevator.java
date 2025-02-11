@@ -40,12 +40,12 @@ public class Elevator {
 
   private Goal goal = Goal.STOW;
 
-  private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Elevator/maxVel", 0.0);
-  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", 0.0);
+  private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Elevator/maxVel", 0.1);
+  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", 0.1);
 
-  private final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.0);
-  private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0.0);
-  private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.0); // 0.09
+  private final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.02);
+  private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 24.2);
+  private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.17);
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
@@ -140,8 +140,10 @@ public class Elevator {
         io.runVolts(homingVolts.getAsDouble());
 
       } else {
-        setpointState = profile.calculate(0.02, setpointState, new TrapezoidProfile.State(goal.getPositionMetres(), 0.0));
-        io.runSetpoint(metresToRotations(MathUtil.clamp(setpointState.position, minInput, maxInput) + homedPosition), ff.calculate(setpointState.velocity));
+        setpointState = profile.calculate(0.02, setpointState,
+            new TrapezoidProfile.State(goal.getPositionMetres(), 0.0));
+        io.runSetpoint(metresToRotations(MathUtil.clamp(setpointState.position, minInput, maxInput) + homedPosition),
+            ff.calculate(setpointState.velocity));
         Logger.recordOutput("Elevator/GoalMetres", goal.getPositionMetres());
         Logger.recordOutput("Elevator/GoalRotations", metresToRotations(goal.getPositionMetres()));
         Logger.recordOutput("Elevator/SetpointState/PosMetres", setpointState.position);
@@ -156,6 +158,7 @@ public class Elevator {
     measuredViz.update(getPositionMetres());
     Logger.recordOutput("Elevator/Goal", goal);
     Logger.recordOutput("Elevator/HomedPositionMetres", homedPosition);
+    Logger.recordOutput("Elevator/PositionMetres", getPositionMetres());
   }
 
   @AutoLogOutput
@@ -198,7 +201,7 @@ public class Elevator {
     return (rotations / gearRatio) * drumCircumference;
   }
 
-  public double getPositionMetres(){
-    return rotationsToMetres(inputs.position) - homedPosition;
+  public double getPositionMetres() {
+    return rotationsToMetres(inputs.position) - rotationsToMetres(homedPosition);
   }
 }
