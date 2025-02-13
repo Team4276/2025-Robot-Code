@@ -18,10 +18,10 @@ import org.littletonrobotics.junction.Logger;
 
 public class Elevator {
   public enum Goal {
-    STOW(new LoggedTunableNumber("Elevator/StowPosition", 0.0)),
+    STOW(new LoggedTunableNumber("Elevator/StowPosition", 0.0125)),
     L1(new LoggedTunableNumber("Elevator/L1Position", 0.0)),
-    L2(new LoggedTunableNumber("Elevator/L2Position", Units.inchesToMeters(7.7))),
-    L3(new LoggedTunableNumber("Elevator/L3Position", Units.inchesToMeters(23.1))),
+    L2(new LoggedTunableNumber("Elevator/L2Position", Units.inchesToMeters(6.7))), // 0.14 m
+    L3(new LoggedTunableNumber("Elevator/L3Position", Units.inchesToMeters(22.1))), // 0.53 m
     CHARACTERIZING(() -> 0.0),
     CUSTOM(new LoggedTunableNumber("Elevator/CustomSetpoint", 0.0));
 
@@ -40,12 +40,12 @@ public class Elevator {
 
   private Goal goal = Goal.STOW;
 
-  private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Elevator/maxVel", 0.1);
-  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", 0.1);
+  private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Elevator/maxVel", 1.2);
+  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", 0.6);
 
-  private final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.02);
+  private final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.11);
   private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 24.2);
-  private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.17);
+  private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.09);
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
@@ -93,8 +93,8 @@ public class Elevator {
       isHoming = false;
 
     } else if (inputs.topLimit) {
-      homedPosition = inputs.position - maxPosition;
-      isHoming = false;
+      // homedPosition = maxPosition - inputs.position;
+      // isHoming = false;
 
     }
 
@@ -132,18 +132,22 @@ public class Elevator {
       if (goal == Goal.CHARACTERIZING) {
         io.runVolts(characterizationInput);
 
-      } else if (wantHome && goal == Goal.STOW && atGoal()) {
-        wantHome = false;
-        isHoming = true;
+      }
+      // else if (wantHome && goal == Goal.STOW && atGoal()) {
+      // wantHome = false;
+      // isHoming = true;
 
-      } else if (isHoming && goal == Goal.STOW) {
-        io.runVolts(homingVolts.getAsDouble());
+      // } else if (isHoming && goal == Goal.STOW) {
+      // // io.runVolts(homingVolts.getAsDouble());
 
-      } else {
+      // }
+      else {
         setpointState = profile.calculate(0.02, setpointState,
             new TrapezoidProfile.State(goal.getPositionMetres(), 0.0));
-        io.runSetpoint(metresToRotations(MathUtil.clamp(setpointState.position, minInput, maxInput) + homedPosition),
-            ff.calculate(setpointState.velocity));
+        double setpointRotations = metresToRotations(MathUtil.clamp(setpointState.position, minInput, maxInput))
+            + homedPosition;
+        io.runSetpoint(setpointRotations, ff.calculate(setpointState.velocity));
+        Logger.recordOutput("Elevator/SetpointRotations", setpointRotations);
         Logger.recordOutput("Elevator/GoalMetres", goal.getPositionMetres());
         Logger.recordOutput("Elevator/GoalRotations", metresToRotations(goal.getPositionMetres()));
         Logger.recordOutput("Elevator/SetpointState/PosMetres", setpointState.position);
@@ -157,7 +161,7 @@ public class Elevator {
     goalViz.update(goal.getPositionMetres());
     measuredViz.update(getPositionMetres());
     Logger.recordOutput("Elevator/Goal", goal);
-    Logger.recordOutput("Elevator/HomedPositionMetres", homedPosition);
+    Logger.recordOutput("Elevator/HomedPositionRotation", homedPosition);
     Logger.recordOutput("Elevator/PositionMetres", getPositionMetres());
   }
 

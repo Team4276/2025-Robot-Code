@@ -13,7 +13,7 @@ public class ArmConstants {
   public static final int currentLimit = 40;
 
   public static final double encoderPositionFactor = 2 * Math.PI;
-  public static final double encoderVelocityFactor = 2 * Math.PI / 60;
+  public static final double encoderVelocityFactor = 2 * Math.PI;
   public static final boolean invertEncoder = false;
 
   public static final double kp = 0.0;

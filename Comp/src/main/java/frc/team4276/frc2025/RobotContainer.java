@@ -325,19 +325,19 @@ public class RobotContainer {
   }
 
   private void configureDemoBindings() {
-    // drive.setDefaultCommand(
-    // drive.run(
-    // () -> drive.feedTeleopInput(
-    // -driver.getLeftWithDeadband().y,
-    // -driver.getLeftWithDeadband().x,
-    // -driver.getRightWithDeadband().x)));
-
     drive.setDefaultCommand(
         drive.run(
             () -> drive.feedTeleopInput(
-                0.0,
-                0.0,
-                0.0)));
+                -driver.getLeftWithDeadband().y,
+                -driver.getLeftWithDeadband().x,
+                -driver.getRightWithDeadband().x)));
+
+    // drive.setDefaultCommand(
+    // drive.run(
+    // () -> drive.feedTeleopInput(
+    // 0.0,
+    // 0.0,
+    // 0.0)));
 
     // Reset gyro to 0° when A button is pressed
     driver
@@ -352,22 +352,32 @@ public class RobotContainer {
                 drive)
                 .ignoringDisable(false));
 
-    superstructure.setDefaultCommand(
-        superstructure.run(() -> superstructure.acceptCharacterizationInput(
-            // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
-            0.0)));
-
-    // driver
-    // .povDown()
-    // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.CUSTOM));
+    // superstructure.setDefaultCommand(
+    // superstructure.run(() -> superstructure.acceptCharacterizationInput(
+    // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
+    // // 0.0
+    // )));
 
     driver
         .povDown()
-        .whileTrue(arm.setGoalCommand(Arm.Goal.CUSTOM));
+        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L1));
+
+    driver
+        .povUp()
+        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L2));
+
+    driver
+        .povLeft()
+        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L3));
+
+    // driver
+    // .povDown()
+    // .whileTrue(arm.setGoalCommand(Arm.Goal.CUSTOM));
 
     arm.setDefaultCommand(
         arm.run(() -> arm.runCharacterization(
-            4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis()))));
+            // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
+            0.0)));
 
     driver
         .leftBumper()
@@ -381,12 +391,7 @@ public class RobotContainer {
 
     driver
         .rightBumper()
-        .whileTrue(
-            Commands.runOnce(
-                () -> superstructure.setEndEffectorGoal(EndEffector.Goal.INTAKE)))
-        .whileFalse(
-            Commands.runOnce(
-                () -> superstructure.setEndEffectorGoal(EndEffector.Goal.IDLE)));
+        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.INTAKE));
   }
 
   private void configureKeyBoardBindings() {
