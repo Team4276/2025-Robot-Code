@@ -61,7 +61,6 @@ public class EndEffector extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       goal = Goal.IDLE;
     }
-
     io.runVolts(goal.getLeftVolts(), goal.getRightVolts());
     Logger.recordOutput("EndEffector/Goal", goal);
   }

@@ -2,6 +2,7 @@ package frc.team4276.frc2025.subsystems.superstructure.endeffector;
 
 import java.util.function.DoubleSupplier;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -17,6 +18,8 @@ import static frc.team4276.util.SparkUtil.tryUntilOk;
 public class EndEffectorIOSparkMax implements EndEffectorIO {
   private final SparkMax leftMotor;
   private final SparkMax rightMotor;
+  private final RelativeEncoder leftEncoder;
+  private final RelativeEncoder  rightEncoder;
   private final Debouncer motorConnectedDebounce = new Debouncer(0.5);
 
   public EndEffectorIOSparkMax(int left_id, int right_id, int currentLimit, boolean invert, boolean brake) {
@@ -50,6 +53,9 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
         5,
         () -> rightMotor.configure(
             config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+
+    leftEncoder = leftMotor.getEncoder();
+    rightEncoder = rightMotor.getEncoder();  
   }
 
   @Override
@@ -61,6 +67,7 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
         (values) -> inputs.leftAppliedVoltage = values[0] * values[1]);
     ifOk(leftMotor, leftMotor::getOutputCurrent, (value) -> inputs.leftSupplyCurrentAmps = value);
     ifOk(leftMotor, leftMotor::getMotorTemperature, (value) -> inputs.leftTempCelsius = value);
+    ifOk(leftMotor, leftEncoder::getVelocity, (value) -> inputs.LeftVelocity = value);
     inputs.leftConnected = motorConnectedDebounce.calculate(!sparkStickyFault);
 
     ifOk(
@@ -70,6 +77,8 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
         (values) -> inputs.rightAppliedVoltage = values[0] * values[1]);
     ifOk(rightMotor, rightMotor::getOutputCurrent, (value) -> inputs.rightSupplyCurrentAmps = value);
     ifOk(rightMotor, rightMotor::getMotorTemperature, (value) -> inputs.RightTempCelsius = value);
+    ifOk(rightMotor, rightEncoder::getVelocity, (value) -> inputs.RightVelocity = value);
+
     inputs.rightConnected = motorConnectedDebounce.calculate(!sparkStickyFault);
 
   }
