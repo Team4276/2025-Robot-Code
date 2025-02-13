@@ -9,9 +9,9 @@ public class objectSensor {
 
     boolean objectDetected;
 
-    objectSensor(Supplier<Double> currentSupplier, Supplier<Double> velocitySupplier, Supplier<Double> accelerationSupplier){
+    objectSensor(Supplier<Double> currentSupplier, Supplier<Double> velocitySupplier){
         cSensor = new CurrentSensor(currentSupplier);
-        vSensor = new VelocitySensor(accelerationSupplier, accelerationSupplier);
+        vSensor = new VelocitySensor(velocitySupplier);
     }
     public void update(){
         cSensor.update();

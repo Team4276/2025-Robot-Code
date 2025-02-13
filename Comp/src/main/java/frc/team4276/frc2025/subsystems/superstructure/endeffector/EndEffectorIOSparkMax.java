@@ -78,7 +78,6 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
     ifOk(rightMotor, rightMotor::getOutputCurrent, (value) -> inputs.rightSupplyCurrentAmps = value);
     ifOk(rightMotor, rightMotor::getMotorTemperature, (value) -> inputs.RightTempCelsius = value);
     ifOk(rightMotor, rightEncoder::getVelocity, (value) -> inputs.RightVelocity = value);
-
     inputs.rightConnected = motorConnectedDebounce.calculate(!sparkStickyFault);
 
   }

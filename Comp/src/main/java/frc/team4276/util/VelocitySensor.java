@@ -3,8 +3,11 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.apache.commons.math3.stat.StatUtils;
+import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.wpilibj.Timer;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
+
 
 public class VelocitySensor {
     Supplier<Double> mAccSupplier;
@@ -12,19 +15,27 @@ public class VelocitySensor {
     List<Double> velocitySamples;
     Double averageVelocity;
     boolean dipDetected;
-
-    public VelocitySensor(Supplier<Double> accSupplier, Supplier<Double> velocitySupplier){
-        mAccSupplier = accSupplier;
+    Double timeOld;
+    public VelocitySensor(Supplier<Double> velocitySupplier){
         mVelocitySupplier = velocitySupplier;
+        timeOld = Timer.getTimestamp();
     }
     //TODO: make these constant easier to config 
     public void update(){
-
+        double timeNow = Timer.getTimestamp();
 
         dipDetected = false;
-        double acceleration = mAccSupplier.get();
         double velocity = mVelocitySupplier.get();
+        double acceleration = 0;
+        if(velocitySamples.isEmpty()){
+            acceleration = velocity;
+        }else{
+            acceleration = (velocity - velocitySamples.get(velocitySamples.size() - 1)) / (timeNow - timeOld);
+        }
         //no longer accelarting but not at rest 
+        Logger.recordOutput("ObjectSensor/Acceleration", acceleration);
+        Logger.recordOutput("ObjectSensor/Velocity", velocity);
+
         if (withinRange(
             acceleration, 
         new LoggedTunableNumber("ObjectSensor/lowerboundAccRange", -0.2).getAsDouble(), 

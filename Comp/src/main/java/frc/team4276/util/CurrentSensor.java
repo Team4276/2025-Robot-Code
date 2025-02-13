@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.apache.commons.math3.stat.StatUtils;
+import org.littletonrobotics.junction.Logger;
 
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 
@@ -19,6 +20,8 @@ public class CurrentSensor {
     public void update(){
         spikeDetected = false;
         Double current = mCurrentSuplier.get();
+        Logger.recordOutput("ObjectSensor/current", current);
+
 
         if(current < new LoggedTunableNumber("ObjectSensor/currentOutlierValue", 45).getAsDouble()){
             currentSamples.add(mCurrentSuplier.get());
