@@ -1,7 +1,6 @@
 package frc.team4276.frc2025.subsystems.superstructure.elevator;
 
-import static frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorConstants.*;
-import static frc.team4276.util.SparkUtil.*;
+import java.util.function.DoubleSupplier;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -14,12 +13,26 @@ import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.LimitSwitchConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.math.filter.Debouncer;
-import java.util.function.DoubleSupplier;
+import static frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorConstants.currentLimit;
+import static frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorConstants.encoderPositionFactor;
+import static frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorConstants.encoderVelocityFactor;
+import static frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorConstants.followerId;
+import static frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorConstants.invertFollower;
+import static frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorConstants.invertLeader;
+import static frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorConstants.kd;
+import static frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorConstants.ki;
+import static frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorConstants.kp;
+import static frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorConstants.leaderId;
+import static frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorConstants.readFreq;
+import static frc.team4276.util.SparkUtil.ifOk;
+import static frc.team4276.util.SparkUtil.sparkStickyFault;
+import static frc.team4276.util.SparkUtil.tryUntilOk;
 
 public class ElevatorIOSparkMax implements ElevatorIO {
     private final SparkBase leaderSpark;

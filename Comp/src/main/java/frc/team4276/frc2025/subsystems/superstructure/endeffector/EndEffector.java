@@ -17,6 +17,8 @@ public class EndEffector extends SubsystemBase {
     IDLE(() -> 0.0, () -> 0.0),
     INTAKE(new LoggedTunableNumber("EndEffector/IntakeVolts", 7.0)),
     SCORE(new LoggedTunableNumber("EndEffector/ScoreVolts", 8.0)),
+    //TODO: Firgure out what to bind this to and if we even need it 
+    REVERSE(new LoggedTunableNumber("EndEffector/IntakeVolts", -3.0)),
     FAVOR_LEFT(favorVolts, lagVolts),
     FAVOR_RIGHT(lagVolts, favorVolts);
 

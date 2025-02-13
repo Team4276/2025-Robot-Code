@@ -18,8 +18,8 @@ import java.util.List;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -59,7 +59,6 @@ import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffectorIOS
 import frc.team4276.frc2025.subsystems.vision.Vision;
 import frc.team4276.frc2025.subsystems.vision.VisionConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO;
-import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVision;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.BetterXboxController;
@@ -325,19 +324,19 @@ public class RobotContainer {
   }
 
   private void configureDemoBindings() {
-    drive.setDefaultCommand(
-        drive.run(
-            () -> drive.feedTeleopInput(
-                -driver.getLeftWithDeadband().y,
-                -driver.getLeftWithDeadband().x,
-                -driver.getRightWithDeadband().x)));
-
     // drive.setDefaultCommand(
     // drive.run(
     // () -> drive.feedTeleopInput(
-    // 0.0,
-    // 0.0,
-    // 0.0)));
+    // -driver.getLeftWithDeadband().y,
+    // -driver.getLeftWithDeadband().x,
+    // -driver.getRightWithDeadband().x)));
+
+    drive.setDefaultCommand(
+        drive.run(
+            () -> drive.feedTeleopInput(
+                0.0,
+                0.0,
+                0.0)));
 
     // Reset gyro to 0° when A button is pressed
     driver
@@ -352,32 +351,22 @@ public class RobotContainer {
                 drive)
                 .ignoringDisable(false));
 
-    // superstructure.setDefaultCommand(
-    // superstructure.run(() -> superstructure.acceptCharacterizationInput(
-    // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
-    // // 0.0
-    // )));
-
-    driver
-        .povDown()
-        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L1));
-
-    driver
-        .povUp()
-        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L2));
-
-    driver
-        .povLeft()
-        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L3));
+    superstructure.setDefaultCommand(
+        superstructure.run(() -> superstructure.acceptCharacterizationInput(
+            // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
+            0.0)));
 
     // driver
     // .povDown()
-    // .whileTrue(arm.setGoalCommand(Arm.Goal.CUSTOM));
+    // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.CUSTOM));
+
+    driver
+        .povDown()
+        .whileTrue(arm.setGoalCommand(Arm.Goal.CUSTOM));
 
     arm.setDefaultCommand(
         arm.run(() -> arm.runCharacterization(
-            // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
-            0.0)));
+            4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis()))));
 
     driver
         .leftBumper()
@@ -391,7 +380,12 @@ public class RobotContainer {
 
     driver
         .rightBumper()
-        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.INTAKE));
+        .whileTrue(
+            Commands.runOnce(
+                () -> superstructure.setEndEffectorGoal(EndEffector.Goal.INTAKE)))
+        .whileFalse(
+            Commands.runOnce(
+                () -> superstructure.setEndEffectorGoal(EndEffector.Goal.IDLE)));
   }
 
   private void configureKeyBoardBindings() {
