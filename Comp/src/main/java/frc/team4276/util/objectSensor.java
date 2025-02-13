@@ -9,7 +9,7 @@ public class objectSensor {
 
     boolean objectDetected;
 
-    objectSensor(Supplier<Double> currentSupplier, Supplier<Double> velocitySupplier){
+    public objectSensor(Supplier<Double> currentSupplier, Supplier<Double> velocitySupplier){
         cSensor = new CurrentSensor(currentSupplier);
         vSensor = new VelocitySensor(velocitySupplier);
     }

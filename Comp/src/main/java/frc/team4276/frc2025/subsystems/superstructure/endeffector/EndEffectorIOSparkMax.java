@@ -14,12 +14,14 @@ import edu.wpi.first.math.filter.Debouncer;
 import static frc.team4276.util.SparkUtil.ifOk;
 import static frc.team4276.util.SparkUtil.sparkStickyFault;
 import static frc.team4276.util.SparkUtil.tryUntilOk;
+import frc.team4276.util.objectSensor;
 
 public class EndEffectorIOSparkMax implements EndEffectorIO {
   private final SparkMax leftMotor;
   private final SparkMax rightMotor;
   private final RelativeEncoder leftEncoder;
   private final RelativeEncoder  rightEncoder;
+  public  objectSensor coralSensor;
   private final Debouncer motorConnectedDebounce = new Debouncer(0.5);
 
   public EndEffectorIOSparkMax(int left_id, int right_id, int currentLimit, boolean invert, boolean brake) {
@@ -53,13 +55,16 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
         5,
         () -> rightMotor.configure(
             config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
-
+    //TODO: test code, if used should be refactored 
     leftEncoder = leftMotor.getEncoder();
     rightEncoder = rightMotor.getEncoder();  
+
+    coralSensor = new objectSensor(() -> leftEncoder.getVelocity(), () -> leftMotor.getOutputCurrent());
   }
 
   @Override
   public void updateInputs(EndEffectorIOInputs inputs) {
+    coralSensor.update();
     sparkStickyFault = false;
     ifOk(
         leftMotor,
