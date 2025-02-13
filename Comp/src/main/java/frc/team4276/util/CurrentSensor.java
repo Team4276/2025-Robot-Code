@@ -5,6 +5,8 @@ import java.util.function.Supplier;
 
 import org.apache.commons.math3.stat.StatUtils;
 
+import frc.team4276.util.dashboard.LoggedTunableNumber;
+
 public class CurrentSensor {
     Supplier<Double> mCurrentSuplier;
     List<Double> currentSamples;
@@ -18,13 +20,13 @@ public class CurrentSensor {
         spikeDetected = false;
         Double current = mCurrentSuplier.get();
 
-        if(current < 45){
+        if(current < new LoggedTunableNumber("ObjectSensor/currentOutlierValue", 45).getAsDouble()){
             currentSamples.add(mCurrentSuplier.get());
         }
         if(currentSamples.size() > 500){
             currentSamples.remove(0);
             currentAverage = StatUtils.mean(currentSamples.stream().mapToDouble(Double::doubleValue).toArray());
-            spikeDetected = current > currentAverage + 10;
+            spikeDetected = current > currentAverage + new LoggedTunableNumber("ObjectSensor/significantCurrentSpike", 10).getAsDouble();
         }else{
             spikeDetected = false;
         }
