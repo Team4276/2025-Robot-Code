@@ -25,6 +25,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team4276.frc2025.field.FieldConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
@@ -100,30 +101,36 @@ public class Vision extends SubsystemBase {
 
       // Loop over pose observations
       for (var observation : inputs[cameraIndex].poseObservations) {
-        // Check whether to reject pose
-        boolean rejectPose = observation.tagCount() == 0 // Must have at least one tag
-            || (observation.tagCount() == 1
-                && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
-            || Math.abs(observation.pose().getZ()) > maxZError // Must have realistic Z coordinate
-
-            // Must be within the field boundaries
-            || observation.pose().getX() < 0.0
-            || observation.pose().getX() > aprilTagLayout.getFieldLength()
-            || observation.pose().getY() < 0.0
-            || observation.pose().getY() > aprilTagLayout.getFieldWidth();
-
         // Add pose to log
         robotPoses.add(observation.pose());
-        if (rejectPose) {
-          robotPosesRejected.add(observation.pose());
-        } else {
-          robotPosesAccepted.add(observation.pose());
-        }
 
-        // Skip if rejected
-        if (rejectPose || !camerasEnabled[cameraIndex]) {
+        if (observation.tagCount() == 0) {
+          robotPosesRejected.add(observation.pose());
           continue;
         }
+
+        if (observation.tagCount() == 1 && observation.ambiguity() > maxAmbiguity) {
+          robotPosesRejected.add(observation.pose());
+          continue;
+        }
+
+        if (!camerasEnabled[cameraIndex]) {
+          robotPosesRejected.add(observation.pose());
+          continue;
+        }
+
+        // Exit if robot pose is off the field
+        if (observation.pose().getX() < -fieldBorderMargin
+            || observation.pose().getX() > FieldConstants.fieldLength + fieldBorderMargin
+            || observation.pose().getY() < -fieldBorderMargin
+            || observation.pose().getY() > FieldConstants.fieldWidth + fieldBorderMargin
+            || observation.pose().getZ() < -maxZError
+            || observation.pose().getZ() > maxZError) {
+          robotPosesRejected.add(observation.pose());
+          continue;
+        }
+
+        robotPosesAccepted.add(observation.pose());
 
         // Calculate standard deviations
         double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
