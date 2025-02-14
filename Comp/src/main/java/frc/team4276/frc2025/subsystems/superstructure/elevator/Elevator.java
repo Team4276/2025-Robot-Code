@@ -13,15 +13,14 @@ import frc.team4276.util.dashboard.LoggedTunableNumber;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator {
   public enum Goal {
     STOW(new LoggedTunableNumber("Elevator/StowPosition", 0.0125)),
     L1(new LoggedTunableNumber("Elevator/L1Position", 0.0)),
-    L2(new LoggedTunableNumber("Elevator/L2Position", Units.inchesToMeters(6.7))), // 0.14 m
-    L3(new LoggedTunableNumber("Elevator/L3Position", Units.inchesToMeters(22.1))), // 0.53 m
+    L2(new LoggedTunableNumber("Elevator/L2Position", Units.inchesToMeters(5.5))),
+    L3(new LoggedTunableNumber("Elevator/L3Position", Units.inchesToMeters(20.8))),
     CHARACTERIZING(() -> 0.0),
     CUSTOM(new LoggedTunableNumber("Elevator/CustomSetpoint", 0.0));
 
@@ -92,10 +91,6 @@ public class Elevator {
       homedPosition = inputs.position;
       isHoming = false;
 
-    } else if (inputs.topLimit) {
-      // homedPosition = maxPosition - inputs.position;
-      // isHoming = false;
-
     }
 
     if (DriverStation.isDisabled()) {
@@ -121,9 +116,8 @@ public class Elevator {
       if (wasDisabled) {
         io.setBrakeMode(true);
         wasDisabled = false;
+        hasFlippedCoast = false;
       }
-
-      hasFlippedCoast = false;
 
       if (goal != Goal.STOW) {
         isHoming = false;
@@ -132,24 +126,21 @@ public class Elevator {
       if (goal == Goal.CHARACTERIZING) {
         io.runVolts(characterizationInput);
 
-      }
-      // else if (wantHome && goal == Goal.STOW && atGoal()) {
-      // wantHome = false;
-      // isHoming = true;
+      } else if (wantHome && goal == Goal.STOW && atGoal()) {
+        wantHome = false;
+        isHoming = true;
 
-      // } else if (isHoming && goal == Goal.STOW) {
-      // // io.runVolts(homingVolts.getAsDouble());
+      } else if (isHoming && goal == Goal.STOW) {
+        io.runVolts(homingVolts.getAsDouble());
 
-      // }
-      else {
+      } else {
         setpointState = profile.calculate(0.02, setpointState,
             new TrapezoidProfile.State(goal.getPositionMetres(), 0.0));
         double setpointRotations = metresToRotations(MathUtil.clamp(setpointState.position, minInput, maxInput))
             + homedPosition;
         io.runSetpoint(setpointRotations, ff.calculate(setpointState.velocity));
+
         Logger.recordOutput("Elevator/SetpointRotations", setpointRotations);
-        Logger.recordOutput("Elevator/GoalMetres", goal.getPositionMetres());
-        Logger.recordOutput("Elevator/GoalRotations", metresToRotations(goal.getPositionMetres()));
         Logger.recordOutput("Elevator/SetpointState/PosMetres", setpointState.position);
         Logger.recordOutput("Elevator/SetpointState/VelMetres", setpointState.velocity);
         Logger.recordOutput("Elevator/SetpointState/PosRotations", metresToRotations(setpointState.position));
@@ -161,21 +152,21 @@ public class Elevator {
     goalViz.update(goal.getPositionMetres());
     measuredViz.update(getPositionMetres());
     Logger.recordOutput("Elevator/Goal", goal);
+    Logger.recordOutput("Elevator/GoalMetres", goal.getPositionMetres());
+    Logger.recordOutput("Elevator/GoalRotations", metresToRotations(goal.getPositionMetres()));
+    Logger.recordOutput("Elevator/AtGoal", atGoal());
     Logger.recordOutput("Elevator/HomedPositionRotation", homedPosition);
     Logger.recordOutput("Elevator/PositionMetres", getPositionMetres());
   }
 
-  @AutoLogOutput
   public void setGoal(Goal goal) {
     this.goal = goal;
   }
 
-  @AutoLogOutput
   public Goal getGoal() {
     return goal;
   }
 
-  @AutoLogOutput
   public boolean atGoal() {
     return MathUtil.isNear(goal.getPositionMetres(), getPositionMetres(), tolerance);
   }
@@ -194,7 +185,7 @@ public class Elevator {
   }
 
   public void requestHome() {
-    wantHome = true;
+    // wantHome = true;
   }
 
   public static double metresToRotations(double metres) {

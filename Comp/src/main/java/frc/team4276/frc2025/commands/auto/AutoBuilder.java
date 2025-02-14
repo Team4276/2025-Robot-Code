@@ -89,7 +89,6 @@ public class AutoBuilder {
     for (int i = 0; i < reefs.size(); i++) {
       scoringCommands.addCommands(
         followTrajectory(drive, trajs.get(i * 2)),
-        // TODO: make it an approach auto
         superstructure.setGoalCommand(toGoal(levels.get(i)))
             .raceWith(Commands.waitUntil(superstructure::atGoal).andThen(scoreCommand(superstructure))));
 
