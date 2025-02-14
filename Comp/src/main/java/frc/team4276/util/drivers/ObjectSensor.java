@@ -11,8 +11,8 @@ public class ObjectSensor {
     vSensor = new VelocitySensor(key + "/ObjectSensor");
   }
 
-  public void update(double current, double velocity) {
-    cSensor.update(current);
+  public void update(double current, double velocity, boolean isIdle) {
+    cSensor.update(current, isIdle);
     vSensor.update(velocity);
     objectDetected = cSensor.getDetection() && vSensor.getDip();
   }

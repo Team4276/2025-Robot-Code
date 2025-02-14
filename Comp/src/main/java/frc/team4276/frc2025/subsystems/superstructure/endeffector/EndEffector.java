@@ -62,12 +62,11 @@ public class EndEffector extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs("EndEffector", inputs);
     
-    coralSensor.update(inputs.leftSupplyCurrentAmps, inputs.leftVelocity); // average them?
 
     if (DriverStation.isDisabled()) {
       goal = Goal.IDLE;
     }
-    
+    coralSensor.update(inputs.leftSupplyCurrentAmps, inputs.leftVelocity, (goal.getLeftVolts() + goal.getRightVolts()) == 0); // average them? The favor left and favor right complicates it ill figure it out after testing 
     io.runVolts(goal.getLeftVolts(), goal.getRightVolts());
     Logger.recordOutput("EndEffector/Goal", goal);
   }

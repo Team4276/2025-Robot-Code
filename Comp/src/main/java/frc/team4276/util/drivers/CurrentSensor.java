@@ -25,11 +25,11 @@ public class CurrentSensor {
     outlierThreshold = new LoggedTunableNumber(key + "/CurrentSensor/currentOutlierValue", 45);
   }
 
-  public void update(double current) {
+  public void update(double current, boolean isIdle) {
     spikeDetected = false;
     Logger.recordOutput(key + "/CurrentSensor/current", current);
 
-    if (current < outlierThreshold.getAsDouble()) {
+    if (current < outlierThreshold.getAsDouble() && !isIdle) {
       currentSamples.add(current);
     }
 
