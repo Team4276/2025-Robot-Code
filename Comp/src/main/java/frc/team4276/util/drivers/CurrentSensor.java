@@ -1,6 +1,8 @@
 package frc.team4276.util.drivers;
 
+import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.math3.stat.StatUtils;
 import org.littletonrobotics.junction.Logger;
 
@@ -11,7 +13,7 @@ public class CurrentSensor {
 
   private final LoggedTunableNumber spikeThreshold;
   private final LoggedTunableNumber outlierThreshold;
-  private List<Double> currentSamples;
+  private List<Double> currentSamples = new ArrayList<>();
   private double currentAverage;
 
   boolean spikeDetected;

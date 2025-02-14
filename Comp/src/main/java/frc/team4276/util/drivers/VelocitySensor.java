@@ -1,5 +1,6 @@
 package frc.team4276.util.drivers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.math3.stat.StatUtils;
@@ -16,7 +17,7 @@ public class VelocitySensor { //TODO: add a debounce?
   private final LoggedTunableNumber upperBoundAccel;
   private final LoggedTunableNumber lowerBoundAccel;
 
-  private final List<Double> velocitySamples = List.of();
+  private final List<Double> velocitySamples = new ArrayList<>();;
   private double averageVelocity;
   private boolean dipDetected;
   private double timeOld;
