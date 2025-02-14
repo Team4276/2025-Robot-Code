@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
+import frc.team4276.util.drivers.ObjectSensor;
 
 public class EndEffector extends SubsystemBase {
   private static final LoggedTunableNumber favorVolts = new LoggedTunableNumber("EndEffector/FavorVolts", 10.0);
@@ -48,19 +49,25 @@ public class EndEffector extends SubsystemBase {
 
   private final EndEffectorIO io;
   private final EndEffectorIOInputsAutoLogged inputs = new EndEffectorIOInputsAutoLogged();
+  
+  private final ObjectSensor coralSensor;
 
   public EndEffector(EndEffectorIO io) {
     this.io = io;
+    coralSensor = new ObjectSensor("EndEffector");
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("EndEffector", inputs);
+    
+    coralSensor.update(inputs.leftSupplyCurrentAmps, inputs.leftVelocity); // average them?
 
     if (DriverStation.isDisabled()) {
       goal = Goal.IDLE;
     }
+    
     io.runVolts(goal.getLeftVolts(), goal.getRightVolts());
     Logger.recordOutput("EndEffector/Goal", goal);
   }

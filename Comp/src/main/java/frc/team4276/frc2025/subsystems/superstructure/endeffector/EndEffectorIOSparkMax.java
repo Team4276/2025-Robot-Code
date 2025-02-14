@@ -1,5 +1,6 @@
 package frc.team4276.frc2025.subsystems.superstructure.endeffector;
 
+import static frc.team4276.util.SparkUtil.*;
 import java.util.function.DoubleSupplier;
 
 import com.revrobotics.RelativeEncoder;
@@ -11,22 +12,19 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.filter.Debouncer;
-import static frc.team4276.util.SparkUtil.ifOk;
-import static frc.team4276.util.SparkUtil.sparkStickyFault;
-import static frc.team4276.util.SparkUtil.tryUntilOk;
-import frc.team4276.util.objectSensor;
 
 public class EndEffectorIOSparkMax implements EndEffectorIO {
   private final SparkMax leftMotor;
   private final SparkMax rightMotor;
   private final RelativeEncoder leftEncoder;
-  private final RelativeEncoder  rightEncoder;
-  public  objectSensor coralSensor;
+  private final RelativeEncoder rightEncoder;
   private final Debouncer motorConnectedDebounce = new Debouncer(0.5);
 
   public EndEffectorIOSparkMax(int left_id, int right_id, int currentLimit, boolean invert, boolean brake) {
     leftMotor = new SparkMax(left_id, MotorType.kBrushless);
     rightMotor = new SparkMax(right_id, MotorType.kBrushless);
+    leftEncoder = leftMotor.getEncoder();
+    rightEncoder = rightMotor.getEncoder(); // TODO: test code, if used should be refactored
 
     var config = new SparkMaxConfig();
     config
@@ -37,52 +35,37 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
+
     tryUntilOk(
         leftMotor,
         5,
         () -> leftMotor.configure(
             config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+
     config
-        .smartCurrentLimit(currentLimit)
-        .inverted(!invert)
-        .idleMode(brake ? IdleMode.kBrake : IdleMode.kBrake);
-    config.signals
-        .appliedOutputPeriodMs(20)
-        .busVoltagePeriodMs(20)
-        .outputCurrentPeriodMs(20);
+        .inverted(!invert);
     tryUntilOk(
         rightMotor,
         5,
         () -> rightMotor.configure(
             config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
-    //TODO: test code, if used should be refactored 
-    leftEncoder = leftMotor.getEncoder();
-    rightEncoder = rightMotor.getEncoder();  
-
-    coralSensor = new objectSensor(() -> leftEncoder.getVelocity(), () -> leftMotor.getOutputCurrent());
   }
 
   @Override
   public void updateInputs(EndEffectorIOInputs inputs) {
-    coralSensor.update();
     sparkStickyFault = false;
-    ifOk(
-        leftMotor,
-        new DoubleSupplier[] { leftMotor::getAppliedOutput, leftMotor::getBusVoltage },
+    ifOk(leftMotor, new DoubleSupplier[] { leftMotor::getAppliedOutput, leftMotor::getBusVoltage },
         (values) -> inputs.leftAppliedVoltage = values[0] * values[1]);
     ifOk(leftMotor, leftMotor::getOutputCurrent, (value) -> inputs.leftSupplyCurrentAmps = value);
     ifOk(leftMotor, leftMotor::getMotorTemperature, (value) -> inputs.leftTempCelsius = value);
-    ifOk(leftMotor, leftEncoder::getVelocity, (value) -> inputs.LeftVelocity = value);
+    ifOk(leftMotor, leftEncoder::getVelocity, (value) -> inputs.leftVelocity = value);
     inputs.leftConnected = motorConnectedDebounce.calculate(!sparkStickyFault);
 
-    ifOk(
-        rightMotor,
-
-        new DoubleSupplier[] { rightMotor::getAppliedOutput, rightMotor::getBusVoltage },
+    ifOk(rightMotor, new DoubleSupplier[] { rightMotor::getAppliedOutput, rightMotor::getBusVoltage },
         (values) -> inputs.rightAppliedVoltage = values[0] * values[1]);
     ifOk(rightMotor, rightMotor::getOutputCurrent, (value) -> inputs.rightSupplyCurrentAmps = value);
-    ifOk(rightMotor, rightMotor::getMotorTemperature, (value) -> inputs.RightTempCelsius = value);
-    ifOk(rightMotor, rightEncoder::getVelocity, (value) -> inputs.RightVelocity = value);
+    ifOk(rightMotor, rightMotor::getMotorTemperature, (value) -> inputs.rightTempCelsius = value);
+    ifOk(rightMotor, rightEncoder::getVelocity, (value) -> inputs.rightVelocity = value);
     inputs.rightConnected = motorConnectedDebounce.calculate(!sparkStickyFault);
 
   }
