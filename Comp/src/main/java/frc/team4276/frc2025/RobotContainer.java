@@ -232,7 +232,7 @@ public class RobotContainer {
   }
 
   private void configureAutos() {
-    autoBuilder = new AutoBuilder(drive, superstructure, autoSelector);
+    autoBuilder = new AutoBuilder(drive, superstructure, arm, roller, autoSelector);
 
     // Set up auto routines
     autoSelector.addRoutine("Test 1 Traj", () -> autoBuilder.testTraj("z_BoxTest"));
@@ -259,6 +259,12 @@ public class RobotContainer {
             AutoQuestionResponse.YES,
             AutoQuestionResponse.NO))),
         () -> autoBuilder.safe5Coal());
+    autoSelector.addRoutine("Vanilla Hybrid",
+        List.of(
+            new AutoQuestion("Is Processor Side?", List.of(
+                AutoQuestionResponse.YES,
+                AutoQuestionResponse.NO))),
+        () -> autoBuilder.vanHybridAuto());
 
   }
 

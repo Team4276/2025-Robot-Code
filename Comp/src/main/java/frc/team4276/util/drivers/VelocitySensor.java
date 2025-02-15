@@ -48,7 +48,7 @@ public class VelocitySensor { //TODO: add a debounce?
       velocitySamples.add(velocity);
     }
 
-    if (velocitySamples.size() > 500) {
+    if (velocitySamples.size() > 100) {
       velocitySamples.remove(0);
       averageVelocity = StatUtils.mean(velocitySamples.stream().mapToDouble(Double::doubleValue).toArray());
       dipDetected = (velocity < averageVelocity - velDipThreshold.getAsDouble())
