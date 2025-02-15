@@ -652,7 +652,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Arm/CustomSetpoint",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -666,7 +666,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Arm/HoldDegrees",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -680,7 +680,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Arm/IntakeDegrees",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -694,7 +694,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Arm/ScoreDegrees",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -708,7 +708,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Arm/StowDegrees",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -722,7 +722,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Arm/kS",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -736,7 +736,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Arm/kV",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -750,7 +750,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Arm/kG",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -764,7 +764,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Arm/kGLoaded",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -778,7 +778,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Arm/maxVel",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -792,7 +792,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Arm/maxAccel",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               }
             ]
@@ -819,7 +819,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Elevator/CustomSetpoint",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -833,7 +833,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Elevator/L1Position",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -847,7 +847,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Elevator/L2Position",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -861,7 +861,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Elevator/L3Position",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -875,7 +875,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Elevator/StowPosition",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -889,7 +889,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Elevator/HomingVolts",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -903,7 +903,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Elevator/kS",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -917,7 +917,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Elevator/kV",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -931,7 +931,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Elevator/kG",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -945,7 +945,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Elevator/maxVel",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -959,7 +959,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Elevator/maxAccel",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               }
             ]
@@ -986,7 +986,7 @@
                   "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Translation/kP",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1000,7 +1000,7 @@
                   "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Translation/kD",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1014,7 +1014,7 @@
                   "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Translation/Tolerance",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1028,7 +1028,7 @@
                   "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Rotation/kP",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1042,7 +1042,7 @@
                   "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Rotation/kD",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1056,7 +1056,7 @@
                   "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Rotation/ToleranceDegrees",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               }
             ]
@@ -1083,7 +1083,7 @@
                   "topic": "SmartDashboard/TunableNumbers/TrajectoryController/Translation/kP",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1097,7 +1097,7 @@
                   "topic": "SmartDashboard/TunableNumbers/TrajectoryController/Translation/kD",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1111,7 +1111,7 @@
                   "topic": "SmartDashboard/TunableNumbers/TrajectoryController/Translation/Tolerance",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1125,7 +1125,7 @@
                   "topic": "SmartDashboard/TunableNumbers/TrajectoryController/Rotation/kP",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1139,7 +1139,7 @@
                   "topic": "SmartDashboard/TunableNumbers/TrajectoryController/Rotation/kD",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1153,7 +1153,7 @@
                   "topic": "SmartDashboard/TunableNumbers/TrajectoryController/Rotation/ToleranceDegrees",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1167,7 +1167,7 @@
                   "topic": "SmartDashboard/TunableNumbers/TrajectoryController/maxError",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               }
             ]
@@ -1194,7 +1194,7 @@
                   "topic": "SmartDashboard/TunableNumbers/HeadingController/kP",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1208,7 +1208,7 @@
                   "topic": "SmartDashboard/TunableNumbers/HeadingController/kI",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1222,7 +1222,7 @@
                   "topic": "SmartDashboard/TunableNumbers/HeadingController/kD",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1236,7 +1236,7 @@
                   "topic": "SmartDashboard/TunableNumbers/HeadingController/ToleranceDegrees",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               }
             ]
@@ -1263,7 +1263,7 @@
                   "topic": "SmartDashboard/TunableNumbers/EndEffector/IntakeVolts",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1277,7 +1277,7 @@
                   "topic": "SmartDashboard/TunableNumbers/EndEffector/ScoreVolts",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1291,7 +1291,7 @@
                   "topic": "SmartDashboard/TunableNumbers/EndEffector/FavorVolts",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1305,7 +1305,7 @@
                   "topic": "SmartDashboard/TunableNumbers/EndEffector/LagVolts",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               }
             ]
@@ -1332,7 +1332,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Roller/IntakeVolts",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1346,7 +1346,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Roller/HoldVolts",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1360,7 +1360,7 @@
                   "topic": "SmartDashboard/TunableNumbers/Roller/ScoreVolts",
                   "period": 0.02,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               }
             ]
