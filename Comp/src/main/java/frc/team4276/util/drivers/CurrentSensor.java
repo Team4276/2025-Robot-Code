@@ -33,7 +33,7 @@ public class CurrentSensor {
       currentSamples.add(current);
     }
 
-    if (currentSamples.size() > 500) {
+    if (currentSamples.size() > 100) {
       currentSamples.remove(0);
       currentAverage = StatUtils.mean(currentSamples.stream().mapToDouble(Double::doubleValue).toArray());
       spikeDetected = current > currentAverage

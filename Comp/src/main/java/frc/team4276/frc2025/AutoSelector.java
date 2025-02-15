@@ -21,6 +21,8 @@ public class AutoSelector extends VirtualSubsystem {
     YES,
     NO,
     MIDDLE,
+    LEFT,
+    RIGHT,
     FAR,
     CLOSE,
     A,
@@ -38,7 +40,8 @@ public class AutoSelector extends VirtualSubsystem {
     L1_LEFT,
     L1_RIGHT,
     L2,
-    L3
+    L3,
+    PROCESSOR
   }
 
   private static final int maxQuestions = 4;
@@ -54,10 +57,10 @@ public class AutoSelector extends VirtualSubsystem {
 
   private AutoRoutine lastRoutine;
   private List<AutoQuestionResponse> lastResponses = List.of(
-    AutoQuestionResponse.EMPTY,
-    AutoQuestionResponse.EMPTY,
-    AutoQuestionResponse.EMPTY,
-    AutoQuestionResponse.EMPTY);
+      AutoQuestionResponse.EMPTY,
+      AutoQuestionResponse.EMPTY,
+      AutoQuestionResponse.EMPTY,
+      AutoQuestionResponse.EMPTY);
 
   public AutoSelector() {
     routineChooser = new LoggedDashboardChooser<>("Comp/Auto/RoutineChooser");
@@ -80,7 +83,7 @@ public class AutoSelector extends VirtualSubsystem {
     delayInput = new LoggedNetworkNumber("Comp/Auto/Delay", 0.0);
 
   }
-  
+
   /** Registers a new auto routine that can be selected. */
   public void addRoutine(String name, Supplier<Command> command) {
     addRoutine(name, List.of(), command);
@@ -150,15 +153,15 @@ public class AutoSelector extends VirtualSubsystem {
     // Update the routine and responses
     lastRoutine = selectedRoutine;
     var cachedResponses = lastResponses.isEmpty() ? List.of(
-      AutoQuestionResponse.EMPTY,
-      AutoQuestionResponse.EMPTY,
-      AutoQuestionResponse.EMPTY,
-      AutoQuestionResponse.EMPTY) : lastResponses;
+        AutoQuestionResponse.EMPTY,
+        AutoQuestionResponse.EMPTY,
+        AutoQuestionResponse.EMPTY,
+        AutoQuestionResponse.EMPTY) : lastResponses;
     lastResponses = new ArrayList<>();
     for (int i = 0; i < lastRoutine.questions().size(); i++) {
       questionChoosers.get(i).periodic();
       var responseString = questionChoosers.get(i).get();
-      if(cachedResponses.get(i) != responseString){
+      if (cachedResponses.get(i) != responseString) {
         // TODO: stop if invalid auto
       }
       lastResponses.add(
