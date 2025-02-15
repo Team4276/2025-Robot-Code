@@ -67,6 +67,9 @@ public class EndEffector extends SubsystemBase {
       goal = Goal.IDLE;
     }
     coralSensor.update(inputs.leftSupplyCurrentAmps, inputs.leftVelocity, (goal.getLeftVolts() + goal.getRightVolts()) == 0); // average them? The favor left and favor right complicates it ill figure it out after testing 
+    if(coralSensor.getDetection()){
+      System.out.println("detected");
+    }
     io.runVolts(goal.getLeftVolts(), goal.getRightVolts());
     Logger.recordOutput("EndEffector/Goal", goal);
   }

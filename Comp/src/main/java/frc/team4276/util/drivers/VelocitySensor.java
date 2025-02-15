@@ -17,8 +17,10 @@ public class VelocitySensor { //TODO: add a debounce?
   private final LoggedTunableNumber upperBoundAccel;
   private final LoggedTunableNumber lowerBoundAccel;
 
-  private final List<Double> velocitySamples = new ArrayList<>();;
+  private final List<Double> peakVelocitySamples = new ArrayList<>();
+
   private double averageVelocity;
+  private double lastVelocity;
   private boolean dipDetected;
   private double timeOld;
 
@@ -27,9 +29,9 @@ public class VelocitySensor { //TODO: add a debounce?
     timeOld = Timer.getTimestamp();
 
     velDipThreshold = new LoggedTunableNumber(key + "/VelocitySensor/VelocityDipThreshold", 10);
-    deccelThreshold = new LoggedTunableNumber(key + "/VelocitySensor/DecellerationThreshold", -1.0);
-    upperBoundAccel = new LoggedTunableNumber(key + "/VelocitySensor/UpperBoundAccelRange", 0.2);
-    lowerBoundAccel = new LoggedTunableNumber(key + "/VelocitySensor/LowerBoundAccelRange", -0.2);
+    deccelThreshold = new LoggedTunableNumber(key + "/VelocitySensor/DecellerationThreshold", -11.0);
+    upperBoundAccel = new LoggedTunableNumber(key + "/VelocitySensor/UpperBoundAccelRange", 10);
+    lowerBoundAccel = new LoggedTunableNumber(key + "/VelocitySensor/LowerBoundAccelRange", -10);
   }
 
   public void update(double velocity) {
@@ -37,27 +39,26 @@ public class VelocitySensor { //TODO: add a debounce?
 
     dipDetected = false;
     double acceleration = 0;
-    if (velocitySamples.isEmpty()) {
+    if (peakVelocitySamples.isEmpty()) {
       acceleration = velocity;
     } else {
-      acceleration = (velocity - velocitySamples.get(velocitySamples.size() - 1)) / (timeNow - timeOld);
+      acceleration = (velocity - lastVelocity) / (timeNow - timeOld);
     }
 
     // no longer accelarting but not at rest
-    if (withinRange(acceleration, lowerBoundAccel.getAsDouble(), upperBoundAccel.getAsDouble()) && velocity >= 30) {
-      velocitySamples.add(velocity);
+    if ((withinRange(acceleration, lowerBoundAccel.getAsDouble(), upperBoundAccel.getAsDouble()) && velocity >= 6000) || (peakVelocitySamples.isEmpty() && velocity >= 6000)) {
+      peakVelocitySamples.add(velocity);
     }
 
-    if (velocitySamples.size() > 500) {
-      velocitySamples.remove(0);
-      averageVelocity = StatUtils.mean(velocitySamples.stream().mapToDouble(Double::doubleValue).toArray());
+    if (peakVelocitySamples.size() > 100) {
+      peakVelocitySamples.remove(0);
+      averageVelocity = StatUtils.mean(peakVelocitySamples.stream().mapToDouble(Double::doubleValue).toArray());
       dipDetected = (velocity < averageVelocity - velDipThreshold.getAsDouble())
           && acceleration < deccelThreshold.getAsDouble();
     }
-
     Logger.recordOutput(key + "/VelocitySensor/Acceleration", acceleration);
     Logger.recordOutput(key + "/VelocitySensor/Velocity", velocity);
-
+    lastVelocity = velocity;
   }
 
   public boolean getDip() {
