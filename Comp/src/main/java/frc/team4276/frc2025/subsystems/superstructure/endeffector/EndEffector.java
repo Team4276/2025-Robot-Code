@@ -16,9 +16,9 @@ public class EndEffector extends SubsystemBase {
 
   public enum Goal {
     IDLE(() -> 0.0, () -> 0.0),
-    INTAKE(new LoggedTunableNumber("EndEffector/IntakeVolts", 7.0)),
+    INTAKE(new LoggedTunableNumber("EndEffector/IntakeVolts", 6.0)),
     SCORE(new LoggedTunableNumber("EndEffector/ScoreVolts", 8.0)),
-    //TODO: Firgure out what to bind this to and if we even need it 
+    // TODO: Firgure out what to bind this to and if we even need it
     REVERSE(new LoggedTunableNumber("EndEffector/ReverseVolts", -3.0)),
     FAVOR_LEFT(favorVolts, lagVolts),
     FAVOR_RIGHT(lagVolts, favorVolts);
@@ -49,7 +49,7 @@ public class EndEffector extends SubsystemBase {
 
   private final EndEffectorIO io;
   private final EndEffectorIOInputsAutoLogged inputs = new EndEffectorIOInputsAutoLogged();
-  
+
   private final ObjectSensor coralSensor;
 
   public EndEffector(EndEffectorIO io) {
@@ -61,12 +61,13 @@ public class EndEffector extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("EndEffector", inputs);
-    
 
     if (DriverStation.isDisabled()) {
       goal = Goal.IDLE;
     }
-    coralSensor.update(inputs.leftSupplyCurrentAmps, inputs.leftVelocity, (goal.getLeftVolts() + goal.getRightVolts()) == 0); // average them? The favor left and favor right complicates it ill figure it out after testing 
+    coralSensor.update(inputs.leftSupplyCurrentAmps, inputs.leftVelocity,
+        (goal.getLeftVolts() + goal.getRightVolts()) == 0); // average them? The favor left and favor right complicates
+                                                            // it ill figure it out after testing
     io.runVolts(goal.getLeftVolts(), goal.getRightVolts());
     Logger.recordOutput("EndEffector/Goal", goal);
   }

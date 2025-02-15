@@ -19,7 +19,7 @@ import org.littletonrobotics.junction.Logger;
 public class Arm extends SubsystemBase {
   public enum Goal {
     STOW(new LoggedTunableNumber("Arm/StowDegrees", 110.0)),
-    INTAKE(new LoggedTunableNumber("Arm/IntakeDegrees", 60.0)),
+    INTAKE(new LoggedTunableNumber("Arm/IntakeDegrees", 65.0)),
     HOLD(new LoggedTunableNumber("Arm/HoldDegrees", 110.0)),
     SCORE(new LoggedTunableNumber("Arm/ScoreDegrees", 90.0)),
     CHARACTERIZING(() -> 90.0),
@@ -42,13 +42,13 @@ public class Arm extends SubsystemBase {
 
   private Goal goal = Goal.STOW;
 
-  private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Arm/maxVel", Math.toRadians(10.0));
-  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Arm/maxAccel", Math.toRadians(10.0));
+  private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Arm/maxVelDeg", 80.0);
+  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Arm/maxAccelDeg", 100.0);
 
-  private final LoggedTunableNumber kS = new LoggedTunableNumber("Arm/kS", 0.5);
-  private final LoggedTunableNumber kV = new LoggedTunableNumber("Arm/kV", 1.0);
-  private final LoggedTunableNumber kG = new LoggedTunableNumber("Arm/kG", 0.2);
-  private final LoggedTunableNumber kGLoaded = new LoggedTunableNumber("Arm/kGLoaded", 0.0);
+  private final LoggedTunableNumber kS = new LoggedTunableNumber("Arm/kS", 0.12);
+  private final LoggedTunableNumber kV = new LoggedTunableNumber("Arm/kV", 1.5);
+  private final LoggedTunableNumber kG = new LoggedTunableNumber("Arm/kG", 0.3);
+  private final LoggedTunableNumber kGLoaded = new LoggedTunableNumber("Arm/kGLoaded", 0.3);
 
   private final ArmIO io;
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
@@ -56,7 +56,9 @@ public class Arm extends SubsystemBase {
   private ArmFeedforward ff = new ArmFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), 0.0);
   private ArmFeedforward ffLoaded = new ArmFeedforward(kS.getAsDouble(), kGLoaded.getAsDouble(), kV.getAsDouble(), 0.0);
   private TrapezoidProfile profile = new TrapezoidProfile(
-      new TrapezoidProfile.Constraints(maxVel.getAsDouble(), maxAccel.getAsDouble()));
+      new TrapezoidProfile.Constraints(
+          Units.degreesToRadians(maxVel.getAsDouble()),
+          Units.degreesToRadians(maxAccel.getAsDouble())));
   private TrapezoidProfile.State setpointState = new TrapezoidProfile.State();
 
   private BooleanSupplier coastOverride;
@@ -105,7 +107,9 @@ public class Arm extends SubsystemBase {
         ff = new ArmFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), 0.0);
         ffLoaded = new ArmFeedforward(kS.getAsDouble(), kGLoaded.getAsDouble(), kV.getAsDouble(), 0.0);
         profile = new TrapezoidProfile(
-            new TrapezoidProfile.Constraints(maxVel.getAsDouble(), maxAccel.getAsDouble()));
+            new TrapezoidProfile.Constraints(
+                Units.degreesToRadians(maxVel.getAsDouble()),
+                Units.degreesToRadians(maxAccel.getAsDouble())));
       }
 
     } else {
@@ -134,6 +138,8 @@ public class Arm extends SubsystemBase {
     goalViz.update(goal.getRads());
     measuredViz.update(inputs.positionRads);
     Logger.recordOutput("Arm/Goal", goal);
+    Logger.recordOutput("Arm/Measured/PositionDeg", Units.radiansToDegrees(inputs.positionRads));
+    Logger.recordOutput("Arm/Measured/PositionRad", inputs.positionRads);
   }
 
   @AutoLogOutput

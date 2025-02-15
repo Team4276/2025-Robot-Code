@@ -84,7 +84,7 @@ public class RobotContainer {
 
   // Controller
   private boolean useKeyboard = false;
-  private boolean isDemo = true;
+  private boolean isDemo = false;
 
   private final BetterXboxController driver = new BetterXboxController(0);
   private final CommandGenericHID buttonBoard = new CommandGenericHID(1);
@@ -330,19 +330,19 @@ public class RobotContainer {
   }
 
   private void configureDemoBindings() {
-    // drive.setDefaultCommand(
-    // drive.run(
-    // () -> drive.feedTeleopInput(
-    // -driver.getLeftWithDeadband().y,
-    // -driver.getLeftWithDeadband().x,
-    // -driver.getRightWithDeadband().x)));
-
     drive.setDefaultCommand(
         drive.run(
             () -> drive.feedTeleopInput(
-                0.0,
-                0.0,
-                0.0)));
+                -driver.getLeftWithDeadband().y,
+                -driver.getLeftWithDeadband().x,
+                -driver.getRightWithDeadband().x)));
+
+    // drive.setDefaultCommand(
+    // drive.run(
+    // () -> drive.feedTeleopInput(
+    // 0.0,
+    // 0.0,
+    // 0.0)));
 
     // Reset gyro to 0° when A button is pressed
     driver
@@ -357,41 +357,38 @@ public class RobotContainer {
                 drive)
                 .ignoringDisable(false));
 
-    superstructure.setDefaultCommand(
-        superstructure.run(() -> superstructure.acceptCharacterizationInput(
-            // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
-            0.0)));
-
     // driver
     // .povDown()
-    // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.CUSTOM));
+    // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L1));
 
-    driver
-        .povDown()
-        .whileTrue(arm.setGoalCommand(Arm.Goal.CUSTOM));
+    // driver
+    // .povLeft()
+    // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L2));
 
-    arm.setDefaultCommand(
-        arm.run(() -> arm.runCharacterization(
-            4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis()))));
-
-    driver
-        .leftBumper()
-        .whileTrue(
-            roller.setGoalCommand(Roller.Goal.INTAKE));
-
-    driver
-        .y()
-        .whileTrue(
-            roller.setGoalCommand(Roller.Goal.SCORE));
+    // driver
+    // .povUp()
+    // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L3));
 
     driver
         .rightBumper()
-        .whileTrue(
-            Commands.runOnce(
-                () -> superstructure.setEndEffectorGoal(EndEffector.Goal.INTAKE)))
-        .whileFalse(
-            Commands.runOnce(
-                () -> superstructure.setEndEffectorGoal(EndEffector.Goal.IDLE)));
+        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.INTAKE));
+
+    driver
+        .rightTrigger()
+        .whileTrue(superstructure.scoreCommand());
+
+    // arm.setDefaultCommand(
+    // arm.run(() -> arm.runCharacterization(
+    // // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
+    // 0.0)));
+
+    driver
+        .povDown()
+        .whileTrue(arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(roller.setGoalCommand(Roller.Goal.INTAKE)));
+
+    driver
+        .povUp()
+        .whileTrue(arm.setGoalCommand(Arm.Goal.SCORE).alongWith(roller.setGoalCommand(Roller.Goal.SCORE)));
   }
 
   private void configureKeyBoardBindings() {
@@ -488,13 +485,9 @@ public class RobotContainer {
                     .resetPose(
                         new Pose2d(
                             RobotState.getInstance().getEstimatedPose().getTranslation(),
-                            AllianceFlipUtil.apply(Rotation2d.kZero))),
+                            AllianceFlipUtil.apply(Rotation2d.k180deg))),
                 drive)
                 .ignoringDisable(false));
-
-    if (true) {
-      return;
-    }
 
     // Coral Intake Triggers
     driver
@@ -518,29 +511,29 @@ public class RobotContainer {
         .leftTrigger()
         .whileTrue(
             arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(
-                roller.setGoalCommand(Roller.Goal.INTAKE)))
-        .whileFalse(
-            Commands.either(
-                arm.setGoalCommand(Arm.Goal.HOLD),
-                arm.setGoalCommand(Arm.Goal.STOW),
-                () -> roller.hasGamePiece()));
+                roller.setGoalCommand(Roller.Goal.INTAKE)));
 
     // Coral Scoring Triggers
     driver
         .rightTrigger()
         .whileTrue(
-            Commands.sequence(
-                DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
-                    .until(() -> drive.isAutoAligned()
-                        && (Constants.getType() == RobotType.SIMBOT ? true : superstructure.atGoal())),
-                DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose)
-                    .alongWith(superstructure.setGoalCommand(() -> scoringHelper.getSuperstructureGoal())))
-                .alongWith(
-                    Commands
-                        .waitUntil(() -> drive.disableBackVision())
-                        .andThen(() -> vision.setEnableCamera(1,
-                            false)))
-                .finallyDo(() -> vision.setEnableCamera(1, true)));
+            Commands.either(
+                Commands.sequence(
+                    DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
+                        .until(() -> drive.isAutoAligned()
+                            && (Constants.getType() == RobotType.SIMBOT ? true : superstructure.atGoal())),
+                    DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose)
+                        .alongWith(superstructure.setGoalCommand(() -> scoringHelper.getSuperstructureGoal())))
+                    .alongWith(
+                        Commands
+                            .waitUntil(() -> drive.disableBackVision())
+                            .andThen(() -> vision.setEnableCamera(1,
+                                false)))
+                    .finallyDo(() -> vision.setEnableCamera(1, true)),
+                Commands.sequence(
+                    DriveCommands.headingAlignCommand(drive, scoringHelper.getSelectedScorePose()::getRotation)
+                        .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal))),
+                () -> !disableTranslationAutoAlign));
 
     // driver
     // .rightStick()
