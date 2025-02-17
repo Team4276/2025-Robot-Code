@@ -23,12 +23,15 @@ public class Superstructure extends SubsystemBase {
   private boolean wantScore = false;
   private boolean leftL1 = false;
 
+  private boolean wantUnjam = false;
+
   public enum Goal {
     STOW,
     INTAKE,
     L1,
     L2,
     L3,
+    UNJAM,
     CHARACTERIZING,
     CUSTOM
   }
@@ -67,11 +70,15 @@ public class Superstructure extends SubsystemBase {
         endeffector.setGoal(EndEffector.Goal.SCORE);
 
       }
-    } else if (scoringTimer.get() > 1.0) {
+    } else if (scoringTimer.get() > 0.5) {
       endeffector.setGoal(EndEffector.Goal.IDLE);
     }
 
     currentGoal = desiredGoal.get();
+
+    if(desiredGoal.get() == Goal.STOW && wantUnjam){
+      currentGoal = Goal.UNJAM;
+    }
 
     switch (currentGoal) {
       case STOW:
@@ -79,6 +86,10 @@ public class Superstructure extends SubsystemBase {
         endeffector.setGoal(EndEffector.Goal.IDLE);
 
         break;
+
+      case UNJAM:
+        elevator.setGoal(Elevator.Goal.UNJAM);
+        endeffector.setGoal(EndEffector.Goal.IDLE);
 
       case INTAKE:
         elevator.setGoal(Elevator.Goal.STOW);
@@ -181,5 +192,11 @@ public class Superstructure extends SubsystemBase {
 
   public void setCoastOverride(BooleanSupplier override) {
     elevator.setCoastOverride(override);
+  }
+
+  public Command unjamCommand(){
+    return Commands.startEnd(
+      () -> wantUnjam = true, 
+      () -> wantUnjam = false);
   }
 }

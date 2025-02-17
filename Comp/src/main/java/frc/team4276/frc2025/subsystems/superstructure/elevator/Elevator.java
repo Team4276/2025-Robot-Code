@@ -17,8 +17,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class Elevator {
   public enum Goal {
-    STOW(new LoggedTunableNumber("Elevator/StowPosition", 0.0125)),
-    L1(new LoggedTunableNumber("Elevator/L1Position", 0.0)),
+    STOW(new LoggedTunableNumber("Elevator/StowPosition", Units.inchesToMeters(0.5))),
+    UNJAM(new LoggedTunableNumber("Elevator/UnjamPosition", Units.inchesToMeters(5.5))), // find a better name for this
+    L1(new LoggedTunableNumber("Elevator/L1Position", Units.inchesToMeters(0.0))),
     L2(new LoggedTunableNumber("Elevator/L2Position", Units.inchesToMeters(5.5))),
     L3(new LoggedTunableNumber("Elevator/L3Position", Units.inchesToMeters(20.8))),
     CHARACTERIZING(() -> 0.0),

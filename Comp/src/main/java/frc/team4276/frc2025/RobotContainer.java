@@ -100,6 +100,8 @@ public class RobotContainer {
   private final DigitalInput elevatorCoastOverride = new DigitalInput(Ports.ELEVATOR_COAST_OVERRIDE);
   private final DigitalInput armCoastOverride = new DigitalInput(Ports.ARM_COAST_OVERRIDE);
 
+  // Coral Scoring Logic
+  private boolean disableHeadingAutoAlign = true;
   private boolean disableTranslationAutoAlign = true;
   private boolean disableVisionSim = true;
 
@@ -485,7 +487,7 @@ public class RobotContainer {
                     .resetPose(
                         new Pose2d(
                             RobotState.getInstance().getEstimatedPose().getTranslation(),
-                            AllianceFlipUtil.apply(Rotation2d.k180deg))),
+                            AllianceFlipUtil.apply(Rotation2d.kZero))),
                 drive)
                 .ignoringDisable(false));
 
@@ -514,37 +516,51 @@ public class RobotContainer {
                 roller.setGoalCommand(Roller.Goal.INTAKE)));
 
     // Coral Scoring Triggers
+    var driveReefCommand = Commands.sequence(
+        DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
+            .until(() -> drive.isAutoAligned()
+                && (Constants.getType() == RobotType.SIMBOT ? true : superstructure.atGoal())),
+        DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose)
+            .alongWith(superstructure.setGoalCommand(() -> scoringHelper.getSuperstructureGoal())))
+        .alongWith(
+            Commands
+                .waitUntil(() -> drive.disableBackVision())
+                .andThen(() -> vision.setEnableCamera(1,
+                    false)))
+        .finallyDo(() -> vision.setEnableCamera(1, true));
+
+    var headingAlignReefCommand = Commands.sequence(
+        DriveCommands.headingAlignCommand(drive, scoringHelper.getSelectedScorePose()::getRotation)
+            .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
+
     driver
         .rightTrigger()
         .whileTrue(
             Commands.either(
-                Commands.sequence(
-                    DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
-                        .until(() -> drive.isAutoAligned()
-                            && (Constants.getType() == RobotType.SIMBOT ? true : superstructure.atGoal())),
-                    DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose)
-                        .alongWith(superstructure.setGoalCommand(() -> scoringHelper.getSuperstructureGoal())))
-                    .alongWith(
-                        Commands
-                            .waitUntil(() -> drive.disableBackVision())
-                            .andThen(() -> vision.setEnableCamera(1,
-                                false)))
-                    .finallyDo(() -> vision.setEnableCamera(1, true)),
-                Commands.sequence(
-                    DriveCommands.headingAlignCommand(drive, scoringHelper.getSelectedScorePose()::getRotation)
-                        .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal))),
-                () -> !disableTranslationAutoAlign));
+                superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal),
+                Commands.either(headingAlignReefCommand,
+                    driveReefCommand,
+                    () -> disableTranslationAutoAlign),
+                () -> disableHeadingAutoAlign));
 
     // driver
     // .rightStick()
     // .onTrue(
-    // Commands.runOnce(() -> {
-    // disableTranslationAutoAlign = !disableTranslationAutoAlign;
-    // }));
+    // Commands.runOnce(() ->
+    // disableTranslationAutoAlign = !disableTranslationAutoAlign
+    // ));
+
+    driver
+        .povDown()
+        .onTrue(Commands.runOnce(() -> disableHeadingAutoAlign = !disableHeadingAutoAlign));
 
     driver
         .rightBumper()
         .onTrue(superstructure.scoreCommand(false));
+
+    driver
+        .povUp()
+        .whileTrue(superstructure.unjamCommand());
 
     // Algae Scoring Triggers
     driver
