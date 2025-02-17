@@ -103,7 +103,7 @@ public class Elevator {
         hasFlippedCoast = true;
       }
 
-      io.setBrakeMode(!coastOverride.getAsBoolean() && hasFlippedCoast);
+      io.setBrakeMode(!(coastOverride.getAsBoolean() && hasFlippedCoast));
 
       setpointState = new TrapezoidProfile.State(getPositionMetres(), 0.0);
 

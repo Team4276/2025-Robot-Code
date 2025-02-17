@@ -99,7 +99,7 @@ public class Arm extends SubsystemBase {
         hasFlippedCoast = true;
       }
 
-      io.setBrakeMode(!coastOverride.getAsBoolean() && hasFlippedCoast);
+      io.setBrakeMode(!(coastOverride.getAsBoolean() && hasFlippedCoast));
 
       setpointState = new TrapezoidProfile.State(inputs.positionRads, 0.0);
 
@@ -115,10 +115,9 @@ public class Arm extends SubsystemBase {
     } else {
       if (wasDisabled) {
         io.setBrakeMode(true);
+        hasFlippedCoast = false;
         wasDisabled = false;
       }
-
-      hasFlippedCoast = false;
 
       if (goal == Goal.CHARACTERIZING) {
         io.runVolts(characterizationInput + (kG.getAsDouble() * Math.cos(inputs.positionRads)));

@@ -201,7 +201,9 @@ public class Robot extends LoggedRobot {
     autoMessagePrinted = false;
     autoStart = Timer.getFPGATimestamp();
 
-    Elastic.selectTab("Auto");
+    if(!Constants.isTuning){
+      Elastic.selectTab("Auto");
+    }
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
@@ -228,7 +230,9 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    Elastic.selectTab("Teleop");
+    if(!Constants.isTuning){
+      Elastic.selectTab("Teleop");
+    }
   }
 
   /** This function is called periodically during operator control. */

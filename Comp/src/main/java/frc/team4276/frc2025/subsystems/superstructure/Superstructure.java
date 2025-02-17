@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -39,8 +38,6 @@ public class Superstructure extends SubsystemBase {
   private Supplier<Goal> desiredGoal = () -> Goal.STOW;
   private Goal currentGoal = Goal.STOW;
 
-  private Timer scoringTimer = new Timer();
-
   private double elevatorCharacterizationInput = 0.0;
 
   public Superstructure(Elevator elevator, EndEffector endeffector, RollerSensorsIO sensorsIO) {
@@ -50,7 +47,6 @@ public class Superstructure extends SubsystemBase {
 
     elevator.setCoastOverride(() -> false);
 
-    scoringTimer.restart();
     setDefaultCommand(setGoalCommand(() -> Superstructure.Goal.STOW));
   }
 
@@ -59,25 +55,19 @@ public class Superstructure extends SubsystemBase {
     sensorsIO.updateInputs(sensorsInputs);
     Logger.processInputs("RollersSensors", sensorsInputs);
 
-    if (wantScore) {
-      scoringTimer.reset();
-      wantScore = false;
-
-      if (currentGoal == Goal.L1) {
-        endeffector.setGoal(leftL1 ? EndEffector.Goal.FAVOR_LEFT : EndEffector.Goal.FAVOR_RIGHT);
-
-      } else {
-        endeffector.setGoal(EndEffector.Goal.SCORE);
-
-      }
-    } else if (scoringTimer.get() > 0.5) {
-      endeffector.setGoal(EndEffector.Goal.IDLE);
-    }
-
     currentGoal = desiredGoal.get();
 
-    if(desiredGoal.get() == Goal.STOW && wantUnjam){
+    if (desiredGoal.get() == Goal.STOW && wantUnjam) {
       currentGoal = Goal.UNJAM;
+    }
+
+    if (wantScore) {
+      endeffector.setGoal(currentGoal == Goal.L1 ?
+          (leftL1 ? EndEffector.Goal.FAVOR_LEFT : EndEffector.Goal.FAVOR_RIGHT) : 
+          EndEffector.Goal.SCORE);
+    } else {
+      endeffector.setGoal(EndEffector.Goal.IDLE);
+
     }
 
     switch (currentGoal) {
@@ -165,10 +155,11 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command scoreCommand(boolean isLeftL1) {
-    return Commands.runOnce(() -> {
+    return Commands.startEnd(() -> {
       wantScore = true;
       leftL1 = isLeftL1;
-    });
+    },
+        () -> wantScore = false);
   }
 
   public void acceptCharacterizationInput(double input) {
@@ -194,9 +185,9 @@ public class Superstructure extends SubsystemBase {
     elevator.setCoastOverride(override);
   }
 
-  public Command unjamCommand(){
+  public Command unjamCommand() {
     return Commands.startEnd(
-      () -> wantUnjam = true, 
-      () -> wantUnjam = false);
+        () -> wantUnjam = true,
+        () -> wantUnjam = false);
   }
 }

@@ -129,7 +129,7 @@ public class AutoCommands {
 
   public static Command scoreCommand(Superstructure superstructure, boolean isLeftL1) {
     return superstructure.scoreCommand(isLeftL1)
-        .alongWith(Commands.waitSeconds(scoreWaitTime))
+        .withDeadline(Commands.waitSeconds(scoreWaitTime))
         .withName("Score")
         .alongWith(notificationCommand("Scoring"));
   }
