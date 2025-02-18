@@ -47,7 +47,7 @@ public class Superstructure extends SubsystemBase {
 
     elevator.setCoastOverride(() -> false);
 
-    setDefaultCommand(setGoalCommand(() -> Superstructure.Goal.STOW));
+    setDefaultCommand(setGoalCommand(() -> Superstructure.Goal.CHARACTERIZING));
   }
 
   @Override
@@ -62,9 +62,8 @@ public class Superstructure extends SubsystemBase {
     }
 
     if (wantScore) {
-      endeffector.setGoal(currentGoal == Goal.L1 ?
-          (leftL1 ? EndEffector.Goal.FAVOR_LEFT : EndEffector.Goal.FAVOR_RIGHT) : 
-          EndEffector.Goal.SCORE);
+      endeffector.setGoal(currentGoal == Goal.L1 ? (leftL1 ? EndEffector.Goal.FAVOR_LEFT : EndEffector.Goal.FAVOR_RIGHT)
+          : EndEffector.Goal.SCORE);
     } else {
       endeffector.setGoal(EndEffector.Goal.IDLE);
 

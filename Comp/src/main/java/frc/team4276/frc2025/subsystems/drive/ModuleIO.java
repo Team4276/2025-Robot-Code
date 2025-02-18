@@ -27,6 +27,7 @@ public interface ModuleIO {
 
     public boolean turnConnected = false;
     public Rotation2d turnPosition = Rotation2d.kZero;
+    public Rotation2d zeroHelperTurnPosition = Rotation2d.kZero;
     public double turnVelocityRadPerSec = 0.0;
     public double turnAppliedVolts = 0.0;
     public double turnCurrentAmps = 0.0;
@@ -37,23 +38,30 @@ public interface ModuleIO {
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(ModuleIOInputs inputs) {}
+  public default void updateInputs(ModuleIOInputs inputs) {
+  }
 
   /** Run the drive motor at the specified open loop value. */
-  public default void setDriveOpenLoop(double output) {}
+  public default void setDriveOpenLoop(double output) {
+  }
 
   /** Run the turn motor at the specified open loop value. */
-  public default void setTurnOpenLoop(double output) {}
+  public default void setTurnOpenLoop(double output) {
+  }
 
   /** Run the drive motor at the specified velocity. */
-  public default void runDriveVelocitySetpoint(double velocityRadPerSec) {}
+  public default void runDriveVelocitySetpoint(double velocityRadPerSec) {
+  }
 
   /** Run to drive velocity setpoint with feedforward */
-  public default void runDriveVelocitySetpoint(double velocityRadsPerSec, double feedForward) {}
+  public default void runDriveVelocitySetpoint(double velocityRadsPerSec, double feedForward) {
+  }
 
   /** Run the turn motor to the specified rotation. */
-  public default void setTurnPosition(Rotation2d rotation) {}
-  
+  public default void setTurnPosition(Rotation2d rotation) {
+  }
+
   /** Set brake mode on drive motor */
-  public default void setBrakeMode(boolean enabled) {}
+  public default void setBrakeMode(boolean enabled) {
+  }
 }

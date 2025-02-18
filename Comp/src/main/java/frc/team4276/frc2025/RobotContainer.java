@@ -84,7 +84,7 @@ public class RobotContainer {
 
   // Controller
   private boolean useKeyboard = false;
-  private boolean isDemo = false;
+  private boolean isDemo = true;
 
   private final BetterXboxController driver = new BetterXboxController(0);
   private final CommandGenericHID buttonBoard = new CommandGenericHID(1);
@@ -371,26 +371,32 @@ public class RobotContainer {
     // .povUp()
     // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L3));
 
-    driver
-        .rightBumper()
-        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.INTAKE));
+    // driver
+    // .rightBumper()
+    // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.INTAKE));
 
-    driver
-        .rightTrigger()
-        .whileTrue(superstructure.scoreCommand());
+    // driver
+    // .rightTrigger()
+    // .whileTrue(superstructure.scoreCommand());
+
+    superstructure.setDefaultCommand(
+        superstructure.run(() -> superstructure.acceptCharacterizationInput(
+            4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
+        // 0.0
+        )));
 
     // arm.setDefaultCommand(
     // arm.run(() -> arm.runCharacterization(
     // // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
     // 0.0)));
 
-    driver
-        .povDown()
-        .whileTrue(arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(roller.setGoalCommand(Roller.Goal.INTAKE)));
+    // driver
+    // .povDown()
+    // .whileTrue(arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(roller.setGoalCommand(Roller.Goal.INTAKE)));
 
-    driver
-        .povUp()
-        .whileTrue(arm.setGoalCommand(Arm.Goal.SCORE).alongWith(roller.setGoalCommand(Roller.Goal.SCORE)));
+    // driver
+    // .povUp()
+    // .whileTrue(arm.setGoalCommand(Arm.Goal.SCORE).alongWith(roller.setGoalCommand(Roller.Goal.SCORE)));
   }
 
   private void configureKeyBoardBindings() {
@@ -560,7 +566,7 @@ public class RobotContainer {
 
     driver
         .povUp()
-        .whileTrue(superstructure.unjamCommand());
+        .toggleOnTrue(superstructure.unjamCommand());
 
     // Algae Scoring Triggers
     driver

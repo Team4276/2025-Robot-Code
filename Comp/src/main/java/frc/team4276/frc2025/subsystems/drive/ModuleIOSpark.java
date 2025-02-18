@@ -46,6 +46,7 @@ import java.util.function.DoubleSupplier;
  */
 public class ModuleIOSpark implements ModuleIO {
   private final Rotation2d zeroRotation;
+  private final Rotation2d zeroHelperRotation;
 
   // Hardware objects
   private final SparkFlex driveSpark;
@@ -76,6 +77,13 @@ public class ModuleIOSpark implements ModuleIO {
       case 1 -> frontRightZeroRotation;
       case 2 -> backLeftZeroRotation;
       case 3 -> backRightZeroRotation;
+      default -> Rotation2d.kZero;
+    };
+    zeroHelperRotation = switch (module) {
+      case 0 -> frontLeftZeroHelperRotation;
+      case 1 -> frontRightZeroHelperRotation;
+      case 2 -> backLeftZeroHelperRotation;
+      case 3 -> backRightZeroHelperRotation;
       default -> Rotation2d.kZero;
     };
     driveSpark = new SparkFlex(
@@ -194,6 +202,7 @@ public class ModuleIOSpark implements ModuleIO {
         new DoubleSupplier[] { turnSpark::getAppliedOutput, turnSpark::getBusVoltage },
         (values) -> inputs.turnAppliedVolts = values[0] * values[1]);
     ifOk(turnSpark, turnSpark::getOutputCurrent, (value) -> inputs.turnCurrentAmps = value);
+    inputs.zeroHelperTurnPosition = inputs.turnPosition.minus(zeroHelperRotation);
     inputs.turnConnected = turnConnectedDebounce.calculate(!sparkStickyFault);
 
     // Update odometry inputs
@@ -257,8 +266,8 @@ public class ModuleIOSpark implements ModuleIO {
                           : SparkBaseConfig.IdleMode.kCoast),
                   SparkBase.ResetMode.kNoResetSafeParameters,
                   SparkBase.PersistMode.kNoPersistParameters));
-                })
+        })
         .start();
-      
+
   }
 }

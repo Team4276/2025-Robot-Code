@@ -34,13 +34,11 @@ public class Module {
   public Module(ModuleIO io, int index) {
     this.io = io;
     this.index = index;
-    driveDisconnectedAlert =
-        new Alert(
-            "Disconnected drive motor on module " + Integer.toString(index) + ".",
-            AlertType.kError);
-    turnDisconnectedAlert =
-        new Alert(
-            "Disconnected turn motor on module " + Integer.toString(index) + ".", AlertType.kError);
+    driveDisconnectedAlert = new Alert(
+        "Disconnected drive motor on module " + Integer.toString(index) + ".",
+        AlertType.kError);
+    turnDisconnectedAlert = new Alert(
+        "Disconnected turn motor on module " + Integer.toString(index) + ".", AlertType.kError);
   }
 
   public void periodic() {
@@ -61,7 +59,10 @@ public class Module {
     turnDisconnectedAlert.set(!inputs.turnConnected);
   }
 
-  /** Runs the module with the specified setpoint state. Mutates the state to optimize it. */
+  /**
+   * Runs the module with the specified setpoint state. Mutates the state to
+   * optimize it.
+   */
   public void runSetpoint(SwerveModuleState state, SwerveModuleState torqueFF) {
     // Optimize state
     state.optimize(inputs.turnPosition);
@@ -74,7 +75,9 @@ public class Module {
     io.setTurnPosition(state.angle);
   }
 
-  /** Runs the module with the specified output while controlling to zero degrees. */
+  /**
+   * Runs the module with the specified output while controlling to zero degrees.
+   */
   public void runCharacterization(double output) {
     io.setDriveOpenLoop(output);
     io.setTurnPosition(Rotation2d.kZero);
@@ -129,5 +132,9 @@ public class Module {
   /** Returns the module velocity in rad/sec. */
   public double getFFCharacterizationVelocity() {
     return inputs.driveVelocityRadPerSec;
+  }
+
+  public SwerveModuleState getZeroHelperModuleState() {
+    return new SwerveModuleState(getVelocityMetersPerSec(), inputs.zeroHelperTurnPosition);
   }
 }

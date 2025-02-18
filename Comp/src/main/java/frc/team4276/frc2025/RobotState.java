@@ -96,6 +96,11 @@ public class RobotState {
     return poseEstimatorOdom.getEstimatedPosition();
   }
 
+  @AutoLogOutput(key = "RobotState/EstimatedVisionPose")
+  public Pose2d getEstimatedVisionPose() {
+    return poseEstimator.getEstimatedPosition();
+  }
+
   private boolean useTrajectorySetpoint() {
     return enableSimTrajPoseEstimation
         ? false

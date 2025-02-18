@@ -41,10 +41,15 @@ public class DriveConstants {
   public static final double maxAngularAccel = 33.9;
 
   // Zeroed rotation values for each module, see setup instructions
-  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(1.446);
-  public static final Rotation2d frontRightZeroRotation = new Rotation2d(-0.024);
-  public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.037);
-  public static final Rotation2d backRightZeroRotation = new Rotation2d(2.538);
+  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(1.52507);
+  public static final Rotation2d frontRightZeroRotation = new Rotation2d(0.0318);
+  public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.034);
+  public static final Rotation2d backRightZeroRotation = new Rotation2d(2.5579);
+
+  public static final Rotation2d frontLeftZeroHelperRotation = Rotation2d.kCCW_90deg;
+  public static final Rotation2d frontRightZeroHelperRotation = Rotation2d.kZero;
+  public static final Rotation2d backLeftZeroHelperRotation = Rotation2d.k180deg;
+  public static final Rotation2d backRightZeroHelperRotation = Rotation2d.kCW_90deg;
 
   // Device CAN IDs
   public static final int frontLeftDriveCanId = Ports.FRONT_LEFT_DRIVE;
