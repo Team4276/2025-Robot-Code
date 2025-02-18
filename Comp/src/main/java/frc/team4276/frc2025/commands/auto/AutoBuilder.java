@@ -104,9 +104,10 @@ public class AutoBuilder {
 
     for (int i = 0; i < reefs.size(); i++) {
       scoringCommands.addCommands(
-          followTrajectory(drive, trajs.get(i * 2)),
-          superstructure.setGoalCommand(toGoal(levels.get(i)))
-              .raceWith(Commands.waitUntil(superstructure::atGoal).andThen(scoreCommand(superstructure))));
+          followTrajectory(drive, trajs.get(i * 2), () -> false)
+              .withDeadline(Commands.waitUntil(drive::isTrajectoryCompleted)
+                  .andThen(superstructure.setGoalCommand(toGoal(levels.get(i)))
+                      .raceWith(Commands.waitUntil(superstructure::atGoal).andThen(scoreCommand(superstructure))))));
 
       if (i != reefs.size() - 1 && !cancelLastIntake) {
         scoringCommands.addCommands(superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
@@ -298,24 +299,24 @@ public class AutoBuilder {
 
   public Command vanHybridAuto() {
     var command = algaeStart(AutoQuestionResponse.CLOSE)
-    .andThen(coralScoreAuto(
-        List.of(
-            AutoQuestionResponse.A,
-            AutoQuestionResponse.A,
-            AutoQuestionResponse.B,
-            AutoQuestionResponse.B),
-        List.of(
-            AutoQuestionResponse.L2,
-            AutoQuestionResponse.L1_LEFT,
-            AutoQuestionResponse.L2,
-            AutoQuestionResponse.L1_RIGHT),
-        List.of(
-            AutoQuestionResponse.CLOSE,
-            AutoQuestionResponse.CLOSE,
-            AutoQuestionResponse.CLOSE,
-            AutoQuestionResponse.CLOSE),
-        false,
-        AutoQuestionResponse.CLOSE));
+        .andThen(coralScoreAuto(
+            List.of(
+                AutoQuestionResponse.A,
+                AutoQuestionResponse.A,
+                AutoQuestionResponse.B,
+                AutoQuestionResponse.B),
+            List.of(
+                AutoQuestionResponse.L2,
+                AutoQuestionResponse.L1_LEFT,
+                AutoQuestionResponse.L2,
+                AutoQuestionResponse.L1_RIGHT),
+            List.of(
+                AutoQuestionResponse.CLOSE,
+                AutoQuestionResponse.CLOSE,
+                AutoQuestionResponse.CLOSE,
+                AutoQuestionResponse.CLOSE),
+            false,
+            AutoQuestionResponse.CLOSE));
     return command;
   }
 
