@@ -5,10 +5,15 @@ import org.littletonrobotics.junction.AutoLog;
 public interface RollerSensorsIO {
   @AutoLog
   class RollerSensorsIOInputs {
-    boolean read = false;
-    boolean tripped = false;
-    boolean cleared = false;
+    boolean frontRead = false;
+    boolean frontTripped = false;
+    boolean frontCleared = false;
+
+    boolean backRead = false;
+    boolean backTripped = false;
+    boolean backCleared = false;
   }
 
-  default void updateInputs(RollerSensorsIOInputs inputs) {}
+  default void updateInputs(RollerSensorsIOInputs inputs) {
+  }
 }

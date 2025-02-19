@@ -13,12 +13,13 @@ import frc.team4276.util.dashboard.Elastic;
 import frc.team4276.util.dashboard.Elastic.Notification;
 import frc.team4276.util.dashboard.Elastic.Notification.NotificationLevel;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 public class AutoCommands {
   private AutoCommands() {
   }
-  
+
   public static final double scoreWaitTime = 0.5;
   public static final double intakeWaitTime = 0.5;
 
@@ -38,11 +39,28 @@ public class AutoCommands {
    * Creates a command that follows a trajectory, command ends when the trajectory
    * is finished
    */
+  public static Command followTrajectory(Drive drive, PathPlannerTrajectory trajectory, BooleanSupplier endCondition) {
+    return followTrajectory(drive, () -> trajectory, endCondition);
+  }
+
+  /**
+   * Creates a command that follows a trajectory, command ends when the trajectory
+   * is finished
+   */
   public static Command followTrajectory(
       Drive drive, Supplier<PathPlannerTrajectory> trajectorySupplier) {
+    return followTrajectory(drive, trajectorySupplier, drive::isTrajectoryCompleted);
+  }
+
+  /**
+   * Creates a command that follows a trajectory, command ends when the trajectory
+   * is finished
+   */
+  public static Command followTrajectory(
+      Drive drive, Supplier<PathPlannerTrajectory> trajectorySupplier, BooleanSupplier endCondition) {
     return Commands.startEnd(
         () -> drive.setTrajectory(trajectorySupplier.get()), drive::clearTrajectory)
-        .until(drive::isTrajectoryCompleted);
+        .until(endCondition);
   }
 
   /**

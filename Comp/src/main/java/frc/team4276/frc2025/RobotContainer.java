@@ -59,6 +59,7 @@ import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffectorIOS
 import frc.team4276.frc2025.subsystems.vision.Vision;
 import frc.team4276.frc2025.subsystems.vision.VisionConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO;
+import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVision;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.BetterXboxController;
@@ -133,13 +134,11 @@ public class RobotContainer {
           roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40,
               false, true));
           vision = new Vision(
-              RobotState.getInstance()::addVisionMeasurement
-          // ,
-          // new VisionIOPhotonVision(
-          // VisionConstants.camera0Name, VisionConstants.robotToCamera0),
-          // new VisionIOPhotonVision(
-          // VisionConstants.camera1Name, VisionConstants.robotToCamera1)
-          );
+              RobotState.getInstance()::addVisionMeasurement,
+              new VisionIOPhotonVision(
+                  VisionConstants.camera0Name, VisionConstants.robotToCamera0),
+              new VisionIOPhotonVision(
+                  VisionConstants.camera1Name, VisionConstants.robotToCamera1));
         }
 
         case SIM -> {

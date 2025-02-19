@@ -5,12 +5,18 @@ import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.DriveFeedforwards;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.wpilibj.Timer;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
+
+import java.util.List;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -40,6 +46,11 @@ public class TrajectoryController {
   private final PIDController rotationController;
 
   private final double[] moduleForces = { 0.0, 0.0, 0.0, 0.0 };
+  private final List<Vector<N2>> moduleForcesActual = List.of( // TODO: move to drive class
+      VecBuilder.fill(0.0, 0.0),
+      VecBuilder.fill(0.0, 0.0),
+      VecBuilder.fill(0.0, 0.0),
+      VecBuilder.fill(0.0, 0.0));
   private final double[] dummyForces = { 0.0, 0.0, 0.0, 0.0 };
 
   public TrajectoryController() {
@@ -60,7 +71,7 @@ public class TrajectoryController {
     timeOffset = 0.0;
   }
 
-  public ChassisSpeeds update(Pose2d currentPose) {    
+  public ChassisSpeeds update(Pose2d currentPose) {
     xController.setPID(translationkP.getAsDouble(), 0.0, translationkD.getAsDouble());
     xController.setTolerance(translationKTol.getAsDouble());
 
@@ -70,9 +81,9 @@ public class TrajectoryController {
     rotationController.setPID(rotationkP.getAsDouble(), 0.0, rotationkD.getAsDouble());
     rotationController.setTolerance(Math.toRadians(rotationKTol.getAsDouble()));
 
-     if(getTrajectoryTime() > traj.getTotalTimeSeconds()){
+    if (getTrajectoryTime() > traj.getTotalTimeSeconds()) {
       isFinished = true;
-     }
+    }
 
     var sampledState = traj.sample(getTrajectoryTime());
 
@@ -91,15 +102,20 @@ public class TrajectoryController {
 
     RobotState.getInstance().setTrajectorySetpoint(sampledState.pose);
 
+    moduleForcesActual.clear();
     for (int i = 0; i < 4; i++) {
       moduleForces[i] = sampledState.feedforwards.linearForcesNewtons()[i];
+      moduleForcesActual.add(new Translation2d(
+          sampledState.feedforwards.robotRelativeForcesXNewtons()[i],
+          sampledState.feedforwards.robotRelativeForcesYNewtons()[i]).toVector());
     }
 
     double xError = sampledState.pose.getX() - currentPose.getTranslation().getX();
     double yError = sampledState.pose.getY() - currentPose.getTranslation().getY();
     double xFeedback = xController.calculate(0.0, xError);
     double yFeedback = yController.calculate(0.0, yError);
-    double thetaError = MathUtil.angleModulus(sampledState.pose.getRotation().minus(currentPose.getRotation()).getRadians());
+    double thetaError = MathUtil
+        .angleModulus(sampledState.pose.getRotation().minus(currentPose.getRotation()).getRadians());
     double thetaFeedback = rotationController.calculate(0.0, thetaError);
 
     ChassisSpeeds outputSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(

@@ -38,7 +38,7 @@ public class VisionConstants {
       Units.inchesToMeters(1.573079),
       Units.inchesToMeters(9.498816) * -1.0,
       Units.inchesToMeters(39.580820),
-      new Rotation3d(0.0, Math.toRadians(25.0) * -1.0, 0.0));
+      new Rotation3d(0.0, Math.toRadians(25.0) * -1.0, Math.PI));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
@@ -54,7 +54,7 @@ public class VisionConstants {
   // (Adjust to trust some cameras more than others)
   public static double[] cameraStdDevFactors = new double[] {
       1.0, // Camera 0
-      1.0 // Camera 1
+      0.75 // Camera 1
   };
 
   // Multipliers to apply for MegaTag 2 observations
