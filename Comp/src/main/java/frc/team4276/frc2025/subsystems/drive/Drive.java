@@ -19,11 +19,15 @@ import static frc.team4276.frc2025.subsystems.drive.DriveConstants.*;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
+
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -81,6 +85,7 @@ public class Drive extends SubsystemBase {
   private final SwerveSetpointGenerator swerveSetpointGenerator = new SwerveSetpointGenerator(driveConfig,
       maxSteerVelocity);
   private SwerveSetpoint prevSetpoint;
+  private boolean disableTrajFF = true;
 
   private DriveMode mode = DriveMode.TELEOP;
   private boolean isHeadingControlled = false;
@@ -249,24 +254,12 @@ public class Drive extends SubsystemBase {
 
       // Send setpoints to modules
       for (int i = 0; i < 4; i++) {
-        if (mode == DriveMode.TRAJECTORY) {
-          // setpointTorques[i] =
-          // new SwerveModuleState(
-          // trajectoryController
-          // .getModuleForces()[i]
-          // .getAngle()
-          // .minus(setpointStates[i].angle)
-          // .getCos()
-          // * trajectoryController.getModuleForces()[i].getNorm()
-          // * wheelRadiusMeters,
-          // setpointStates[i].angle);
-          setpointTorques[i] = new SwerveModuleState(
-              trajectoryController.getModuleForces()[i] * wheelRadiusMeters,
-              setpointStates[i].angle);
-        } else {
-          setpointTorques[i] = new SwerveModuleState(0.0, setpointStates[i].angle);
+        Vector<N2> forces = VecBuilder.fill(0.0, 0.0);
+        if (mode == DriveMode.TRAJECTORY && !disableTrajFF) {
+          forces = trajectoryController.getModuleForces().get(i);
         }
-        modules[i].runSetpoint(setpointStates[i], setpointTorques[i]);
+
+        modules[i].runSetpoint(setpointStates[i], forces);
       }
 
       // Log optimized setpoints (runSetpoint mutates each state)

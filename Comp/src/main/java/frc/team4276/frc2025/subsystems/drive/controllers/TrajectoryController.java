@@ -8,7 +8,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.Vector;
@@ -16,6 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -45,8 +45,7 @@ public class TrajectoryController {
   private final PIDController yController;
   private final PIDController rotationController;
 
-  private final double[] moduleForces = { 0.0, 0.0, 0.0, 0.0 };
-  private final List<Vector<N2>> moduleForcesActual = List.of( // TODO: move to drive class
+  private List<Vector<N2>> moduleForces = List.of(
       VecBuilder.fill(0.0, 0.0),
       VecBuilder.fill(0.0, 0.0),
       VecBuilder.fill(0.0, 0.0),
@@ -102,12 +101,12 @@ public class TrajectoryController {
 
     RobotState.getInstance().setTrajectorySetpoint(sampledState.pose);
 
-    moduleForcesActual.clear();
+    moduleForces = new ArrayList<>();
     for (int i = 0; i < 4; i++) {
-      moduleForces[i] = sampledState.feedforwards.linearForcesNewtons()[i];
-      moduleForcesActual.add(new Translation2d(
+      moduleForces.add(VecBuilder.fill(
           sampledState.feedforwards.robotRelativeForcesXNewtons()[i],
-          sampledState.feedforwards.robotRelativeForcesYNewtons()[i]).toVector());
+          sampledState.feedforwards.robotRelativeForcesYNewtons()[i]));
+
     }
 
     double xError = sampledState.pose.getX() - currentPose.getTranslation().getX();
@@ -148,7 +147,7 @@ public class TrajectoryController {
     return isFinished;
   }
 
-  public double[] getModuleForces() {
+  public List<Vector<N2>> getModuleForces() {
     return moduleForces;
   }
 }
