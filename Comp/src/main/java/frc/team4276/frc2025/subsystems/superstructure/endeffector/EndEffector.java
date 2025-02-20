@@ -16,9 +16,9 @@ public class EndEffector extends SubsystemBase {
 
   public enum Goal {
     IDLE(() -> 0.0, () -> 0.0),
-    INTAKE(new LoggedTunableNumber("EndEffector/IntakeVolts", 6.0)),
+    INTAKE(new LoggedTunableNumber("EndEffector/IntakeVolts", 5.0)),
+    SLOINTAKE(new LoggedTunableNumber("EndEffector/SlowIntakeVolts", 3.0)),
     SCORE(new LoggedTunableNumber("EndEffector/ScoreVolts", 8.0)),
-    // TODO: Firgure out what to bind this to and if we even need it
     REVERSE(new LoggedTunableNumber("EndEffector/ReverseVolts", -3.0)),
     FAVOR_LEFT(favorVolts, lagVolts),
     FAVOR_RIGHT(lagVolts, favorVolts);

@@ -503,17 +503,21 @@ public class RobotContainer {
         .x()
         .whileTrue(
             superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
-                .alongWith(
+                .alongWith(Commands.either(
+                    Commands.none(),
                     DriveCommands.headingAlignCommand(drive,
-                        () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(305.0)))));
+                        () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(305.0))),
+                    () -> disableHeadingAutoAlign)));
 
     driver
         .b()
         .whileTrue(
             superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
-                .alongWith(
+                .alongWith(Commands.either(
+                    Commands.none(),
                     DriveCommands.headingAlignCommand(drive,
-                        () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(55.0)))));
+                        () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(55.0))),
+                    () -> disableHeadingAutoAlign)));
 
     // Algae Intake Trigger
     driver
