@@ -40,6 +40,9 @@ public class Superstructure extends SubsystemBase {
 
   private double elevatorCharacterizationInput = 0.0;
 
+  private boolean cleared1 = false;
+  private boolean cleared2 = false;
+
   public Superstructure(Elevator elevator, EndEffector endeffector, RollerSensorsIO sensorsIO) {
     this.elevator = elevator;
     this.endeffector = endeffector;
@@ -53,7 +56,7 @@ public class Superstructure extends SubsystemBase {
   @Override
   public void periodic() {
     sensorsIO.updateInputs(sensorsInputs);
-    Logger.processInputs("RollersSensors", sensorsInputs);
+    Logger.processInputs("Superstructure/RollersSensors", sensorsInputs);
 
     currentGoal = desiredGoal.get();
 
@@ -69,6 +72,10 @@ public class Superstructure extends SubsystemBase {
 
     }
 
+    if (currentGoal != Goal.INTAKE) {
+      cleared1 = false;
+    }
+
     switch (currentGoal) {
       case STOW:
         elevator.setGoal(Elevator.Goal.STOW);
@@ -82,7 +89,20 @@ public class Superstructure extends SubsystemBase {
 
       case INTAKE:
         elevator.setGoal(Elevator.Goal.STOW);
-        endeffector.setGoal(EndEffector.Goal.INTAKE);
+        if (sensorsInputs.backTripped) {
+          cleared2 = true;
+        }
+        if (sensorsInputs.backCleared || cleared1) {
+          if (sensorsInputs.frontTripped) {
+            cleared2 = false;
+          }
+          cleared1 = true;
+          endeffector.setGoal(EndEffector.Goal.IDLE);
+
+        } else {
+          endeffector.setGoal(EndEffector.Goal.INTAKE);
+
+        }
 
         break;
 

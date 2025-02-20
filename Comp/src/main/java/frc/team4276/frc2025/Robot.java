@@ -46,12 +46,12 @@ import org.littletonrobotics.urcl.URCL;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
-  
+
   private final Timer canInitialErrorTimer = new Timer();
   private final Timer canErrorTimer = new Timer();
   private static final double canErrorTimeThreshold = 0.5; // Seconds to disable alert
-  private final Alert canErrorAlert =
-      new Alert("CAN errors detected, robot may not be controllable.", AlertType.kError);
+  private final Alert canErrorAlert = new Alert("CAN errors detected, robot may not be controllable.",
+      AlertType.kError);
 
   private boolean autoMessagePrinted = false;
   private double autoStart = 0.0;
@@ -127,7 +127,7 @@ public class Robot extends LoggedRobot {
             (Command command) -> {
               logCommandFunction.accept(command, false);
             });
-            
+
     // Reset alert timers
     canInitialErrorTimer.restart();
     canErrorTimer.restart();
@@ -201,7 +201,7 @@ public class Robot extends LoggedRobot {
     autoMessagePrinted = false;
     autoStart = Timer.getFPGATimestamp();
 
-    if(!Constants.isTuning){
+    if (!Constants.isTuning) {
       Elastic.selectTab("Auto");
     }
 
@@ -230,7 +230,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    if(!Constants.isTuning){
+    if (!Constants.isTuning) {
       Elastic.selectTab("Teleop");
     }
   }

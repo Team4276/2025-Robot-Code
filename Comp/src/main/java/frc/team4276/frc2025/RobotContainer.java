@@ -85,7 +85,7 @@ public class RobotContainer {
 
   // Controller
   private boolean useKeyboard = false;
-  private boolean isDemo = true;
+  private boolean isDemo = false;
 
   private final BetterXboxController driver = new BetterXboxController(0);
   private final CommandGenericHID buttonBoard = new CommandGenericHID(1);
@@ -442,9 +442,11 @@ public class RobotContainer {
             Commands.sequence(
                 DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
                     .until(() -> drive.isAutoAligned()
-                        && (Constants.getType() == RobotType.SIMBOT ? true : superstructure.atGoal())),
+                        && (Constants.getType() == RobotType.SIMBOT ? true
+                            : superstructure.atGoal())),
                 DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose)
-                    .alongWith(superstructure.setGoalCommand(() -> scoringHelper.getSuperstructureGoal())))
+                    .alongWith(superstructure
+                        .setGoalCommand(() -> scoringHelper.getSuperstructureGoal())))
                 .alongWith(
                     Commands
                         .waitUntil(() -> drive.disableBackVision())

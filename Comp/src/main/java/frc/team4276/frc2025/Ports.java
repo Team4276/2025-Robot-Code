@@ -24,7 +24,7 @@ public class Ports {
   public static final int ELEVATOR_COAST_OVERRIDE = 0;
   public static final int ARM_COAST_OVERRIDE = 1;
 
-  public static final int CORAL_BREAK_FRONT = 3;
-  public static final int CORAL_BREAK_BACK = 4;
+  public static final int CORAL_BREAK_FRONT = 7;
+  public static final int CORAL_BREAK_BACK = 8;
 
 }
