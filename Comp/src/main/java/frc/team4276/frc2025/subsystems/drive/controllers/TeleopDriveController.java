@@ -7,7 +7,7 @@ import frc.team4276.frc2025.subsystems.drive.DriveConstants;
 import frc.team4276.util.AllianceFlipUtil;
 
 public class TeleopDriveController {
-  private static final double LINEAR_VELOCITY_SCALAR = 1.0;
+  private static final double LINEAR_VELOCITY_SCALAR = 0.5;
   private static final double ANGULAR_VELOCITY_SCALAR = 0.65;
 
   private double controllerX = 0.0;

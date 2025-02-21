@@ -18,12 +18,12 @@ public class AutoAlignController {
   private final LoggedTunableNumber translationkP = new LoggedTunableNumber("AutoAlignController/Translation/kP", 1.0);
   private final LoggedTunableNumber translationkD = new LoggedTunableNumber("AutoAlignController/Translation/kD", 0.0);
   private final LoggedTunableNumber translationKTol = new LoggedTunableNumber(
-      "AutoAlignController/Translation/Tolerance", 0.1);
+      "AutoAlignController/Translation/Tolerance", 0.05);
 
   private final LoggedTunableNumber rotationkP = new LoggedTunableNumber("AutoAlignController/Rotation/kP", 0.5);
   private final LoggedTunableNumber rotationkD = new LoggedTunableNumber("AutoAlignController/Rotation/kD", 0.0);
   private final LoggedTunableNumber rotationKTol = new LoggedTunableNumber(
-      "AutoAlignController/Rotation/ToleranceDegrees", 1.0);
+      "AutoAlignController/Rotation/ToleranceDegrees", 3.0);
 
   private final ProfiledPIDController translationController;
   private final ProfiledPIDController headingController;

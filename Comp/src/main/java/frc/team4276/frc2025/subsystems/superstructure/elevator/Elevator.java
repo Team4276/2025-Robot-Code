@@ -18,6 +18,7 @@ import org.littletonrobotics.junction.Logger;
 public class Elevator {
   public enum Goal {
     STOW(new LoggedTunableNumber("Elevator/StowPosition", Units.inchesToMeters(0.5))),
+    INTAKE(new LoggedTunableNumber("Elevator/IntakePosition", Units.inchesToMeters(0.0))),
     UNJAM(new LoggedTunableNumber("Elevator/UnjamPosition", Units.inchesToMeters(5.5))), // find a better name for this
     L1(new LoggedTunableNumber("Elevator/L1Position", Units.inchesToMeters(0.0))),
     L2(new LoggedTunableNumber("Elevator/L2Position", Units.inchesToMeters(5.5))),
@@ -40,13 +41,13 @@ public class Elevator {
 
   private Goal goal = Goal.STOW;
 
-  private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Elevator/maxVel", 1.2);
-  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", 0.6);
+  private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Elevator/maxVel", 2.75);
+  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", 2.0);
 
   // TODO: retune
-  private final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.0); // 0.11
-  private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0.0); // 24.2
-  private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.0); // 0.09
+  private final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.20); // 0.11
+  private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 9.0); // 24.2
+  private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.15); // 0.09
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();

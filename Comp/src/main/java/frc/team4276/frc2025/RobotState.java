@@ -88,7 +88,7 @@ public class RobotState {
 
   @AutoLogOutput(key = "RobotState/EstimatedPose")
   public Pose2d getEstimatedPose() {
-    return useTrajectorySetpoint() ? trajectorySetpoint : poseEstimatorOdom.getEstimatedPosition();
+    return useTrajectorySetpoint() ? trajectorySetpoint : poseEstimator.getEstimatedPosition();
   }
 
   @AutoLogOutput(key = "RobotState/EstimatedOdomPose")

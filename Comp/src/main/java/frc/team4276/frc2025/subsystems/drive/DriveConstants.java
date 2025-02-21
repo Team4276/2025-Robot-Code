@@ -81,7 +81,7 @@ public class DriveConstants {
   // Drive PID configuration
   public static final double driveKp = 0.001;
   public static final double driveKd = 0.0;
-  public static final double driveKs = 0.0;
+  public static final double driveKs = 0.177;
   public static final double driveKv = 12.0 / (driveGearbox.freeSpeedRadPerSec / driveMotorReduction);
   public static final double driveSimP = 1.0;
   public static final double driveSimD = 0.0;
@@ -126,4 +126,5 @@ public class DriveConstants {
   public static final double ffkT = 1.0 / DCMotor.getNeoVortex(1).KtNMPerAmp;
 
   public static final double disableBackVisionDistance = 0.5; // Cancel secondary camera for more precise alignment
+  public static final double reefAlignThreshold = 0.5; // Distance before we begin auto aligning
 }

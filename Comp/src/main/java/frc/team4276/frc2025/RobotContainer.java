@@ -136,9 +136,11 @@ public class RobotContainer {
           vision = new Vision(
               RobotState.getInstance()::addVisionMeasurement,
               new VisionIOPhotonVision(
-                  VisionConstants.camera0Name, VisionConstants.robotToCamera0),
-              new VisionIOPhotonVision(
-                  VisionConstants.camera1Name, VisionConstants.robotToCamera1));
+                  VisionConstants.camera0Name, VisionConstants.robotToCamera0)
+          // ,
+          // new VisionIOPhotonVision(
+          // VisionConstants.camera1Name, VisionConstants.robotToCamera1)
+          );
         }
 
         case SIM -> {
@@ -358,31 +360,31 @@ public class RobotContainer {
                 drive)
                 .ignoringDisable(false));
 
-    // driver
-    // .povDown()
-    // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L1));
+    driver
+        .povDown()
+        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L1));
 
-    // driver
-    // .povLeft()
-    // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L2));
+    driver
+        .povLeft()
+        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L2));
 
-    // driver
-    // .povUp()
-    // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L3));
+    driver
+        .povUp()
+        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L3));
 
-    // driver
-    // .rightBumper()
-    // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.INTAKE));
+    driver
+        .rightBumper()
+        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.INTAKE));
 
     // driver
     // .rightTrigger()
     // .whileTrue(superstructure.scoreCommand());
 
-    superstructure.setDefaultCommand(
-        superstructure.run(() -> superstructure.acceptCharacterizationInput(
-            4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
-        // 0.0
-        )));
+    // superstructure.setDefaultCommand(
+    // superstructure.run(() -> superstructure.acceptCharacterizationInput(
+    // 3.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
+    // // 0.0
+    // )));
 
     // arm.setDefaultCommand(
     // arm.run(() -> arm.runCharacterization(
@@ -440,6 +442,7 @@ public class RobotContainer {
         .button(12)
         .whileTrue(
             Commands.sequence(
+                Commands.waitUntil(drive::inReefAlignThreshold),
                 DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
                     .until(() -> drive.isAutoAligned()
                         && (Constants.getType() == RobotType.SIMBOT ? true
@@ -528,11 +531,13 @@ public class RobotContainer {
 
     // Coral Scoring Triggers
     var driveReefCommand = Commands.sequence(
+        Commands.waitUntil(drive::inReefAlignThreshold),
         DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
             .until(() -> drive.isAutoAligned()
                 && (Constants.getType() == RobotType.SIMBOT ? true : superstructure.atGoal())),
         DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose)
-            .alongWith(superstructure.setGoalCommand(() -> scoringHelper.getSuperstructureGoal())))
+            .alongWith(
+                superstructure.setGoalCommand(() -> scoringHelper.getSuperstructureGoal()).until(drive::isAutoAligned)))
         .alongWith(
             Commands
                 .waitUntil(() -> drive.disableBackVision())
@@ -554,12 +559,10 @@ public class RobotContainer {
                     () -> disableTranslationAutoAlign),
                 () -> disableHeadingAutoAlign));
 
-    // driver
-    // .rightStick()
-    // .onTrue(
-    // Commands.runOnce(() ->
-    // disableTranslationAutoAlign = !disableTranslationAutoAlign
-    // ));
+    driver
+        .rightStick()
+        .onTrue(
+            Commands.runOnce(() -> disableTranslationAutoAlign = !disableTranslationAutoAlign));
 
     driver
         .povDown()
@@ -567,7 +570,7 @@ public class RobotContainer {
 
     driver
         .rightBumper()
-        .onTrue(superstructure.scoreCommand(false));
+        .whileTrue(superstructure.scoreCommand(false));
 
     driver
         .povUp()

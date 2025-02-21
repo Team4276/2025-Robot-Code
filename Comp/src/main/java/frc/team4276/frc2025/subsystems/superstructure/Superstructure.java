@@ -51,7 +51,7 @@ public class Superstructure extends SubsystemBase {
 
     elevator.setCoastOverride(() -> false);
 
-    setDefaultCommand(setGoalCommand(() -> Superstructure.Goal.CHARACTERIZING));
+    setDefaultCommand(setGoalCommand(() -> Superstructure.Goal.STOW));
   }
 
   @Override
@@ -75,6 +75,8 @@ public class Superstructure extends SubsystemBase {
 
     if (currentGoal != Goal.INTAKE) {
       cleared1 = false;
+      cleared2 = false;
+      cleared3 = false;
     }
 
     switch (currentGoal) {
@@ -89,11 +91,11 @@ public class Superstructure extends SubsystemBase {
         endeffector.setGoal(EndEffector.Goal.IDLE);
 
       case INTAKE:
-        elevator.setGoal(Elevator.Goal.STOW);
-        if(sensorsInputs.backTripped || cleared3){
+        elevator.setGoal(Elevator.Goal.INTAKE);
+        if ((sensorsInputs.backTripped && cleared2) || cleared3) {
           cleared3 = true;
           endeffector.setGoal(EndEffector.Goal.IDLE);
-        } else if(sensorsInputs.backCleared || cleared2){
+        } else if (sensorsInputs.backCleared || cleared2) {
           cleared2 = true;
           endeffector.setGoal(EndEffector.Goal.REVERSE);
         } else if (sensorsInputs.backTripped || cleared1) {

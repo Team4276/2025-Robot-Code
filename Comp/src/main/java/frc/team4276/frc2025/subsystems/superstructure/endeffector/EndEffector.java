@@ -16,10 +16,10 @@ public class EndEffector extends SubsystemBase {
 
   public enum Goal {
     IDLE(() -> 0.0, () -> 0.0),
-    INTAKE(new LoggedTunableNumber("EndEffector/IntakeVolts", 5.0)),
+    INTAKE(new LoggedTunableNumber("EndEffector/IntakeVolts", 6.0)),
     SLOINTAKE(new LoggedTunableNumber("EndEffector/SlowIntakeVolts", 3.0)),
     SCORE(new LoggedTunableNumber("EndEffector/ScoreVolts", 8.0)),
-    REVERSE(new LoggedTunableNumber("EndEffector/ReverseVolts", -3.0)),
+    REVERSE(new LoggedTunableNumber("EndEffector/ReverseVolts", -2.0)),
     FAVOR_LEFT(favorVolts, lagVolts),
     FAVOR_RIGHT(lagVolts, favorVolts);
 
@@ -65,8 +65,10 @@ public class EndEffector extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       goal = Goal.IDLE;
     }
-    coralSensor.update(inputs.leftSupplyCurrentAmps, inputs.leftVelocity, (goal.getLeftVolts() + goal.getRightVolts()) == 0); // average them? The favor left and favor right complicates it ill figure it out after testing 
-    if(coralSensor.getDetection()){
+    coralSensor.update(inputs.leftSupplyCurrentAmps, inputs.leftVelocity,
+        (goal.getLeftVolts() + goal.getRightVolts()) == 0); // average them? The favor left and favor right complicates
+                                                            // it ill figure it out after testing
+    if (coralSensor.getDetection()) {
       System.out.println("detected");
     }
     io.runVolts(goal.getLeftVolts(), goal.getRightVolts());

@@ -3,6 +3,7 @@ package frc.team4276.frc2025;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
@@ -41,18 +42,18 @@ public class ScoringHelper extends VirtualSubsystem {
   };
 
   private final int[] redVizTable = {
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
   };
 
   private final CommandGenericHID buttonBoard;
@@ -63,7 +64,7 @@ public class ScoringHelper extends VirtualSubsystem {
   private Goal level = Goal.L1;
   private int side = 0;
 
-  public ScoringHelper(CommandGenericHID buttonBoard, CommandGenericHID keyboard, boolean useKeyboard){
+  public ScoringHelper(CommandGenericHID buttonBoard, CommandGenericHID keyboard, boolean useKeyboard) {
     this.buttonBoard = buttonBoard;
     this.keyboard = keyboard;
     this.useKeyboard = useKeyboard;
@@ -71,7 +72,7 @@ public class ScoringHelper extends VirtualSubsystem {
 
   @Override
   public void periodic() {
-    if(useKeyboard){
+    if (useKeyboard) {
       updateKeyboard();
     } else {
       updateButtonBoard();
@@ -94,7 +95,7 @@ public class ScoringHelper extends VirtualSubsystem {
     Logger.recordOutput("ScoringHelper/Level", level);
   }
 
-  private void updateButtonBoard(){    
+  private void updateButtonBoard() {
     // Update Positions
     if (buttonBoard.getHID().getRawButtonPressed(9)) {
       isRight = true;
@@ -128,7 +129,7 @@ public class ScoringHelper extends VirtualSubsystem {
     }
   }
 
-  private void updateKeyboard(){
+  private void updateKeyboard() {
     // Update Positions
     if (keyboard.getHID().getRawButtonPressed(1)) {
       isRight = true;
@@ -163,14 +164,16 @@ public class ScoringHelper extends VirtualSubsystem {
   }
 
   public Pose2d getSelectedAlignPose() {
-    return RobotState.getInstance().getPOIs().reefAlign[getSelectedReef()];
-  } 
+    var pose = RobotState.getInstance().getPOIs().reefAlign[getSelectedReef()];
+    return new Pose2d(pose.getTranslation(), pose.getRotation().rotateBy(Rotation2d.kZero));
+  }
 
   public Pose2d getSelectedScorePose() {
-    return RobotState.getInstance().getPOIs().reefScore[getSelectedReef()];
-  }  
+    var pose = RobotState.getInstance().getPOIs().reefScore[getSelectedReef()];
+    return new Pose2d(pose.getTranslation(), pose.getRotation().rotateBy(Rotation2d.kZero));
+  }
 
-  private int getSelectedTableIndex(){
+  private int getSelectedTableIndex() {
     return side * 2 + (isRight ? 0 : 1);
   }
 
