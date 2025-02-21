@@ -13,7 +13,7 @@ public class HeadingController {
   private final LoggedTunableNumber kI = new LoggedTunableNumber("HeadingController/kI", 0.0);
   private final LoggedTunableNumber kD = new LoggedTunableNumber("HeadingController/kD", 0.1);
   private static final LoggedTunableNumber toleranceDegrees = new LoggedTunableNumber(
-      "HeadingController/ToleranceDegrees", 1.0);
+      "HeadingController/ToleranceDegrees", 3.0);
   private PIDController controller;
 
   private Supplier<Rotation2d> targetHeadingSupplier;

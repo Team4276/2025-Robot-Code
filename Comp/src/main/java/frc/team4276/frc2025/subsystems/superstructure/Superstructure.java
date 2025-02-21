@@ -90,6 +90,7 @@ public class Superstructure extends SubsystemBase {
         elevator.setGoal(Elevator.Goal.UNJAM);
         endeffector.setGoal(EndEffector.Goal.IDLE);
 
+        break;
       case INTAKE:
         elevator.setGoal(Elevator.Goal.INTAKE);
         if ((sensorsInputs.backTripped && cleared2) || cleared3) {

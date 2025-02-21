@@ -80,11 +80,13 @@ public class AutoAlignController {
     headingController.setPID(rotationkP.getAsDouble(), 0.0, rotationkD.getAsDouble());
     headingController.setTolerance(Math.toRadians(rotationKTol.getAsDouble()));
 
-    Translation2d trans = currentPose.getTranslation().minus(setpoint.getTranslation());
+    Translation2d trans = setpoint.getTranslation().minus(currentPose.getTranslation());
     Translation2d linearOutput = Translation2d.kZero;
     if (trans.getNorm() > 1e-6) {
       linearOutput = new Translation2d(
-          translationController.calculate(trans.getNorm(), 0.0), trans.getAngle());
+          translationController.calculate(0.0, trans.getNorm()) +
+              translationController.getSetpoint().velocity,
+          trans.unaryMinus().getAngle());
     }
 
     if (!translationController.atGoal()) {
@@ -92,8 +94,8 @@ public class AutoAlignController {
 
     }
 
-    double thetaError = MathUtil.angleModulus(currentPose.getRotation().minus(setpoint.getRotation()).getRadians());
-    double omega = headingController.calculate(thetaError, 0.0);
+    double thetaError = MathUtil.angleModulus(setpoint.getRotation().minus(currentPose.getRotation()).getRadians());
+    double omega = headingController.calculate(0.0, thetaError) + headingController.getSetpoint().velocity;
 
     if (!headingController.atGoal()) {
       headingToleranceTimer.reset();

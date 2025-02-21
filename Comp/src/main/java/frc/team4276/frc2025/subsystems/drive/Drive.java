@@ -323,10 +323,6 @@ public class Drive extends SubsystemBase {
         && getAutoAlignDistanceToGoal().getTranslation().getNorm() < disableBackVisionDistance;
   }
 
-  public boolean inReefAlignThreshold() {
-    return getAutoAlignDistanceToGoal().getTranslation().getNorm() < reefAlignThreshold;
-  }
-
   public boolean isAutoAligned() {
     return autoAlignController.atGoal();
   }

@@ -31,6 +31,7 @@ import frc.team4276.frc2025.AutoSelector.AutoQuestion;
 import frc.team4276.frc2025.AutoSelector.AutoQuestionResponse;
 import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.frc2025.Constants.RobotType;
+import frc.team4276.frc2025.commands.AutoScore;
 import frc.team4276.frc2025.commands.DriveCommands;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
@@ -84,7 +85,7 @@ public class RobotContainer {
   private AutoBuilder autoBuilder;
 
   // Controller
-  private boolean useKeyboard = false;
+  private boolean useKeyboard = true;
   private boolean isDemo = false;
 
   private final BetterXboxController driver = new BetterXboxController(0);
@@ -307,7 +308,6 @@ public class RobotContainer {
         () -> new FeedForwardCharacterization(
             superstructure, superstructure::acceptCharacterizationInput,
             superstructure::getFFCharacterizationVelocity, true));
-
   }
 
   /**
@@ -441,21 +441,8 @@ public class RobotContainer {
     keyboard
         .button(12)
         .whileTrue(
-            Commands.sequence(
-                Commands.waitUntil(drive::inReefAlignThreshold),
-                DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
-                    .until(() -> drive.isAutoAligned()
-                        && (Constants.getType() == RobotType.SIMBOT ? true
-                            : superstructure.atGoal())),
-                DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose)
-                    .alongWith(superstructure
-                        .setGoalCommand(() -> scoringHelper.getSuperstructureGoal())))
-                .alongWith(
-                    Commands
-                        .waitUntil(() -> drive.disableBackVision())
-                        .andThen(() -> vision.setEnableCamera(1,
-                            false)))
-                .finallyDo(() -> vision.setEnableCamera(1, true)));
+            AutoScore.getAutoScoreCommand(
+                drive, superstructure, vision, scoringHelper));
 
     keyboard
         .button(13)
@@ -531,7 +518,6 @@ public class RobotContainer {
 
     // Coral Scoring Triggers
     var driveReefCommand = Commands.sequence(
-        Commands.waitUntil(drive::inReefAlignThreshold),
         DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
             .until(() -> drive.isAutoAligned()
                 && (Constants.getType() == RobotType.SIMBOT ? true : superstructure.atGoal())),
