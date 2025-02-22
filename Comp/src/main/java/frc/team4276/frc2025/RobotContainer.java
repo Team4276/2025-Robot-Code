@@ -115,8 +115,8 @@ public class RobotContainer {
    */
   public RobotContainer() {
     if (Constants.getMode() != Constants.Mode.REPLAY) {
-      switch (Constants.getMode()) {
-        case REAL -> {
+      switch (Constants.getType()) {
+        case COMPBOT -> {
           // Real robot, instantiate hardware IO implementations
           drive = new Drive(
               new GyroIOADIS(),
@@ -144,7 +144,7 @@ public class RobotContainer {
           );
         }
 
-        case SIM -> {
+        case SIMBOT -> {
           // Sim robot, instantiate physics sim IO implementations
           drive = new Drive(
               new GyroIO() {
@@ -181,40 +181,51 @@ public class RobotContainer {
 
           }
         }
-
-        default -> {
-          // Replayed robot, disable IO implementations
-          drive = new Drive(
-              new GyroIO() {
-              },
-              new ModuleIO() {
-              },
-              new ModuleIO() {
-              },
-              new ModuleIO() {
-              },
-              new ModuleIO() {
-              });
-          superstructure = new Superstructure(
-              new Elevator(new ElevatorIO() {
-              }),
-              new EndEffector(new EndEffectorIO() {
-              }),
-              new RollerSensorsIO() {
-              });
-          arm = new Arm(new ArmIO() {
-          });
-          roller = new Roller(new RollerIO() {
-          });
-          vision = new Vision(
-              RobotState.getInstance()::addVisionMeasurement,
-              new VisionIO() {
-              },
-              new VisionIO() {
-              });
-
-        }
       }
+    }
+
+    // No-op implmentations for replay
+    if (drive == null) {
+      drive = new Drive(
+          new GyroIO() {
+          },
+          new ModuleIO() {
+          },
+          new ModuleIO() {
+          },
+          new ModuleIO() {
+          },
+          new ModuleIO() {
+          });
+    }
+
+    if (vision == null) {
+      vision = new Vision(
+          RobotState.getInstance()::addVisionMeasurement,
+          new VisionIO() {
+          },
+          new VisionIO() {
+          });
+    }
+
+    if (superstructure == null) {
+      superstructure = new Superstructure(
+          new Elevator(new ElevatorIO() {
+          }),
+          new EndEffector(new EndEffectorIO() {
+          }),
+          new RollerSensorsIO() {
+          });
+    }
+
+    if (arm == null) {
+      arm = new Arm(new ArmIO() {
+      });
+    }
+
+    if (roller == null) {
+      roller = new Roller(new RollerIO() {
+      });
     }
 
     configureOverrides();
@@ -430,12 +441,7 @@ public class RobotContainer {
         .button(11)
         .whileTrue(
             arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(
-                roller.setGoalCommand(Roller.Goal.INTAKE)))
-        .whileFalse(
-            Commands.either(
-                arm.setGoalCommand(Arm.Goal.HOLD),
-                arm.setGoalCommand(Arm.Goal.STOW),
-                () -> roller.hasGamePiece()));
+                roller.setGoalCommand(Roller.Goal.INTAKE)));
 
     // Coral Scoring Triggers
     keyboard
@@ -464,6 +470,11 @@ public class RobotContainer {
                             () -> AllianceFlipUtil.apply(Rotation2d.kCCW_90deg)),
                         drive::clearHeadingGoal)),
                 keyboard.button(12)));
+
+    // Util
+    // driver
+    //     .povUp()
+    //     .toggleOnTrue(superstructure.unjamCommand()); // ned to bind
 
   }
 

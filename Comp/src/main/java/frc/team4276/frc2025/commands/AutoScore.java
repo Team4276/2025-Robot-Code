@@ -13,7 +13,7 @@ import frc.team4276.util.dashboard.LoggedTunableNumber;
 
 public class AutoScore {
   private static final LoggedTunableNumber reefAlignThreshold = new LoggedTunableNumber("AutoScore/ReefAlignThreshold",
-      2.0);
+      3.0);
 
   public static Command getAutoScoreCommand(
       Drive drive,
@@ -26,9 +26,9 @@ public class AutoScore {
         DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
             .until(() -> drive.isAutoAligned()
                 && (Constants.getType() == RobotType.SIMBOT ? true : superstructure.atGoal())),
-        DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose)
+        DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose).until(drive::isAutoAligned)
             .alongWith(
-                superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal).until(drive::isAutoAligned)))
+                superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)))
         .alongWith(
             Commands
                 .waitUntil(() -> drive.disableBackVision())

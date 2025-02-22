@@ -6,6 +6,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -29,6 +30,8 @@ public class RobotState {
       lastWheelPositions, Pose2d.kZero);
   private SwerveDrivePoseEstimator poseEstimatorOdom = new SwerveDrivePoseEstimator(kinematics, lastGyroAngle,
       lastWheelPositions, Pose2d.kZero);
+
+  private ChassisSpeeds robotVelocity = new ChassisSpeeds();
 
   private Pose2d trajectorySetpoint = Pose2d.kZero;
 
@@ -59,6 +62,10 @@ public class RobotState {
 
   public void setTrajectorySetpoint(Pose2d setpoint) {
     trajectorySetpoint = setpoint;
+  }
+
+  public void addDriveSpeeds(ChassisSpeeds speeds){
+    robotVelocity = speeds;
   }
 
   public void addOdometryObservation(
@@ -109,5 +116,10 @@ public class RobotState {
 
   public Pose2d getTrajectorySetpoint() {
     return trajectorySetpoint;
+  }
+
+  @AutoLogOutput(key = "RobotState/FieldVelocity")
+  public ChassisSpeeds getFieldVelocity(){
+    return ChassisSpeeds.fromRobotRelativeSpeeds(robotVelocity, getEstimatedPose().getRotation());
   }
 }
