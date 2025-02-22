@@ -12,7 +12,8 @@ import frc.team4276.frc2025.subsystems.roller.RollerIOInputsAutoLogged;
 public class Displacer {
   public enum Goal {
     IDLE(() -> 0.0),
-    VROOOM(new LoggedTunableNumber("Displacer/VROOMVolts", 10.0));
+    MOOORV(new LoggedTunableNumber("Displacer/MOOORVVolts", 12.0)),
+    VROOOM(new LoggedTunableNumber("Displacer/VROOMVolts", -12.0));
 
     private final DoubleSupplier voltageGoal;
 

@@ -19,12 +19,12 @@ public class Elevator {
   public enum Goal {
     STOW(new LoggedTunableNumber("Elevator/StowPosition", Units.inchesToMeters(0.5))),
     INTAKE(new LoggedTunableNumber("Elevator/IntakePosition", Units.inchesToMeters(0.0))),
-    UNJAM(new LoggedTunableNumber("Elevator/UnjamPosition", Units.inchesToMeters(5.5))), // find a better name for this
+    UNJAM(new LoggedTunableNumber("Elevator/UnjamPosition", Units.inchesToMeters(15.0))), // find a better name for this
     L1(new LoggedTunableNumber("Elevator/L1Position", Units.inchesToMeters(0.0))),
-    L2(new LoggedTunableNumber("Elevator/L2Position", Units.inchesToMeters(5.5))),
-    L3(new LoggedTunableNumber("Elevator/L3Position", Units.inchesToMeters(20.8))),
+    L2(new LoggedTunableNumber("Elevator/L2Position", Units.inchesToMeters(5.5))), // 0.17
+    L3(new LoggedTunableNumber("Elevator/L3Position", Units.inchesToMeters(20.8))), // 0.53
     LO_ALGAE(new LoggedTunableNumber("Elevator/LoAlgae", Units.inchesToMeters(0.0))),
-    HI_ALGAE(new LoggedTunableNumber("Elevator/HiAlgae", Units.inchesToMeters(5.5))),
+    HI_ALGAE(new LoggedTunableNumber("Elevator/HiAlgae", Units.inchesToMeters(5.5))), // 0.44
     CHARACTERIZING(() -> 0.0),
     CUSTOM(new LoggedTunableNumber("Elevator/CustomSetpoint", 0.0));
 
