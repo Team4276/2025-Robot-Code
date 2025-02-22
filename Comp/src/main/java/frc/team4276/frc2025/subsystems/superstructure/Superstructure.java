@@ -9,12 +9,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team4276.frc2025.subsystems.superstructure.displacer.Displacer;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.Elevator;
 import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffector;
 
 public class Superstructure extends SubsystemBase {
   private final Elevator elevator;
   private final EndEffector endeffector;
+  private final Displacer displacer;
 
   private final RollerSensorsIO sensorsIO;
   private final RollerSensorsIOInputsAutoLogged sensorsInputs = new RollerSensorsIOInputsAutoLogged();
@@ -30,6 +32,8 @@ public class Superstructure extends SubsystemBase {
     L1,
     L2,
     L3,
+    LO_ALGAE,
+    HI_ALGAE,
     UNJAM,
     CHARACTERIZING,
     CUSTOM
@@ -44,9 +48,10 @@ public class Superstructure extends SubsystemBase {
   private boolean cleared2 = false;
   private boolean cleared3 = false;
 
-  public Superstructure(Elevator elevator, EndEffector endeffector, RollerSensorsIO sensorsIO) {
+  public Superstructure(Elevator elevator, EndEffector endeffector, Displacer displacer, RollerSensorsIO sensorsIO) {
     this.elevator = elevator;
     this.endeffector = endeffector;
+    this.displacer = displacer;
     this.sensorsIO = sensorsIO;
 
     elevator.setCoastOverride(() -> false);
@@ -83,12 +88,14 @@ public class Superstructure extends SubsystemBase {
       case STOW:
         elevator.setGoal(Elevator.Goal.STOW);
         endeffector.setGoal(EndEffector.Goal.IDLE);
+        displacer.setGoal(Displacer.Goal.IDLE);
 
         break;
 
       case UNJAM:
         elevator.setGoal(Elevator.Goal.UNJAM);
         endeffector.setGoal(EndEffector.Goal.IDLE);
+        displacer.setGoal(Displacer.Goal.IDLE);
 
         break;
       case INTAKE:
@@ -106,26 +113,42 @@ public class Superstructure extends SubsystemBase {
           endeffector.setGoal(EndEffector.Goal.INTAKE);
 
         }
+        displacer.setGoal(Displacer.Goal.IDLE);
 
         break;
 
       case L1:
         elevator.setGoal(Elevator.Goal.L1);
+        displacer.setGoal(Displacer.Goal.IDLE);
 
         break;
 
       case L2:
         elevator.setGoal(Elevator.Goal.L2);
         elevator.requestHome();
+        displacer.setGoal(Displacer.Goal.IDLE);
 
         break;
 
       case L3:
         elevator.setGoal(Elevator.Goal.L3);
         elevator.requestHome();
+        displacer.setGoal(Displacer.Goal.IDLE);
 
         break;
 
+      case LO_ALGAE:
+        elevator.setGoal(Elevator.Goal.LO_ALGAE);
+        endeffector.setGoal(EndEffector.Goal.IDLE);
+        displacer.setGoal(Displacer.Goal.VROOOM);
+
+        break;
+      case HI_ALGAE:
+        elevator.setGoal(Elevator.Goal.HI_ALGAE);
+        endeffector.setGoal(EndEffector.Goal.IDLE);
+        displacer.setGoal(Displacer.Goal.VROOOM);
+
+        break;
       case CHARACTERIZING:
         elevator.runCharacterization(elevatorCharacterizationInput);
         endeffector.setGoal(endEffectorGoal);
@@ -140,6 +163,7 @@ public class Superstructure extends SubsystemBase {
 
     elevator.periodic();
     endeffector.periodic();
+    displacer.periodic();
 
     SmartDashboard.putString("Comp/Superstructure/DesiredGoal", desiredGoal.get().toString());
     SmartDashboard.putString("Comp/Superstructure/CurrentGoal", currentGoal.toString());

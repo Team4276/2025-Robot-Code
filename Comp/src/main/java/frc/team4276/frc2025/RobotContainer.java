@@ -32,7 +32,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.team4276.frc2025.AutoSelector.AutoQuestion;
 import frc.team4276.frc2025.AutoSelector.AutoQuestionResponse;
 import frc.team4276.frc2025.Constants.Mode;
-import frc.team4276.frc2025.Constants.RobotType;
 import frc.team4276.frc2025.commands.AutoScore;
 import frc.team4276.frc2025.commands.DriveCommands;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
@@ -53,6 +52,7 @@ import frc.team4276.frc2025.subsystems.roller.RollerIOSparkMax;
 import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIO;
 import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIOHardware;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
+import frc.team4276.frc2025.subsystems.superstructure.displacer.Displacer;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.Elevator;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorIO;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorIOSparkMax;
@@ -135,6 +135,8 @@ public class RobotContainer {
                   Ports.ENDEFFECTOR_RIGHT,
                   40, false,
                   true)),
+              new Displacer(
+                  new RollerIOSparkMax(Ports.ALGAE_DISPLACER, 20, false, true)),
               new RollerSensorsIOHardware());
           arm = new Arm(new ArmIOSparkMax());
           roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40,
@@ -163,6 +165,8 @@ public class RobotContainer {
               }),
               new EndEffector(new EndEffectorIO() {
               }),
+              new Displacer(
+                  new RollerIOSparkMax(Ports.ALGAE_DISPLACER, 20, false, true)),
               new RollerSensorsIO() {
               });
           arm = new Arm(new ArmIO() {
@@ -218,6 +222,9 @@ public class RobotContainer {
           new Elevator(new ElevatorIO() {
           }),
           new EndEffector(new EndEffectorIO() {
+          }),
+          new Displacer(new RollerIO() {
+
           }),
           new RollerSensorsIO() {
           });
@@ -478,8 +485,8 @@ public class RobotContainer {
 
     // Util
     // driver
-    //     .povUp()
-    //     .toggleOnTrue(superstructure.unjamCommand()); // ned to bind
+    // .povUp()
+    // .toggleOnTrue(superstructure.unjamCommand()); // ned to bind
 
   }
 
@@ -580,6 +587,15 @@ public class RobotContainer {
                             () -> AllianceFlipUtil.apply(Rotation2d.kCCW_90deg)),
                         drive::clearHeadingGoal)),
                 driver.rightTrigger()));
+
+    // Algae Displacing Trigglers
+    driver
+        .povLeft()
+        .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.LO_ALGAE));
+
+    driver
+        .povRight()
+        .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.HI_ALGAE));
   }
 
   public void updateAlerts() {

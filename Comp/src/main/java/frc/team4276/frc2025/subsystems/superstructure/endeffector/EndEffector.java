@@ -6,11 +6,10 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import frc.team4276.util.drivers.ObjectSensor;
 
-public class EndEffector extends SubsystemBase {
+public class EndEffector {
   private static final LoggedTunableNumber favorVolts = new LoggedTunableNumber("EndEffector/FavorVolts", 10.0);
   private static final LoggedTunableNumber lagVolts = new LoggedTunableNumber("EndEffector/LagVolts", 4.0);
 
@@ -57,7 +56,6 @@ public class EndEffector extends SubsystemBase {
     coralSensor = new ObjectSensor("EndEffector");
   }
 
-  @Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("EndEffector", inputs);

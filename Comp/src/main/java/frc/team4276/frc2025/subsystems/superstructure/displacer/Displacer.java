@@ -1,0 +1,56 @@
+package frc.team4276.frc2025.subsystems.superstructure.displacer;
+
+import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
+
+import frc.team4276.util.dashboard.LoggedTunableNumber;
+import frc.team4276.frc2025.subsystems.roller.RollerIO;
+import frc.team4276.frc2025.subsystems.roller.RollerIOInputsAutoLogged;
+
+public class Displacer {
+  public enum Goal {
+    IDLE(() -> 0.0),
+    VROOOM(new LoggedTunableNumber("Displacer/VROOMVolts", 10.0));
+
+    private final DoubleSupplier voltageGoal;
+
+    private Goal(DoubleSupplier voltageGoal) {
+      this.voltageGoal = voltageGoal;
+    }
+
+    private double getVolts() {
+      return voltageGoal.getAsDouble();
+    }
+
+  }
+
+  private Goal goal = Goal.IDLE;
+
+  private final RollerIO io;
+  private final RollerIOInputsAutoLogged inputs = new RollerIOInputsAutoLogged();
+
+  public Displacer(RollerIO io) {
+    this.io = io;
+  }
+
+  public void periodic() {
+    io.updateInputs(inputs);
+    Logger.processInputs("Displacer", inputs);
+
+    io.runVolts(goal.getVolts());
+    Logger.recordOutput("Displacer/Goal", goal);
+    Logger.recordOutput("Displacer/GoalVolts", goal);
+  }
+
+  @AutoLogOutput
+  public Goal getGoal() {
+    return goal;
+  }
+
+  @AutoLogOutput
+  public void setGoal(Goal goal) {
+    this.goal = goal;
+  }
+}

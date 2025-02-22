@@ -23,6 +23,8 @@ public class Elevator {
     L1(new LoggedTunableNumber("Elevator/L1Position", Units.inchesToMeters(0.0))),
     L2(new LoggedTunableNumber("Elevator/L2Position", Units.inchesToMeters(5.5))),
     L3(new LoggedTunableNumber("Elevator/L3Position", Units.inchesToMeters(20.8))),
+    LO_ALGAE(new LoggedTunableNumber("Elevator/LoAlgae", Units.inchesToMeters(0.0))),
+    HI_ALGAE(new LoggedTunableNumber("Elevator/HiAlgae", Units.inchesToMeters(5.5))),
     CHARACTERIZING(() -> 0.0),
     CUSTOM(new LoggedTunableNumber("Elevator/CustomSetpoint", 0.0));
 
