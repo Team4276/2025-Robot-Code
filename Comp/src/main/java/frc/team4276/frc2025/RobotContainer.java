@@ -15,6 +15,8 @@ package frc.team4276.frc2025;
 
 import java.util.List;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
@@ -85,7 +87,7 @@ public class RobotContainer {
   private AutoBuilder autoBuilder;
 
   // Controller
-  private boolean useKeyboard = true;
+  private boolean useKeyboard = false;
   private boolean isDemo = false;
 
   private final BetterXboxController driver = new BetterXboxController(0);
@@ -103,8 +105,11 @@ public class RobotContainer {
   private final DigitalInput armCoastOverride = new DigitalInput(Ports.ARM_COAST_OVERRIDE);
 
   // Coral Scoring Logic
+  @AutoLogOutput
   private boolean disableHeadingAutoAlign = true;
+  @AutoLogOutput
   private boolean disableTranslationAutoAlign = true;
+  @AutoLogOutput
   private boolean disableVisionSim = true;
 
   // Dashboard inputs
@@ -528,20 +533,6 @@ public class RobotContainer {
                 roller.setGoalCommand(Roller.Goal.INTAKE)));
 
     // Coral Scoring Triggers
-    var driveReefCommand = Commands.sequence(
-        DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
-            .until(() -> drive.isAutoAligned()
-                && (Constants.getType() == RobotType.SIMBOT ? true : superstructure.atGoal())),
-        DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose)
-            .alongWith(
-                superstructure.setGoalCommand(() -> scoringHelper.getSuperstructureGoal()).until(drive::isAutoAligned)))
-        .alongWith(
-            Commands
-                .waitUntil(() -> drive.disableBackVision())
-                .andThen(() -> vision.setEnableCamera(1,
-                    false)))
-        .finallyDo(() -> vision.setEnableCamera(1, true));
-
     var headingAlignReefCommand = Commands.sequence(
         DriveCommands.headingAlignCommand(drive, scoringHelper.getSelectedScorePose()::getRotation)
             .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
@@ -552,7 +543,7 @@ public class RobotContainer {
             Commands.either(
                 superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal),
                 Commands.either(headingAlignReefCommand,
-                    driveReefCommand,
+                    AutoScore.getAutoScoreCommand(drive, superstructure, vision, scoringHelper),
                     () -> disableTranslationAutoAlign),
                 () -> disableHeadingAutoAlign));
 
