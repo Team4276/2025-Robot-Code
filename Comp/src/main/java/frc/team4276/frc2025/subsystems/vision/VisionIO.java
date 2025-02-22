@@ -33,15 +33,13 @@ public interface VisionIO {
   /** Represents a robot pose sample used for pose estimation. */
   public static record PoseObservation(
       double timestamp,
-      Pose3d pose,
-      double ambiguity,
       int tagCount,
-      double averageTagDistance,
+      Pose3d[] pose,
+      double ambiguity,
+      double[] avgTagDistance,
       PoseObservationType type) {}
 
   public static enum PoseObservationType {
-    MEGATAG_1,
-    MEGATAG_2,
     PHOTONVISION
   }
 

@@ -24,7 +24,7 @@ public class EndEffectorIOSparkMax implements EndEffectorIO {
     leftMotor = new SparkMax(left_id, MotorType.kBrushless);
     rightMotor = new SparkMax(right_id, MotorType.kBrushless);
     leftEncoder = leftMotor.getEncoder();
-    rightEncoder = rightMotor.getEncoder(); // TODO: test code, if used should be refactored
+    rightEncoder = rightMotor.getEncoder();
 
     var config = new SparkMaxConfig();
     config

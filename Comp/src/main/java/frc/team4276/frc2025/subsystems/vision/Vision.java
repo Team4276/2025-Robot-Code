@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.frc2025.field.FieldConstants;
-import frc.team4276.frc2025.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -100,46 +99,42 @@ public class Vision extends SubsystemBase {
       }
 
       // Loop over pose observations
-      for (var observation : inputs[cameraIndex].poseObservations) {
+      for (var observation : inputs[cameraIndex].poseObservations) { // TODO: finish vision improvements
         // Add pose to log
-        robotPoses.add(observation.pose());
+        robotPoses.add(observation.pose()[0]);
 
         if (observation.tagCount() == 0) {
-          robotPosesRejected.add(observation.pose());
+          robotPosesRejected.add(observation.pose()[0]);
           continue;
         }
 
         if (observation.tagCount() == 1 && observation.ambiguity() > maxAmbiguity) {
-          robotPosesRejected.add(observation.pose());
+          robotPosesRejected.add(observation.pose()[0]);
           continue;
         }
 
         if (!camerasEnabled[cameraIndex]) {
-          robotPosesRejected.add(observation.pose());
+          robotPosesRejected.add(observation.pose()[0]);
           continue;
         }
 
         // Exit if robot pose is off the field
-        if (observation.pose().getX() < -fieldBorderMargin
-            || observation.pose().getX() > FieldConstants.fieldLength + fieldBorderMargin
-            || observation.pose().getY() < -fieldBorderMargin
-            || observation.pose().getY() > FieldConstants.fieldWidth + fieldBorderMargin
-            || observation.pose().getZ() < -maxZError
-            || observation.pose().getZ() > maxZError) {
-          robotPosesRejected.add(observation.pose());
+        if (observation.pose()[0].getX() < -fieldBorderMargin
+            || observation.pose()[0].getX() > FieldConstants.fieldLength + fieldBorderMargin
+            || observation.pose()[0].getY() < -fieldBorderMargin
+            || observation.pose()[0].getY() > FieldConstants.fieldWidth + fieldBorderMargin
+            || observation.pose()[0].getZ() < -maxZError
+            || observation.pose()[0].getZ() > maxZError) {
+          robotPosesRejected.add(observation.pose()[0]);
           continue;
         }
 
-        robotPosesAccepted.add(observation.pose());
+        robotPosesAccepted.add(observation.pose()[0]);
 
         // Calculate standard deviations
-        double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
+        double stdDevFactor = Math.pow(observation.avgTagDistance()[0], 2.0) / observation.tagCount();
         double linearStdDev = linearStdDevBaseline * stdDevFactor;
         double angularStdDev = angularStdDevBaseline * stdDevFactor;
-        if (observation.type() == PoseObservationType.MEGATAG_2) {
-          linearStdDev *= linearStdDevMegatag2Factor;
-          angularStdDev *= angularStdDevMegatag2Factor;
-        }
         if (cameraIndex < cameraStdDevFactors.length) {
           linearStdDev *= cameraStdDevFactors[cameraIndex];
           angularStdDev *= cameraStdDevFactors[cameraIndex];
@@ -147,7 +142,7 @@ public class Vision extends SubsystemBase {
 
         // Send vision observation
         consumer.accept(
-            observation.pose().toPose2d(),
+            observation.pose()[0].toPose2d(),
             observation.timestamp(),
             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
       }

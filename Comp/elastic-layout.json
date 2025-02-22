@@ -969,7 +969,7 @@
             "x": 512.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 448.0,
+            "height": 704.0,
             "type": "List Layout",
             "properties": {
               "label_position": "TOP"
@@ -1054,6 +1054,62 @@
                 "type": "Text Display",
                 "properties": {
                   "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Rotation/ToleranceDegrees",
+                  "period": 0.02,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Rotation Max Vel",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Rotation/maxVel",
+                  "period": 0.02,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Rotation Max Accel",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Rotation/maxAccel",
+                  "period": 0.02,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Translation Max Accel",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Translation/maxAccel",
+                  "period": 0.02,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Translation Max Vel",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Translation/maxVel",
                   "period": 0.02,
                   "data_type": "double",
                   "show_submit_button": false
@@ -1386,6 +1442,33 @@
                 "type": "Text Display",
                 "properties": {
                   "topic": "SmartDashboard/TunableNumbers/Roller/ScoreVolts",
+                  "period": 0.02,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "List Layout",
+            "x": 1280.0,
+            "y": 448.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "ReefAlignThreshold",
+                "x": 1312.0,
+                "y": 480.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/AutoScore/ReefAlignThreshold",
                   "period": 0.02,
                   "data_type": "double",
                   "show_submit_button": false

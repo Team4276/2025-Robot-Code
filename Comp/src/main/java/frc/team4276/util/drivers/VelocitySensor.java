@@ -9,7 +9,7 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.Timer;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 
-public class VelocitySensor { //TODO: add a debounce?
+public class VelocitySensor { // add a debounce?
   private final String key;
 
   private final LoggedTunableNumber velDipThreshold;

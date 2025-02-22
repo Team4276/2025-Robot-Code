@@ -44,7 +44,6 @@ public class Elevator {
   private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Elevator/maxVel", 2.75);
   private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", 2.0);
 
-  // TODO: retune
   private final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.20); // 0.11
   private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 9.0); // 24.2
   private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.15); // 0.09
