@@ -69,7 +69,7 @@ public class AutoBuilder {
       boolean cancelLastIntake,
       AutoQuestionResponse startStation) {
 
-    if (reefs.isEmpty() || levels.isEmpty() || stations.isEmpty()) { // TODO: handle this well
+    if (reefs.isEmpty() || levels.isEmpty() || stations.isEmpty()) {
       CommandScheduler.getInstance().schedule(notificationCommand("Error invalid Coral Auto List is Empty"));
 
       return Commands.none();

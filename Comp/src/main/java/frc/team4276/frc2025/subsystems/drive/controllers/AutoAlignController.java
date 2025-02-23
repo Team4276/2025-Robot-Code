@@ -17,26 +17,26 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class AutoAlignController {
-  private final LoggedTunableNumber translationkP = new LoggedTunableNumber("AutoAlignController/Translation/kP", 3.0);
-  private final LoggedTunableNumber translationkD = new LoggedTunableNumber("AutoAlignController/Translation/kD", 0.0);
-  private final LoggedTunableNumber translationKTol = new LoggedTunableNumber(
+  private final LoggedTunableNumber driveKp = new LoggedTunableNumber("AutoAlignController/Translation/kP", 3.0);
+  private final LoggedTunableNumber driveKd = new LoggedTunableNumber("AutoAlignController/Translation/kD", 0.0);
+  private final LoggedTunableNumber driveKTol = new LoggedTunableNumber(
       "AutoAlignController/Translation/Tolerance", 0.05);
-  private final LoggedTunableNumber translationMaxVel = new LoggedTunableNumber(
+  private final LoggedTunableNumber driveMaxVel = new LoggedTunableNumber(
       "AutoAlignController/Translation/maxVel", 3.0);
-  private final LoggedTunableNumber translationMaxAccel = new LoggedTunableNumber(
+  private final LoggedTunableNumber driveMaxAccel = new LoggedTunableNumber(
       "AutoAlignController/Translation/maxAccel", 3.0);
 
-  private final LoggedTunableNumber rotationkP = new LoggedTunableNumber("AutoAlignController/Rotation/kP", 2.0);
-  private final LoggedTunableNumber rotationkD = new LoggedTunableNumber("AutoAlignController/Rotation/kD", 0.0);
-  private final LoggedTunableNumber rotationKTol = new LoggedTunableNumber(
+  private final LoggedTunableNumber thetakP = new LoggedTunableNumber("AutoAlignController/Rotation/kP", 1.0);
+  private final LoggedTunableNumber thetakD = new LoggedTunableNumber("AutoAlignController/Rotation/kD", 0.0);
+  private final LoggedTunableNumber thetaKTol = new LoggedTunableNumber(
       "AutoAlignController/Rotation/ToleranceDegrees", 3.0);
-  private final LoggedTunableNumber rotationMaxVel = new LoggedTunableNumber("AutoAlignController/Rotation/maxVel",
+  private final LoggedTunableNumber thetaMaxVel = new LoggedTunableNumber("AutoAlignController/Rotation/maxVel",
       Units.degreesToRadians(360));
-  private final LoggedTunableNumber rotationMaxAccel = new LoggedTunableNumber("AutoAlignController/Rotation/maxAccel",
+  private final LoggedTunableNumber thetaMaxAccel = new LoggedTunableNumber("AutoAlignController/Rotation/maxAccel",
       6.0);
 
-  private final ProfiledPIDController translationController;
-  private final ProfiledPIDController rotationController;
+  private final ProfiledPIDController driveController;
+  private final ProfiledPIDController thetaController;
 
   @AutoLogOutput(key = "AutoAlign/SetpointPose")
   private Pose2d setpoint = Pose2d.kZero;
@@ -49,20 +49,20 @@ public class AutoAlignController {
   private boolean cancelTheta = false;
 
   public AutoAlignController() {
-    translationController = new ProfiledPIDController(
-        translationkP.getAsDouble(),
+    driveController = new ProfiledPIDController(
+        driveKp.getAsDouble(),
         0,
-        translationkD.getAsDouble(),
-        new TrapezoidProfile.Constraints(translationMaxVel.getAsDouble(), translationMaxAccel.getAsDouble()));
-    rotationController = new ProfiledPIDController(
-        rotationkP.getAsDouble(),
+        driveKd.getAsDouble(),
+        new TrapezoidProfile.Constraints(driveMaxVel.getAsDouble(), driveMaxAccel.getAsDouble()));
+    thetaController = new ProfiledPIDController(
+        thetakP.getAsDouble(),
         0,
-        rotationkD.getAsDouble(),
+        thetakD.getAsDouble(),
         new TrapezoidProfile.Constraints(maxAngularSpeed, maxAngularAccel));
-    rotationController.enableContinuousInput(-Math.PI, Math.PI);
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    translationController.setTolerance(translationKTol.getAsDouble());
-    rotationController.setTolerance(Math.toRadians(rotationKTol.getAsDouble()));
+    driveController.setTolerance(driveKTol.getAsDouble());
+    thetaController.setTolerance(Math.toRadians(thetaKTol.getAsDouble()));
   }
 
   public void setSetpoint(Pose2d pose) {
@@ -71,9 +71,9 @@ public class AutoAlignController {
     ChassisSpeeds fieldVelocity = RobotState.getInstance().getFieldVelocity();
     Translation2d linearFieldVelocity = new Translation2d(fieldVelocity.vxMetersPerSecond,
         fieldVelocity.vyMetersPerSecond);
-    rotationController.reset(
+    thetaController.reset(
         currentPose.getRotation().getRadians(), fieldVelocity.omegaRadiansPerSecond);
-    translationController.reset(
+    driveController.reset(
         currentPose.getTranslation().getDistance(pose.getTranslation()),
         Math.min(
             0.0,
@@ -96,34 +96,34 @@ public class AutoAlignController {
 
   private ChassisSpeeds updateContoller(Pose2d currentPose) {
     if (Constants.isTuning) {
-      translationController.setPID(translationkP.getAsDouble(), 0.0, translationkD.getAsDouble());
-      translationController.setTolerance(translationKTol.getAsDouble());
-      translationController.setConstraints(
-          new TrapezoidProfile.Constraints(translationMaxVel.getAsDouble(), translationMaxAccel.getAsDouble()));
-      rotationController.setPID(rotationkP.getAsDouble(), 0.0, rotationkD.getAsDouble());
-      rotationController.setTolerance(Math.toRadians(rotationKTol.getAsDouble()));
-      rotationController.setConstraints(
-          new TrapezoidProfile.Constraints(rotationMaxVel.getAsDouble(), rotationMaxAccel.getAsDouble()));
+      driveController.setPID(driveKp.getAsDouble(), 0.0, driveKd.getAsDouble());
+      driveController.setTolerance(driveKTol.getAsDouble());
+      driveController.setConstraints(
+          new TrapezoidProfile.Constraints(driveMaxVel.getAsDouble(), driveMaxAccel.getAsDouble()));
+      thetaController.setPID(thetakP.getAsDouble(), 0.0, thetakD.getAsDouble());
+      thetaController.setTolerance(Math.toRadians(thetaKTol.getAsDouble()));
+      thetaController.setConstraints(
+          new TrapezoidProfile.Constraints(thetaMaxVel.getAsDouble(), thetaMaxAccel.getAsDouble()));
     }
 
     Translation2d trans = currentPose.getTranslation().minus(setpoint.getTranslation());
     Translation2d linearOutput = new Translation2d(
-      translationController.calculate(trans.getNorm(), 0.0) +
-          translationController.getSetpoint().velocity,
+      driveController.calculate(trans.getNorm(), 0.0) +
+          driveController.getSetpoint().velocity,
       trans.getAngle());
-    if (trans.getNorm() < translationController.getPositionTolerance()) {
+    if (trans.getNorm() < driveController.getPositionTolerance()) {
       linearOutput = Translation2d.kZero;
     }
 
     double thetaError = MathUtil.angleModulus(currentPose.getRotation().minus(setpoint.getRotation()).getRadians());
-    double omega = rotationController.calculate(thetaError, 0.0) + rotationController.getSetpoint().velocity;
-    if (Math.abs(thetaError) < rotationController.getPositionTolerance()) {
+    double omega = thetaController.calculate(thetaError, 0.0) + thetaController.getSetpoint().velocity;
+    if (Math.abs(thetaError) < thetaController.getPositionTolerance()) {
       omega = 0.0;
     }
 
     distanceToGoal = setpoint.relativeTo(currentPose);
 
-    Logger.recordOutput("AutoAlign/DistanceSetpoint", translationController.getSetpoint().position);
+    Logger.recordOutput("AutoAlign/DistanceSetpoint", driveController.getSetpoint().position);
     Logger.recordOutput("AutoAlign/DistanceError", trans.getNorm());
     Logger.recordOutput("AutoAlign/ThetaMeasured", currentPose.getRotation().getRadians());
     Logger.recordOutput("AutoAlign/ThetaSetpoint", setpoint.getRotation().getRadians());
@@ -156,8 +156,8 @@ public class AutoAlignController {
 
   @AutoLogOutput(key = "AutoAlign/AtGoal")
   public boolean atGoal() {
-    return translationController.atGoal() &&
-        rotationController.atGoal();
+    return driveController.atGoal() &&
+        thetaController.atGoal();
   }
 
   public Pose2d distToGoal() {
@@ -165,6 +165,6 @@ public class AutoAlignController {
   }
 
   public boolean isHeadingAligned() {
-    return rotationController.atGoal();
+    return thetaController.atGoal();
   }
 }
