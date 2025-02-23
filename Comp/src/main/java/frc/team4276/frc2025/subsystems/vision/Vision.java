@@ -57,16 +57,6 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  /**
-   * Returns the X angle to the best target, which can be used for simple servoing
-   * with vision.
-   *
-   * @param cameraIndex The index of the camera to use.
-   */
-  public Rotation2d getTargetX(int cameraIndex) {
-    return inputs[cameraIndex].latestTargetObservation.tx();
-  }
-
   @Override
   public void periodic() {
     for (int i = 0; i < io.length; i++) {
@@ -102,34 +92,39 @@ public class Vision extends SubsystemBase {
       // Loop over pose observations
       for (var observation : inputs[cameraIndex].poseObservations) {
         if (observation.tagCount() == 0) {
-          robotPosesRejected.add(observation.pose()[0]);
+          robotPosesRejected.add(observation.pose1());
           continue;
         }
 
         Pose3d robotPose3d = null;
+        double avgTagDist = 0.0;
         if (observation.tagCount() > 1) {
           // Add pose to log
-          robotPoses.add(observation.pose()[0]);
-          robotPose3d = observation.pose()[0];
+          robotPoses.add(observation.pose1());
+          robotPose3d = observation.pose1();
 
+          avgTagDist = observation.avgTagDistance1();
         } else if (observation.tagCount() == 1) {
           // Add pose to log
-          robotPoses.add(observation.pose()[0]);
-          robotPoses.add(observation.pose()[1]);
+          robotPoses.add(observation.pose1());
+          robotPoses.add(observation.pose2());
 
           if (observation.ambiguity() < maxAmbiguity) {
             Rotation2d currentRotation = RobotState.getInstance().getEstimatedPose().getRotation();
-            Rotation2d visionRotation0 = observation.pose()[0].toPose2d().getRotation();
-            Rotation2d visionRotation1 = observation.pose()[1].toPose2d().getRotation();
+            Rotation2d visionRotation0 = observation.pose1().toPose2d().getRotation();
+            Rotation2d visionRotation1 = observation.pose2().toPose2d().getRotation();
             if (Math.abs(currentRotation.minus(visionRotation0).getRadians()) < Math
                 .abs(currentRotation.minus(visionRotation1).getRadians())) {
-              robotPose3d = observation.pose()[0];
+              robotPose3d = observation.pose1();
+              avgTagDist = observation.avgTagDistance1();
             } else {
-              robotPose3d = observation.pose()[1];
+              robotPose3d = observation.pose2();
+              avgTagDist = observation.avgTagDistance2();
             }
           }
 
           if (robotPose3d == null) {
+            robotPosesRejected.add(robotPose3d);
             continue;
           }
 
@@ -152,7 +147,7 @@ public class Vision extends SubsystemBase {
           robotPosesAccepted.add(robotPose3d);
 
           // Calculate standard deviations
-          double stdDevFactor = Math.pow(observation.avgTagDistance()[0], 2.0) / observation.tagCount();
+          double stdDevFactor = Math.pow(avgTagDist, 2.0) / observation.tagCount();
           double linearStdDev = linearStdDevBaseline * stdDevFactor;
           double angularStdDev = angularStdDevBaseline * stdDevFactor;
           if (cameraIndex < cameraStdDevFactors.length) {

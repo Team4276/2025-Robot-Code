@@ -19,12 +19,12 @@ public class Elevator {
   public enum Goal {
     STOW(new LoggedTunableNumber("Elevator/StowPosition", Units.inchesToMeters(0.5))),
     INTAKE(new LoggedTunableNumber("Elevator/IntakePosition", Units.inchesToMeters(0.0))),
-    UNJAM(new LoggedTunableNumber("Elevator/UnjamPosition", Units.inchesToMeters(15.0))), // find a better name for this
+    UNJAM(new LoggedTunableNumber("Elevator/UnjamPosition", Units.inchesToMeters(15.0))),
     L1(new LoggedTunableNumber("Elevator/L1Position", Units.inchesToMeters(0.0))),
-    L2(new LoggedTunableNumber("Elevator/L2Position", Units.inchesToMeters(5.5))), // 0.17
-    L3(new LoggedTunableNumber("Elevator/L3Position", Units.inchesToMeters(20.8))), // 0.53
+    L2(new LoggedTunableNumber("Elevator/L2Position", Units.inchesToMeters(6.69))),
+    L3(new LoggedTunableNumber("Elevator/L3Position", Units.inchesToMeters(21.26))),
     LO_ALGAE(new LoggedTunableNumber("Elevator/LoAlgae", Units.inchesToMeters(0.0))),
-    HI_ALGAE(new LoggedTunableNumber("Elevator/HiAlgae", Units.inchesToMeters(5.5))), // 0.44
+    HI_ALGAE(new LoggedTunableNumber("Elevator/HiAlgae", Units.inchesToMeters(17.32))),
     CHARACTERIZING(() -> 0.0),
     CUSTOM(new LoggedTunableNumber("Elevator/CustomSetpoint", 0.0));
 
@@ -46,9 +46,9 @@ public class Elevator {
   private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Elevator/maxVel", 2.75);
   private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", 2.0);
 
-  private final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.20); // 0.11
-  private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 9.0); // 24.2
-  private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.15); // 0.09
+  private final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.20);
+  private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 9.0);
+  private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.15);
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();

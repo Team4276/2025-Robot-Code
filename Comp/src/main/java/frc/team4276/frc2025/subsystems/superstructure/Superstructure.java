@@ -35,6 +35,7 @@ public class Superstructure extends SubsystemBase {
     LO_ALGAE,
     HI_ALGAE,
     UNJAM,
+    SHUFFLE,
     CHARACTERIZING,
     CUSTOM
   }
@@ -44,9 +45,13 @@ public class Superstructure extends SubsystemBase {
 
   private double elevatorCharacterizationInput = 0.0;
 
-  private boolean cleared1 = false;
+  private boolean cleared1 = false; // clean up this mess
   private boolean cleared2 = false;
   private boolean cleared3 = false;
+  private boolean cleared4 = false;
+  private boolean cleared5 = false;
+
+  private boolean hasCoral = false;
 
   public Superstructure(Elevator elevator, EndEffector endeffector, Displacer displacer, RollerSensorsIO sensorsIO) {
     this.elevator = elevator;
@@ -73,6 +78,7 @@ public class Superstructure extends SubsystemBase {
     if (wantScore) {
       endeffector.setGoal(currentGoal == Goal.L1 ? (leftL1 ? EndEffector.Goal.FAVOR_LEFT : EndEffector.Goal.FAVOR_RIGHT)
           : EndEffector.Goal.SCORE);
+          hasCoral = false;
     } else {
       endeffector.setGoal(EndEffector.Goal.IDLE);
 
@@ -84,11 +90,33 @@ public class Superstructure extends SubsystemBase {
       cleared3 = false;
     }
 
+    if (currentGoal != Goal.SHUFFLE) {
+      cleared4 = false;
+      cleared5 = false;
+    }
+
     switch (currentGoal) {
       case STOW:
         elevator.setGoal(Elevator.Goal.STOW);
         endeffector.setGoal(EndEffector.Goal.IDLE);
         displacer.setGoal(Displacer.Goal.IDLE);
+
+        break;
+
+      case SHUFFLE:
+        elevator.setGoal(Elevator.Goal.STOW);
+        displacer.setGoal(Displacer.Goal.IDLE);
+
+        if (sensorsInputs.backTripped || cleared5){
+          cleared5 = true;
+          endeffector.setGoal(EndEffector.Goal.IDLE);
+        } else if (sensorsInputs.backCleared || cleared4){
+          cleared4 = true;
+          endeffector.setGoal(EndEffector.Goal.REVERSE);
+        } else {
+          endeffector.setGoal(EndEffector.Goal.SLOINTAKE);
+          
+        }
 
         break;
 
@@ -102,6 +130,7 @@ public class Superstructure extends SubsystemBase {
         elevator.setGoal(Elevator.Goal.INTAKE);
         if ((sensorsInputs.backTripped && cleared2) || cleared3) {
           cleared3 = true;
+          hasCoral = true;
           endeffector.setGoal(EndEffector.Goal.IDLE);
         } else if (sensorsInputs.backCleared || cleared2) {
           cleared2 = true;
@@ -235,5 +264,9 @@ public class Superstructure extends SubsystemBase {
     return Commands.startEnd(
         () -> wantUnjam = true,
         () -> wantUnjam = false);
+  }
+
+  public boolean hasCoral() {
+    return hasCoral;
   }
 }

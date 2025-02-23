@@ -1,16 +1,20 @@
 package frc.team4276.util;
 
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
-public class BetterXboxController extends CommandXboxController {
+public class VikXboxController extends CommandXboxController {
   private double JOYSTICK_DEADBAND = 0.1;
   private double TRIGGER_DEADBAND = 0.5;
 
-  public BetterXboxController(int port) {
+  public VikXboxController(int port) {
     super(port);
   }
 
-  public BetterXboxController(int port, double deadband) {
+  public VikXboxController(int port, double deadband) {
     super(port);
     this.JOYSTICK_DEADBAND = deadband;
   }
@@ -72,5 +76,20 @@ public class BetterXboxController extends CommandXboxController {
 
   public boolean getRT() {
     return getRightTriggerAxis() > TRIGGER_DEADBAND;
+  }
+
+  public Command rumbleCommand(RumbleType type, double value, double duration) {
+    return rumbleCommand(type, value, duration, 1);
+  }
+
+  public Command rumbleCommand(RumbleType type, double value, double duration, int times) {
+    var command = new SequentialCommandGroup();
+
+    for (int i = 0; i < times; i++) {
+      command.addCommands(Commands.startEnd(() -> setRumble(type, value), () -> setRumble(type, 0.0))
+          .withTimeout(duration).andThen(Commands.waitSeconds(0.1)));
+    }
+
+    return command;
   }
 }

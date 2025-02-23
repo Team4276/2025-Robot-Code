@@ -14,29 +14,25 @@
 package frc.team4276.frc2025.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface VisionIO {
   @AutoLog
   public static class VisionIOInputs {
     public boolean connected = false;
-    public TargetObservation latestTargetObservation =
-        new TargetObservation(Rotation2d.kZero, Rotation2d.kZero);
     public PoseObservation[] poseObservations = new PoseObservation[0];
     public int[] tagIds = new int[0];
   }
-
-  /** Represents the angle to a simple target, not used for pose estimation. */
-  public static record TargetObservation(Rotation2d tx, Rotation2d ty) {}
 
   /** Represents a robot pose sample used for pose estimation. */
   public static record PoseObservation(
       double timestamp,
       int tagCount,
-      Pose3d[] pose,
+      Pose3d pose1,
+      Pose3d pose2,
       double ambiguity,
-      double[] avgTagDistance,
+      double avgTagDistance1,
+      double avgTagDistance2,
       PoseObservationType type) {}
 
   public static enum PoseObservationType {

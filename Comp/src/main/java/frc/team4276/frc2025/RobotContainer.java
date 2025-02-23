@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -65,7 +66,7 @@ import frc.team4276.frc2025.subsystems.vision.VisionIO;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVision;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.team4276.util.AllianceFlipUtil;
-import frc.team4276.util.BetterXboxController;
+import frc.team4276.util.VikXboxController;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -90,7 +91,7 @@ public class RobotContainer {
   private boolean useKeyboard = false;
   private boolean isDemo = false;
 
-  private final BetterXboxController driver = new BetterXboxController(0);
+  private final VikXboxController driver = new VikXboxController(0);
   private final CommandGenericHID buttonBoard = new CommandGenericHID(1);
   private final CommandGenericHID keyboard = new CommandGenericHID(2);
 
@@ -516,21 +517,21 @@ public class RobotContainer {
         .x()
         .whileTrue(
             superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
-                .alongWith(Commands.either(
-                    Commands.none(),
-                    DriveCommands.headingAlignCommand(drive,
-                        () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(305.0))),
-                    () -> disableHeadingAutoAlign)));
+                .alongWith(DriveCommands
+                    .headingAlignCommand(drive, () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(305.0)))
+                    .unless(() -> disableHeadingAutoAlign))
+                .alongWith(Commands.waitUntil(superstructure::hasCoral)
+                    .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 1.0))));
 
     driver
         .b()
         .whileTrue(
             superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
-                .alongWith(Commands.either(
-                    Commands.none(),
-                    DriveCommands.headingAlignCommand(drive,
-                        () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(55.0))),
-                    () -> disableHeadingAutoAlign)));
+                .alongWith(DriveCommands
+                    .headingAlignCommand(drive, () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(55.0)))
+                    .unless(() -> disableHeadingAutoAlign))
+                .alongWith(Commands.waitUntil(superstructure::hasCoral)
+                    .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 1.0))));
 
     // Algae Intake Trigger
     driver
@@ -542,7 +543,8 @@ public class RobotContainer {
     // Coral Scoring Triggers
     var headingAlignReefCommand = Commands.sequence(
         DriveCommands.headingAlignCommand(drive, scoringHelper.getSelectedScorePose()::getRotation)
-            .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal))); //TODO: fix this inverting
+            .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal))); // TODO: fix this
+                                                                                              // inverting
 
     driver
         .rightTrigger()
@@ -550,9 +552,12 @@ public class RobotContainer {
             Commands.either(
                 superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal),
                 Commands.either(headingAlignReefCommand,
-                    AutoScore.getAutoScoreCommand(drive, superstructure, vision, scoringHelper),
+                    AutoScore.getAutoScoreCommand(drive, superstructure, vision, scoringHelper)
+                        .alongWith(Commands.waitUntil(() -> (superstructure.atGoal() && drive.isAutoAligned()))
+                            .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 0.2, 3))),
                     () -> disableTranslationAutoAlign),
-                () -> disableHeadingAutoAlign));
+                () -> disableHeadingAutoAlign)
+                .unless(() -> (driver.getHID().getXButton() || driver.getHID().getBButton())));
 
     driver
         .rightStick()
@@ -565,11 +570,11 @@ public class RobotContainer {
 
     driver
         .rightBumper()
-        .whileTrue(superstructure.scoreCommand(false));
-
-    driver
-        .povUp()
-        .toggleOnTrue(superstructure.unjamCommand());
+        .whileTrue(
+            Commands.either(
+                superstructure.scoreCommand(false),
+                superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE),
+                driver.rightTrigger()));
 
     // Algae Scoring Triggers
     driver
@@ -596,6 +601,11 @@ public class RobotContainer {
     driver
         .povRight()
         .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.HI_ALGAE));
+
+    // Misc
+    driver
+        .povUp()
+        .toggleOnTrue(superstructure.unjamCommand());
   }
 
   public void updateAlerts() {
