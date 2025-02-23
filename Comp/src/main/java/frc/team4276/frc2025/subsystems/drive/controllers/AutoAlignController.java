@@ -16,7 +16,7 @@ import frc.team4276.util.dashboard.LoggedTunableNumber;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class AutoAlignController {
+public class AutoAlignController { // TODO: cleanup/improve dashboard; cleanup advantage scope; add test autos; add update displacer logic; add rumbles; add shuffle for intake;
   private final LoggedTunableNumber driveKp = new LoggedTunableNumber("AutoAlignController/Translation/kP", 3.0);
   private final LoggedTunableNumber driveKd = new LoggedTunableNumber("AutoAlignController/Translation/kD", 0.0);
   private final LoggedTunableNumber driveKTol = new LoggedTunableNumber(

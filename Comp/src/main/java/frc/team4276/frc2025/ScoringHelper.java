@@ -3,7 +3,6 @@ package frc.team4276.frc2025;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
@@ -72,7 +71,7 @@ public class ScoringHelper extends VirtualSubsystem {
 
   @Override
   public void periodic() {
-    if (useKeyboard) {
+    if (useKeyboard && Constants.getMode() == Constants.Mode.SIM) {
       updateKeyboard();
     } else {
       updateButtonBoard();
@@ -164,13 +163,11 @@ public class ScoringHelper extends VirtualSubsystem {
   }
 
   public Pose2d getSelectedAlignPose() {
-    var pose = RobotState.getInstance().getPOIs().reefAlign[getSelectedReef()];
-    return new Pose2d(pose.getTranslation(), pose.getRotation().rotateBy(Rotation2d.kZero));
+    return RobotState.getInstance().getPOIs().reefAlign[getSelectedReef()];
   }
 
   public Pose2d getSelectedScorePose() {
-    var pose = RobotState.getInstance().getPOIs().reefScore[getSelectedReef()];
-    return new Pose2d(pose.getTranslation(), pose.getRotation().rotateBy(Rotation2d.kZero));
+    return RobotState.getInstance().getPOIs().reefScore[getSelectedReef()];
   }
 
   private int getSelectedTableIndex() {

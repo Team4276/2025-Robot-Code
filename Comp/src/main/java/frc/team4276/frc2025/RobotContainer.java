@@ -542,7 +542,7 @@ public class RobotContainer {
     // Coral Scoring Triggers
     var headingAlignReefCommand = Commands.sequence(
         DriveCommands.headingAlignCommand(drive, scoringHelper.getSelectedScorePose()::getRotation)
-            .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
+            .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal))); //TODO: fix this inverting
 
     driver
         .rightTrigger()
