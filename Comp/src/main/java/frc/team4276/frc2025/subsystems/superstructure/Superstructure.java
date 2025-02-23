@@ -199,6 +199,7 @@ public class Superstructure extends SubsystemBase {
     Logger.recordOutput("Superstructure/CurrentGoal", currentGoal);
     Logger.recordOutput("Superstructure/WantScore", wantScore);
     Logger.recordOutput("Superstructure/Displace", displace);
+    Logger.recordOutput("Superstructure/HasCoral", hasCoral);
   }
 
   public boolean atGoal() {

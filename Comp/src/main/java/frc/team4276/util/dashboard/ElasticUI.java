@@ -7,11 +7,16 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team4276.util.AllianceFlipUtil;
 
 public class ElasticUI {
   private ElasticUI() {
+  }
+  
+  public static void update(){
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
   }
 
   public static void putSwerveDrive(Supplier<SwerveModuleState[]> state, Supplier<Rotation2d> angle) {

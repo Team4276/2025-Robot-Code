@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.team4276.util.dashboard.Elastic;
+import frc.team4276.util.dashboard.ElasticUI;
 import frc.team4276.util.drivers.VirtualSubsystem;
 
 import java.util.HashMap;
@@ -144,6 +145,7 @@ public class Robot extends LoggedRobot {
     Threads.setCurrentThreadPriority(true, 99);
 
     VirtualSubsystem.periodicAll();
+    ElasticUI.update();
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled commands, running already-scheduled commands, removing
     // finished or interrupted commands, and running subsystem periodic() methods.

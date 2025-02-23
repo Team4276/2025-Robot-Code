@@ -272,9 +272,9 @@
           {
             "title": "Field",
             "x": 576.0,
-            "y": 256.0,
+            "y": 384.0,
             "width": 448.0,
-            "height": 288.0,
+            "height": 256.0,
             "type": "Field",
             "properties": {
               "topic": "/SmartDashboard/Field",
@@ -290,7 +290,7 @@
             }
           },
           {
-            "title": "CurrentGoal",
+            "title": "CurrentGoal (S)",
             "x": 1344.0,
             "y": 128.0,
             "width": 192.0,
@@ -298,20 +298,6 @@
             "type": "Text Display",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Superstructure/CurrentGoal",
-              "period": 0.02,
-              "data_type": "string",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "DesiredGoal",
-            "x": 1344.0,
-            "y": 0.0,
-            "width": 192.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Superstructure/DesiredGoal",
               "period": 0.02,
               "data_type": "string",
               "show_submit_button": false
@@ -507,7 +493,7 @@
           {
             "title": "L1",
             "x": 1024.0,
-            "y": 384.0,
+            "y": 512.0,
             "width": 320.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -524,7 +510,7 @@
           {
             "title": "L2",
             "x": 1024.0,
-            "y": 256.0,
+            "y": 384.0,
             "width": 320.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -541,7 +527,7 @@
           {
             "title": "L3",
             "x": 1024.0,
-            "y": 128.0,
+            "y": 256.0,
             "width": 320.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -558,7 +544,7 @@
           {
             "title": "L4",
             "x": 1024.0,
-            "y": 0.0,
+            "y": 128.0,
             "width": 320.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -580,7 +566,7 @@
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/AdvantageKit/RealOutputs/AutoAlign/AtGoal",
+              "topic": "/AdvantageKit/RealOutputs/AutoAlignController/atGoal",
               "period": 0.02,
               "data_type": "boolean",
               "true_color": 4278255360,
@@ -621,6 +607,99 @@
               "false_color": 4278190080,
               "true_icon": "None",
               "false_icon": "None"
+            }
+          },
+          {
+            "title": "DesiredGoal (S)",
+            "x": 1344.0,
+            "y": 0.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/Superstructure/DesiredGoal",
+              "period": 0.02,
+              "data_type": "string",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Displace",
+            "x": 1344.0,
+            "y": 384.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/Superstructure/Displace",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4278255360,
+              "false_color": 4294901760,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "WantScore",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 320.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/Superstructure/WantScore",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4278255615,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "HasCoral",
+            "x": 832.0,
+            "y": 0.0,
+            "width": 192.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/Superstructure/HasCoral",
+              "period": 0.02,
+              "data_type": "boolean",
+              "true_color": 4278255360,
+              "false_color": 4294901760,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "FMSInfo",
+            "x": 576.0,
+            "y": 256.0,
+            "width": 448.0,
+            "height": 128.0,
+            "type": "FMSInfo",
+            "properties": {
+              "topic": "/FMSInfo",
+              "period": 0.02
+            }
+          },
+          {
+            "title": "Match Time",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/SmartDashboard/Match Time",
+              "period": 0.02,
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 15,
+              "yellow_start_time": 30
             }
           }
         ]
