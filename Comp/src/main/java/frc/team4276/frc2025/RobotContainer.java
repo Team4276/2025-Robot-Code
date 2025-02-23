@@ -88,7 +88,7 @@ public class RobotContainer {
   private AutoBuilder autoBuilder;
 
   // Controller
-  private boolean useKeyboard = false;
+  private boolean useKeyboard = true;
   private boolean isDemo = false;
 
   private final VikXboxController driver = new VikXboxController(0);
@@ -457,11 +457,16 @@ public class RobotContainer {
                 roller.setGoalCommand(Roller.Goal.INTAKE)));
 
     // Coral Scoring Triggers
+    var headingAlignReefCommand = Commands.sequence(
+      DriveCommands.headingAlignCommand(drive, () -> scoringHelper.getSelectedScorePose().getRotation())
+          .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
+
     keyboard
         .button(12)
-        .whileTrue(
-            AutoScore.getAutoScoreCommand(
-                drive, superstructure, vision, scoringHelper));
+        .whileTrue(headingAlignReefCommand
+            // AutoScore.getAutoScoreCommand(
+            //     drive, superstructure, vision, scoringHelper)
+                );
 
     keyboard
         .button(13)
@@ -539,9 +544,8 @@ public class RobotContainer {
 
     // Scoring
     var headingAlignReefCommand = Commands.sequence(
-        DriveCommands.headingAlignCommand(drive, scoringHelper.getSelectedScorePose()::getRotation)
-            .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal))); // TODO: fix this
-                                                                                              // inverting
+        DriveCommands.headingAlignCommand(drive, () -> scoringHelper.getSelectedScorePose().getRotation())
+            .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
 
     driver
         .rightTrigger()

@@ -21,6 +21,7 @@ public class AutoAlignController { // TODO: cleanup/improve dashboard; cleanup a
 
   private TeleopDriveController teleopDriveController = new TeleopDriveController();
 
+  private boolean useCancel = false;
   private boolean cancelX = false;
   private boolean cancelY = false;
   private boolean cancelTheta = false;
@@ -110,9 +111,9 @@ public class AutoAlignController { // TODO: cleanup/improve dashboard; cleanup a
 
     var teleopSpeeds = teleopDriveController.updateRaw(currentPose.getRotation());
 
-    cancelX = cancelX || Math.abs(teleopSpeeds.vxMetersPerSecond) > 1e-6;
-    cancelY = cancelY || Math.abs(teleopSpeeds.vyMetersPerSecond) > 1e-6;
-    cancelTheta = cancelTheta || Math.abs(teleopSpeeds.omegaRadiansPerSecond) > 1e-6;
+    cancelX = (useCancel ? cancelX : false) || Math.abs(teleopSpeeds.vxMetersPerSecond) > 1e-6;
+    cancelY = (useCancel ? cancelY : false) || Math.abs(teleopSpeeds.vyMetersPerSecond) > 1e-6;
+    cancelTheta = (useCancel ? cancelTheta : false) || Math.abs(teleopSpeeds.omegaRadiansPerSecond) > 1e-6;
 
     Logger.recordOutput("AutoAlignController/CancelX", cancelX);
     Logger.recordOutput("AutoAlignController/CancelY", cancelY);
@@ -125,7 +126,7 @@ public class AutoAlignController { // TODO: cleanup/improve dashboard; cleanup a
         currentPose.getRotation());
   }
 
-  @AutoLogOutput
+  @AutoLogOutput(key = "AutoAlignController/atGoal")
   public boolean atGoal() {
     return driveController.atGoal() &&
         thetaController.atGoal();
