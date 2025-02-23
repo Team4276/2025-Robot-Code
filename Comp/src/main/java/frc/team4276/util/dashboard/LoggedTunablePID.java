@@ -15,7 +15,7 @@ public class LoggedTunablePID extends PIDController {
     super(kp, ki, kd);
     this.key = key;
     Kp = new LoggedTunableNumber(this.key + "/kP", kp);
-    Ki = new LoggedTunableNumber(this.key + "/kD", ki);
+    Ki = new LoggedTunableNumber(this.key + "/kI", ki);
     Kd = new LoggedTunableNumber(this.key + "/kD", kd);
     KTol = new LoggedTunableNumber(this.key + "/Tolerance", getErrorTolerance());
   }
@@ -24,7 +24,7 @@ public class LoggedTunablePID extends PIDController {
     super(kp, ki, kd);
     this.key = key;
     Kp = new LoggedTunableNumber(this.key + "/kP", kp);
-    Ki = new LoggedTunableNumber(this.key + "/kD", ki);
+    Ki = new LoggedTunableNumber(this.key + "/kI", ki);
     Kd = new LoggedTunableNumber(this.key + "/kD", kd);
     KTol = new LoggedTunableNumber(this.key + "/Tolerance", tol);
   }
