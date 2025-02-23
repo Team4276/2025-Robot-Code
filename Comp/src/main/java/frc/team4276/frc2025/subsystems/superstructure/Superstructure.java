@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -52,6 +51,7 @@ public class Superstructure extends SubsystemBase {
   private boolean cleared5 = false;
 
   private boolean hasCoral = false;
+  private boolean displace = true;
 
   public Superstructure(Elevator elevator, EndEffector endeffector, Displacer displacer, RollerSensorsIO sensorsIO) {
     this.elevator = elevator;
@@ -84,6 +84,10 @@ public class Superstructure extends SubsystemBase {
 
     }
 
+    if(displace){
+      displacer.setGoal(Displacer.Goal.VROOOM);
+    }
+
     if (currentGoal != Goal.INTAKE) {
       cleared1 = false;
       cleared2 = false;
@@ -99,7 +103,7 @@ public class Superstructure extends SubsystemBase {
       case STOW:
         elevator.setGoal(Elevator.Goal.STOW);
         endeffector.setGoal(EndEffector.Goal.IDLE);
-        displacer.setGoal(Displacer.Goal.IDLE);
+        displacer.setGoal(Displacer.Goal.MOOORV);
 
         break;
 
@@ -148,21 +152,18 @@ public class Superstructure extends SubsystemBase {
 
       case L1:
         elevator.setGoal(Elevator.Goal.L1);
-        displacer.setGoal(Displacer.Goal.IDLE);
 
         break;
 
       case L2:
         elevator.setGoal(Elevator.Goal.L2);
         elevator.requestHome();
-        displacer.setGoal(Displacer.Goal.IDLE);
 
         break;
 
       case L3:
         elevator.setGoal(Elevator.Goal.L3);
         elevator.requestHome();
-        displacer.setGoal(Displacer.Goal.IDLE);
 
         break;
 
@@ -194,11 +195,10 @@ public class Superstructure extends SubsystemBase {
     endeffector.periodic();
     displacer.periodic();
 
-    SmartDashboard.putString("Comp/Superstructure/DesiredGoal", desiredGoal.get().toString());
-    SmartDashboard.putString("Comp/Superstructure/CurrentGoal", currentGoal.toString());
-
     Logger.recordOutput("Superstructure/DesiredGoal", desiredGoal.get());
     Logger.recordOutput("Superstructure/CurrentGoal", currentGoal);
+    Logger.recordOutput("Superstructure/WantScore", wantScore);
+    Logger.recordOutput("Superstructure/Displace", displace);
   }
 
   public boolean atGoal() {
@@ -209,28 +209,16 @@ public class Superstructure extends SubsystemBase {
     desiredGoal = () -> goal;
   }
 
-  public void setGoal(Supplier<Goal> goal) {
-    desiredGoal = goal;
-  }
-
   public Command setGoalCommand(Goal goal) {
     return setGoalCommand(() -> goal);
   }
 
   public Command setGoalCommand(Supplier<Goal> goal) {
-    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW), this);
-  }
-
-  public Goal getGoal() {
-    return currentGoal;
-  }
-
-  public Command scoreCommand() {
-    return scoreCommand(false);
+    return startEnd(() -> setGoal(goal.get()), () -> setGoal(Goal.STOW));
   }
 
   public Command scoreCommand(boolean isLeftL1) {
-    return Commands.startEnd(() -> {
+    return startEnd(() -> {
       wantScore = true;
       leftL1 = isLeftL1;
     },
@@ -268,5 +256,9 @@ public class Superstructure extends SubsystemBase {
 
   public boolean hasCoral() {
     return hasCoral;
+  }
+
+  public Command toggleDisplacerCommand(){
+    return Commands.runOnce(() -> displace = !displace);
   }
 }

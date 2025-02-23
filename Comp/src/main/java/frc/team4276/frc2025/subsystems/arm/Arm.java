@@ -6,7 +6,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.frc2025.Constants;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
@@ -152,7 +151,7 @@ public class Arm extends SubsystemBase {
   }
 
   public Command setGoalCommand(Goal goal) {
-    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW), this);
+    return startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW));
   }
 
   public void runCharacterization(double output) {

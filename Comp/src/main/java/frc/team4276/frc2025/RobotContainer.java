@@ -492,6 +492,8 @@ public class RobotContainer {
   }
 
   private void configureControllerBindings() {
+    /***************** Drive Triggers *****************/
+
     drive.setDefaultCommand(
         drive.run(
             () -> drive.feedTeleopInput(
@@ -512,7 +514,9 @@ public class RobotContainer {
                 drive)
                 .ignoringDisable(false));
 
-    // Coral Intake Triggers
+    /***************** Coral Triggers *****************/
+
+    // Intake
     driver
         .x()
         .whileTrue(
@@ -533,14 +537,7 @@ public class RobotContainer {
                 .alongWith(Commands.waitUntil(superstructure::hasCoral)
                     .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 1.0))));
 
-    // Algae Intake Trigger
-    driver
-        .leftTrigger()
-        .whileTrue(
-            arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(
-                roller.setGoalCommand(Roller.Goal.INTAKE)));
-
-    // Coral Scoring Triggers
+    // Scoring
     var headingAlignReefCommand = Commands.sequence(
         DriveCommands.headingAlignCommand(drive, scoringHelper.getSelectedScorePose()::getRotation)
             .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal))); // TODO: fix this
@@ -560,6 +557,19 @@ public class RobotContainer {
                 .unless(() -> (driver.getHID().getXButton() || driver.getHID().getBButton())));
 
     driver
+        .leftBumper()
+        .whileTrue(
+            superstructure.scoreCommand(true)
+                .onlyIf(driver.rightTrigger()));
+
+    driver
+        .rightBumper()
+        .whileTrue(
+            superstructure.scoreCommand(false)
+                .onlyIf(driver.rightTrigger()));
+
+    // Modal
+    driver
         .rightStick()
         .onTrue(
             Commands.runOnce(() -> disableTranslationAutoAlign = !disableTranslationAutoAlign));
@@ -568,32 +578,20 @@ public class RobotContainer {
         .povDown()
         .onTrue(Commands.runOnce(() -> disableHeadingAutoAlign = !disableHeadingAutoAlign));
 
+    // Misc
     driver
         .rightBumper()
         .whileTrue(
-            Commands.either(
-                superstructure.scoreCommand(false),
-                superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE),
-                driver.rightTrigger()));
-
-    // Algae Scoring Triggers
-    driver
-        .y()
-        .whileTrue(roller.setGoalCommand(Roller.Goal.SCORE));
+            superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE)
+                .unless(driver.rightTrigger()));
 
     driver
-        .leftBumper()
-        .whileTrue(
-            Commands.either(
-                superstructure.scoreCommand(true),
-                arm.setGoalCommand(Arm.Goal.SCORE).alongWith(
-                    Commands.startEnd(
-                        () -> drive.setHeadingGoal(
-                            () -> AllianceFlipUtil.apply(Rotation2d.kCCW_90deg)),
-                        drive::clearHeadingGoal)),
-                driver.rightTrigger()));
+        .povUp()
+        .toggleOnTrue(superstructure.unjamCommand());
 
-    // Algae Displacing Trigglers
+    /***************** Algae Triggers *****************/
+
+    // Displacing
     driver
         .povLeft()
         .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.LO_ALGAE));
@@ -602,10 +600,32 @@ public class RobotContainer {
         .povRight()
         .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.HI_ALGAE));
 
-    // Misc
     driver
-        .povUp()
-        .toggleOnTrue(superstructure.unjamCommand());
+        .y()
+        .onTrue(superstructure.toggleDisplacerCommand());
+
+    // Intake
+    driver
+        .leftTrigger()
+        .whileTrue(
+            arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(
+                roller.setGoalCommand(Roller.Goal.INTAKE)).unless(driver.leftBumper()));
+
+    // Align
+    driver
+        .leftBumper()
+        .whileTrue(
+            arm.setGoalCommand(Arm.Goal.SCORE).alongWith(
+                Commands.startEnd(
+                    () -> drive.setHeadingGoal(
+                        () -> AllianceFlipUtil.apply(Rotation2d.kCCW_90deg)),
+                    drive::clearHeadingGoal))
+                .unless(driver.rightTrigger()));
+
+    // Score
+    driver
+        .leftTrigger()
+        .whileTrue(roller.setGoalCommand(Roller.Goal.SCORE).onlyIf(driver.leftBumper()));
   }
 
   public void updateAlerts() {
@@ -625,6 +645,5 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoSelector.getCommand();
-    // Commands.none();
   }
 }

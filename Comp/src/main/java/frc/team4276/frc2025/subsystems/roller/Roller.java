@@ -7,7 +7,6 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 
@@ -80,7 +79,7 @@ public class Roller extends SubsystemBase {
   }
 
   public Command setGoalCommand(Goal goal) {
-    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.IDLE), this);
+    return startEnd(() -> setGoal(goal), () -> setGoal(Goal.IDLE));
   }
 
   @AutoLogOutput

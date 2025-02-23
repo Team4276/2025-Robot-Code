@@ -6,7 +6,6 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N2;
@@ -14,6 +13,7 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.wpilibj.Timer;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
+import frc.team4276.util.dashboard.LoggedTunablePID;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,16 +22,6 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class TrajectoryController {
-  private final LoggedTunableNumber translationkP = new LoggedTunableNumber("TrajectoryController/Translation/kP", 4.0);
-  private final LoggedTunableNumber translationkD = new LoggedTunableNumber("TrajectoryController/Translation/kD", 0.0);
-  private final LoggedTunableNumber translationKTol = new LoggedTunableNumber(
-      "TrajectoryController/Translation/Tolerance", 0.1);
-
-  private final LoggedTunableNumber rotationkP = new LoggedTunableNumber("TrajectoryController/Rotation/kP", 3.0);
-  private final LoggedTunableNumber rotationkD = new LoggedTunableNumber("TrajectoryController/Rotation/kD", 0.0);
-  private final LoggedTunableNumber rotationKTol = new LoggedTunableNumber(
-      "TrajectoryController/Rotation/ToleranceDegrees", 1.0);
-
   private final LoggedTunableNumber maxError = new LoggedTunableNumber("TrajectoryController/maxError", 0.75);
 
   private PathPlannerTrajectory traj;
@@ -41,9 +31,9 @@ public class TrajectoryController {
 
   private boolean isFinished = true;
 
-  private final PIDController xController;
-  private final PIDController yController;
-  private final PIDController rotationController;
+  private final LoggedTunablePID xController;
+  private final LoggedTunablePID yController;
+  private final LoggedTunablePID rotController;
 
   private List<Vector<N2>> moduleForces = List.of(
       VecBuilder.fill(0.0, 0.0),
@@ -53,14 +43,12 @@ public class TrajectoryController {
   private final double[] dummyForces = { 0.0, 0.0, 0.0, 0.0 };
 
   public TrajectoryController() {
-    xController = new PIDController(translationkP.getAsDouble(), 0.0, translationkD.getAsDouble());
-    yController = new PIDController(translationkP.getAsDouble(), 0.0, translationkD.getAsDouble());
-    rotationController = new PIDController(rotationkP.getAsDouble(), 0.0, rotationkD.getAsDouble());
-    rotationController.enableContinuousInput(-Math.PI, Math.PI);
+    xController = new LoggedTunablePID(4.0, 0.0, 0.0, 0.1, "TrajectoryController/TranslationX");
+    yController = new LoggedTunablePID(4.0, 0.0, 0.0, 0.1, "TrajectoryController/TranslationY");
+    rotController = new LoggedTunablePID(3.0, 0.0, 0.0, Math.toRadians(1.0), "TrajectoryController/Rotation");
 
-    xController.setTolerance(translationKTol.getAsDouble());
-    yController.setTolerance(translationKTol.getAsDouble());
-    rotationController.setTolerance(Math.toRadians(rotationKTol.getAsDouble()));
+    rotController.enableContinuousInput(-Math.PI, Math.PI);
+
   }
 
   public void setTrajectory(PathPlannerTrajectory traj) {
@@ -71,15 +59,6 @@ public class TrajectoryController {
   }
 
   public ChassisSpeeds update(Pose2d currentPose) {
-    xController.setPID(translationkP.getAsDouble(), 0.0, translationkD.getAsDouble());
-    xController.setTolerance(translationKTol.getAsDouble());
-
-    yController.setPID(translationkP.getAsDouble(), 0.0, translationkD.getAsDouble());
-    yController.setTolerance(translationKTol.getAsDouble());
-
-    rotationController.setPID(rotationkP.getAsDouble(), 0.0, rotationkD.getAsDouble());
-    rotationController.setTolerance(Math.toRadians(rotationKTol.getAsDouble()));
-
     if (getTrajectoryTime() > traj.getTotalTimeSeconds()) {
       isFinished = true;
     }
@@ -112,10 +91,10 @@ public class TrajectoryController {
     double xError = sampledState.pose.getX() - currentPose.getTranslation().getX();
     double yError = sampledState.pose.getY() - currentPose.getTranslation().getY();
     double xFeedback = xController.calculate(0.0, xError);
-    double yFeedback = yController.calculate(0.0, yError);
+    double yFeedback = yController.calculate(0.0, xError);
     double thetaError = MathUtil
         .angleModulus(sampledState.pose.getRotation().minus(currentPose.getRotation()).getRadians());
-    double thetaFeedback = rotationController.calculate(0.0, thetaError);
+    double thetaFeedback = rotController.calculate(0.0, thetaError);
 
     ChassisSpeeds outputSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
         sampledState.fieldSpeeds.vxMetersPerSecond + xFeedback,
@@ -123,13 +102,11 @@ public class TrajectoryController {
         sampledState.fieldSpeeds.omegaRadiansPerSecond + thetaFeedback,
         currentPose.getRotation());
 
-    Logger.recordOutput("Trajectory/SetpointPose", sampledState.pose);
-    Logger.recordOutput("Trajectory/SetpointSpeeds/vx", sampledState.fieldSpeeds.vxMetersPerSecond);
-    Logger.recordOutput("Trajectory/SetpointSpeeds/vy", sampledState.fieldSpeeds.vyMetersPerSecond);
-    Logger.recordOutput("Trajectory/SetpointSpeeds/omega", sampledState.heading.getRadians());
-    Logger.recordOutput("Trajectory/OutputSpeeds", outputSpeeds);
-    Logger.recordOutput("Trajectory/TranslationError", Math.hypot(xError, yError));
-    Logger.recordOutput("Trajectory/RotationError", thetaError);
+    Logger.recordOutput("TrajectoryController/SetpointPose", sampledState.pose);
+    Logger.recordOutput("TrajectoryController/SetpointSpeeds", sampledState.fieldSpeeds);
+    Logger.recordOutput("TrajectoryController/OutputSpeeds", outputSpeeds);
+    Logger.recordOutput("TrajectoryController/TranslationError", Math.hypot(xError, yError));
+    Logger.recordOutput("TrajectoryController/RotationError", thetaError);
 
     return outputSpeeds;
   }
@@ -142,7 +119,7 @@ public class TrajectoryController {
     isFinished = true;
   }
 
-  @AutoLogOutput(key = "Trajectory/Finished")
+  @AutoLogOutput(key = "TrajectoryController/Finished")
   public boolean isFinished() {
     return isFinished;
   }
