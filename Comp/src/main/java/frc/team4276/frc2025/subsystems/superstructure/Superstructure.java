@@ -71,7 +71,7 @@ public class Superstructure extends SubsystemBase {
 
     currentGoal = desiredGoal.get();
 
-    if (desiredGoal.get() == Goal.STOW && wantUnjam) {
+    if (wantUnjam){
       currentGoal = Goal.UNJAM;
     }
 
@@ -253,10 +253,8 @@ public class Superstructure extends SubsystemBase {
     elevator.setCoastOverride(override);
   }
 
-  public Command unjamCommand() {
-    return Commands.startEnd(
-        () -> wantUnjam = true,
-        () -> wantUnjam = false);
+  public Command toggleUnjamCommand() {
+    return Commands.runOnce(() -> wantUnjam = !wantUnjam);
   }
 
   public boolean hasCoral() {

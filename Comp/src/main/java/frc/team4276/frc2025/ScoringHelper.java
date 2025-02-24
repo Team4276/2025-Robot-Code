@@ -9,7 +9,7 @@ import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
 import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.drivers.VirtualSubsystem;
 
-public class ScoringHelper extends VirtualSubsystem {
+public class ScoringHelper extends VirtualSubsystem { //TODO: switch to fms naming convention
   private final int[] redScoringTable = {
       9,
       8,

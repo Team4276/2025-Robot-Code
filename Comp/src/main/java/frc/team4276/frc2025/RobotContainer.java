@@ -67,6 +67,7 @@ import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVision;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.VikXboxController;
+import frc.team4276.util.dashboard.ElasticUI;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -88,7 +89,7 @@ public class RobotContainer {
   private AutoBuilder autoBuilder;
 
   // Controller
-  private boolean useKeyboard = true;
+  private boolean useKeyboard = false;
   private boolean isDemo = false;
 
   private final VikXboxController driver = new VikXboxController(0);
@@ -247,6 +248,7 @@ public class RobotContainer {
 
     }
     configureButtonBindings();
+    configureUI();
 
     // Peace and quiet
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -460,33 +462,39 @@ public class RobotContainer {
                     DriveCommands.headingAlignCommand(drive,
                         () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(305.0)))));
 
-    // Algae Intake Trigger
-    keyboard
-        .button(11)
-        .whileTrue(
-            arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(
-                roller.setGoalCommand(Roller.Goal.INTAKE)));
-
     // Coral Scoring Triggers
-    var headingAlignReefCommand = Commands.sequence(
-        DriveCommands.headingAlignCommand(drive, () -> scoringHelper.getSelectedScorePose().getRotation())
-            .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
+    // var headingAlignReefCommand = Commands.sequence(
+    //     DriveCommands.headingAlignCommand(drive, () -> scoringHelper.getSelectedScorePose().getRotation())
+    //         .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
 
     keyboard
         .button(12)
-        .whileTrue(headingAlignReefCommand
-        // AutoScore.getAutoScoreCommand(
-        // drive, superstructure, vision, scoringHelper)
-        );
+        .and(() -> !(keyboard.getHID().getRawButton(9) || keyboard.getHID().getRawButton(10)))
+        .whileTrue(
+            // headingAlignReefCommand
+            AutoScore.getAutoScoreCommand(
+                drive, superstructure, vision, scoringHelper));
 
     keyboard
-        .button(13)
-        .onTrue(superstructure.scoreCommand(false));
+        .button(11)
+        .and(() -> !keyboard.getHID().getRawButton(12))
+        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE));
+
+    keyboard
+        .button(11)
+        .and(keyboard.button(12))
+        .whileTrue(superstructure.scoreCommand(false));
 
     // Algae Scoring Triggers
     keyboard
         .button(15)
         .whileTrue(roller.setGoalCommand(Roller.Goal.SCORE));
+
+    // keyboard
+    // .button(11)
+    // .whileTrue(
+    // arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(
+    // roller.setGoalCommand(Roller.Goal.INTAKE)));
 
     keyboard
         .button(14)
@@ -526,9 +534,8 @@ public class RobotContainer {
                     .resetPose(
                         new Pose2d(
                             RobotState.getInstance().getEstimatedPose().getTranslation(),
-                            AllianceFlipUtil.apply(Rotation2d.kZero))),
-                drive)
-                .ignoringDisable(false));
+                            AllianceFlipUtil.apply(Rotation2d.kZero))))
+                .ignoringDisable(true));
 
     /***************** Coral Triggers *****************/
 
@@ -554,88 +561,99 @@ public class RobotContainer {
                     .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 1.0))));
 
     // Scoring
-    var headingAlignReefCommand = Commands.sequence(
-        DriveCommands.headingAlignCommand(drive, () -> scoringHelper.getSelectedScorePose().getRotation())
-            .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
+    var headingAlignReefCommand = DriveCommands
+        .headingAlignCommand(drive, () -> scoringHelper.getSelectedScorePose().getRotation())
+        .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal));
 
     driver
         .rightTrigger()
+        .and(() -> !(driver.getHID().getXButton() || driver.getHID().getBButton()))
         .whileTrue(
             Commands.either(
                 superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal),
-                Commands.either(headingAlignReefCommand,
+
+                Commands.either(
+                    headingAlignReefCommand,
+
                     AutoScore.getAutoScoreCommand(drive, superstructure, vision, scoringHelper)
                         .alongWith(Commands.waitUntil(() -> (superstructure.atGoal() && drive.isAutoAligned()))
                             .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 0.2, 3))),
-                    () -> disableTranslationAutoAlign),
-                () -> disableHeadingAutoAlign)
-                .unless(() -> (driver.getHID().getXButton() || driver.getHID().getBButton())));
 
-    // TODO: make it so theres only one trigger declaration so it don't mess with
-    // stuff
+                    () -> disableTranslationAutoAlign),
+
+                () -> disableHeadingAutoAlign));
 
     driver
         .rightBumper()
-        .whileTrue(
-            Commands.either(
-                superstructure.scoreCommand(false),
-                superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE),
-                () -> driver.getRT()));
+        .and(driver.rightTrigger())
+        .whileTrue(superstructure.scoreCommand(false));
+
+    driver
+        .leftBumper()
+        .and(driver.rightTrigger())
+        .whileTrue(superstructure.scoreCommand(true));
 
     // Modal
     driver
-        .rightStick()
+        .povRight()
         .onTrue(
             Commands.runOnce(() -> disableTranslationAutoAlign = !disableTranslationAutoAlign));
 
     driver
-        .povDown()
+        .povLeft()
         .onTrue(Commands.runOnce(() -> disableHeadingAutoAlign = !disableHeadingAutoAlign));
 
     // Misc
+    driver
+        .rightBumper()
+        .and(() -> !driver.getRT())
+        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE));
 
     driver
         .povUp()
-        .toggleOnTrue(superstructure.unjamCommand());
+        .onTrue(superstructure.toggleUnjamCommand());
 
     /***************** Algae Triggers *****************/
 
     // Displacing
     driver
-        .povLeft()
+        .y()
+        .and(() -> scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L2
+            || scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L1)
         .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.LO_ALGAE));
 
     driver
-        .povRight()
-        .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.HI_ALGAE));
-
-    driver
         .y()
-        .onTrue(superstructure.toggleDisplacerCommand());
+        .and(() -> scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L3)
+        .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.HI_ALGAE));
 
     // Intake
     driver
         .leftTrigger()
+        .and(() -> !driver.getHID().getLeftBumperButton())
         .whileTrue(
-            Commands.either(
-                roller.setGoalCommand(Roller.Goal.SCORE),
-                arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(
-                    roller.setGoalCommand(Roller.Goal.INTAKE)),
-                driver.leftBumper()));
+            arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(
+                roller.setGoalCommand(Roller.Goal.INTAKE)));
 
     // Align
     driver
         .leftBumper()
-        .whileTrue(Commands.either(
-            superstructure.scoreCommand(true),
-            arm.setGoalCommand(Arm.Goal.SCORE).alongWith(
-                Commands.startEnd(
-                    () -> drive.setHeadingGoal(
-                        () -> AllianceFlipUtil.apply(Rotation2d.kCCW_90deg)),
-                    drive::clearHeadingGoal)),
-            driver.rightTrigger()));
+        .and(() -> !driver.getRT())
+        .whileTrue(
+            arm.setGoalCommand(Arm.Goal.SCORE)
+                .alongWith(
+                    DriveCommands.headingAlignCommand(drive, () -> AllianceFlipUtil.apply(Rotation2d.kCCW_90deg))));
 
     // Score
+    driver
+        .leftTrigger()
+        .and(driver.leftBumper())
+        .whileTrue(
+            roller.setGoalCommand(Roller.Goal.SCORE));
+  }
+
+  public void configureUI(){
+    ElasticUI.setAlignToggleSuppliers(() -> disableHeadingAutoAlign, () -> disableTranslationAutoAlign);
   }
 
   public void updateAlerts() {

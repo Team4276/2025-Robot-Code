@@ -32,6 +32,8 @@ public class Displacer {
   private final RollerIO io;
   private final RollerIOInputsAutoLogged inputs = new RollerIOInputsAutoLogged();
 
+  private boolean hasSpiked = false;
+
   public Displacer(RollerIO io) {
     this.io = io;
   }
@@ -40,10 +42,18 @@ public class Displacer {
     io.updateInputs(inputs);
     Logger.processInputs("Displacer", inputs);
 
-    // TODO: disable if current spike
-    io.runVolts(goal.getVolts());
+    if(goal != Goal.VROOOM){
+      hasSpiked = false;
+
+    } else if(inputs.supplyCurrentAmps > 20.0){
+      hasSpiked = true;
+    }
+
+    io.runVolts(hasSpiked ? 0.0 : goal.getVolts());
+
     Logger.recordOutput("Displacer/Goal", goal);
     Logger.recordOutput("Displacer/GoalVolts", goal);
+    Logger.recordOutput("Displacer/HasSpiked", hasSpiked);
   }
 
   @AutoLogOutput

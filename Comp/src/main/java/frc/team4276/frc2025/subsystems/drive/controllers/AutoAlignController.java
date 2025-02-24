@@ -11,7 +11,7 @@ import frc.team4276.util.dashboard.LoggedTunableProfiledPID;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class AutoAlignController { // TODO: cleanup/improve dashboard; cleanup advantage scope; add test autos;
+public class AutoAlignController { // TODO: improve dashboard;
   private final LoggedTunableProfiledPID driveController;
   private final LoggedTunableProfiledPID thetaController;
 

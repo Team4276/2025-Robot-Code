@@ -1,5 +1,6 @@
 package frc.team4276.util.dashboard;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -14,9 +15,19 @@ import frc.team4276.util.AllianceFlipUtil;
 public class ElasticUI {
   private ElasticUI() {
   }
+
+  private static BooleanSupplier headingAlignSupplier;
+  private static BooleanSupplier driveAlignSupplier;
+
+  public static void setAlignToggleSuppliers(BooleanSupplier heading, BooleanSupplier drive){
+    headingAlignSupplier = heading;
+    driveAlignSupplier = drive;
+  }
   
   public static void update(){
     SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+    SmartDashboard.putBoolean("Heading Align Enabled", !headingAlignSupplier.getAsBoolean());
+    SmartDashboard.putBoolean("Drive Align Enabled", !driveAlignSupplier.getAsBoolean());
   }
 
   public static void putSwerveDrive(Supplier<SwerveModuleState[]> state, Supplier<Rotation2d> angle) {
