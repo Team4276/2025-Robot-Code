@@ -3,7 +3,22 @@
  "version":1,
  "type":"Swerve",
  "variables":{
-  "expressions":{},
+  "expressions":{
+   "maxAccel":{
+    "dimension":"LinAcc",
+    "var":{
+     "exp":"4 m / s ^ 2",
+     "val":4.0
+    }
+   },
+   "maxVel":{
+    "dimension":"LinVel",
+    "var":{
+     "exp":"2 m / s",
+     "val":2.0
+    }
+   }
+  },
   "poses":{}
  },
  "config":{

@@ -21,7 +21,7 @@ public class AutoCommands {
   }
 
   public static final double scoreWaitTime = 0.5;
-  public static final double intakeWaitTime = 0.5;
+  public static final double intakeWaitTime = 2.0;
 
   public static Command resetPose(Pose2d pose) {
     return Commands.runOnce(() -> RobotState.getInstance().resetPose(pose));
@@ -147,8 +147,8 @@ public class AutoCommands {
 
   public static Command scoreCommand(Superstructure superstructure, boolean isLeftL1) {
     return superstructure.scoreCommand(isLeftL1)
-        .withDeadline(Commands.waitSeconds(scoreWaitTime))
-        .withName("Score")
-        .alongWith(notificationCommand("Scoring"));
+        .alongWith(notificationCommand("Scoring"))
+        .withTimeout(scoreWaitTime)
+        .withName("Score");
   }
 }

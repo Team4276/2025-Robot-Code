@@ -262,7 +262,7 @@ public class RobotContainer {
     autoBuilder = new AutoBuilder(drive, superstructure, arm, roller, autoSelector);
 
     // Set up auto routines
-    autoSelector.addRoutine("Test 1 Traj", () -> autoBuilder.testTraj("z_BoxTest"));
+    autoSelector.addRoutine("Box Test", () -> autoBuilder.testTraj("z_BoxTest"));
     autoSelector.addRoutine("RP Auto",
         List.of(
             new AutoQuestion("Is Processor Side?", List.of(
@@ -298,6 +298,12 @@ public class RobotContainer {
                 AutoQuestionResponse.YES,
                 AutoQuestionResponse.NO))),
         () -> autoBuilder.test3Coral());
+    autoSelector.addRoutine("Shrimple Coral Auto",
+        List.of(
+            new AutoQuestion("Is Processor Side?", List.of(
+                AutoQuestionResponse.YES,
+                AutoQuestionResponse.NO))),
+        () -> autoBuilder.shrimpleCoralAuto());
 
   }
 
