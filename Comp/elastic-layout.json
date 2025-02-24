@@ -304,7 +304,7 @@
             }
           },
           {
-            "title": "SelectedReef0",
+            "title": "G",
             "x": 288.0,
             "y": 0.0,
             "width": 96.0,
@@ -321,7 +321,7 @@
             }
           },
           {
-            "title": "SelectedReef2",
+            "title": "I",
             "x": 96.0,
             "y": 128.0,
             "width": 96.0,
@@ -338,7 +338,7 @@
             }
           },
           {
-            "title": "SelectedReef3",
+            "title": "J",
             "x": 0.0,
             "y": 128.0,
             "width": 96.0,
@@ -355,7 +355,7 @@
             }
           },
           {
-            "title": "SelectedReef4",
+            "title": "K",
             "x": 0.0,
             "y": 320.0,
             "width": 96.0,
@@ -372,7 +372,7 @@
             }
           },
           {
-            "title": "SelectedReef5",
+            "title": "L",
             "x": 96.0,
             "y": 320.0,
             "width": 96.0,
@@ -389,7 +389,7 @@
             }
           },
           {
-            "title": "SelectedReef6",
+            "title": "A",
             "x": 192.0,
             "y": 448.0,
             "width": 96.0,
@@ -406,7 +406,7 @@
             }
           },
           {
-            "title": "SelectedReef7",
+            "title": "B",
             "x": 288.0,
             "y": 448.0,
             "width": 96.0,
@@ -423,7 +423,7 @@
             }
           },
           {
-            "title": "SelectedReef9",
+            "title": "D",
             "x": 480.0,
             "y": 320.0,
             "width": 96.0,
@@ -440,7 +440,7 @@
             }
           },
           {
-            "title": "SelectedReef8",
+            "title": "C",
             "x": 384.0,
             "y": 320.0,
             "width": 96.0,
@@ -457,7 +457,7 @@
             }
           },
           {
-            "title": "SelectedReef10",
+            "title": "E",
             "x": 480.0,
             "y": 128.0,
             "width": 96.0,
@@ -474,7 +474,7 @@
             }
           },
           {
-            "title": "SelectedReef11",
+            "title": "F",
             "x": 384.0,
             "y": 128.0,
             "width": 96.0,
@@ -593,7 +593,7 @@
             }
           },
           {
-            "title": "SelectedReef1",
+            "title": "H",
             "x": 192.0,
             "y": 0.0,
             "width": 96.0,

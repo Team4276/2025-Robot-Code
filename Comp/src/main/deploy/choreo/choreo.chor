@@ -19,7 +19,22 @@
     }
    }
   },
-  "poses":{}
+  "poses":{
+   "st_side":{
+    "x":{
+     "exp":"7.1415 m",
+     "val":7.1415
+    },
+    "y":{
+     "exp":"2.875 m",
+     "val":2.875
+    },
+    "heading":{
+     "exp":"90 rad",
+     "val":90.0
+    }
+   }
+  }
  },
  "config":{
   "frontLeft":{
