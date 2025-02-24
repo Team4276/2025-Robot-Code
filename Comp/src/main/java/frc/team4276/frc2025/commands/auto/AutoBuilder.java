@@ -218,10 +218,10 @@ public class AutoBuilder { // TODO: fix auto not intaking
                   .andThen(superstructure.setGoalCommand(toGoal(levels.get(i)))
                       .raceWith(Commands.waitUntil(superstructure::atGoal).andThen(scoreCommand(superstructure))))));
 
-      if (i != reefs.size() - 1 && !cancelLastIntake) {
+      if (!(i == reefs.size() - 1 && cancelLastIntake)) {
         scoringCommands.addCommands(superstructure.setGoalCommand(Superstructure.Goal.INTAKE)
-            .withDeadline(followTrajectory(drive, trajs.get((i * 2) + 1)))
-            .andThen(Commands.waitSeconds(intakeWaitTime)));
+            .withDeadline(followTrajectory(drive, trajs.get((i * 2) + 1))
+                .andThen(Commands.waitSeconds(intakeWaitTime))));
       }
     }
 
