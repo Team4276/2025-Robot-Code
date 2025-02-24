@@ -91,7 +91,7 @@ public class TrajectoryController {
     double xError = sampledState.pose.getX() - currentPose.getTranslation().getX();
     double yError = sampledState.pose.getY() - currentPose.getTranslation().getY();
     double xFeedback = xController.calculate(0.0, xError);
-    double yFeedback = yController.calculate(0.0, xError);
+    double yFeedback = yController.calculate(0.0, yError);
     double thetaError = MathUtil
         .angleModulus(sampledState.pose.getRotation().minus(currentPose.getRotation()).getRadians());
     double thetaFeedback = rotController.calculate(0.0, thetaError);

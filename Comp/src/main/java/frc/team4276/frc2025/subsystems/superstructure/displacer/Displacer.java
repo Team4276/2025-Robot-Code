@@ -12,7 +12,7 @@ import frc.team4276.frc2025.subsystems.roller.RollerIOInputsAutoLogged;
 public class Displacer {
   public enum Goal {
     IDLE(() -> 0.0),
-    MOOORV(new LoggedTunableNumber("Displacer/MOOORVVolts", 5.0)),
+    MOOORV(new LoggedTunableNumber("Displacer/MOOORVVolts", 0.0)),
     VROOOM(new LoggedTunableNumber("Displacer/VROOMVolts", -12.0));
 
     private final DoubleSupplier voltageGoal;
@@ -40,6 +40,7 @@ public class Displacer {
     io.updateInputs(inputs);
     Logger.processInputs("Displacer", inputs);
 
+    // TODO: disable if current spike
     io.runVolts(goal.getVolts());
     Logger.recordOutput("Displacer/Goal", goal);
     Logger.recordOutput("Displacer/GoalVolts", goal);

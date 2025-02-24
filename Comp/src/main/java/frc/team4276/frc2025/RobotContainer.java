@@ -145,11 +145,9 @@ public class RobotContainer {
           vision = new Vision(
               RobotState.getInstance()::addVisionMeasurement,
               new VisionIOPhotonVision(
-                  VisionConstants.camera0Name, VisionConstants.robotToCamera0)
-          // ,
-          // new VisionIOPhotonVision(
-          // VisionConstants.camera1Name, VisionConstants.robotToCamera1)
-          );
+                  VisionConstants.camera0Name, VisionConstants.robotToCamera0),
+              new VisionIOPhotonVision(
+                  VisionConstants.camera1Name, VisionConstants.robotToCamera1));
         }
 
         case SIMBOT -> {
@@ -167,7 +165,8 @@ public class RobotContainer {
               new EndEffector(new EndEffectorIO() {
               }),
               new Displacer(
-                  new RollerIOSparkMax(Ports.ALGAE_DISPLACER, 20, false, true)),
+                  new RollerIO() {
+                  }),
               new RollerSensorsIO() {
               });
           arm = new Arm(new ArmIO() {
@@ -293,6 +292,12 @@ public class RobotContainer {
                 AutoQuestionResponse.YES,
                 AutoQuestionResponse.NO))),
         () -> autoBuilder.vanHybridAuto());
+    autoSelector.addRoutine("Test 3 Coral",
+        List.of(
+            new AutoQuestion("Is Processor Side?", List.of(
+                AutoQuestionResponse.YES,
+                AutoQuestionResponse.NO))),
+        () -> autoBuilder.test3Coral());
 
   }
 
@@ -458,15 +463,15 @@ public class RobotContainer {
 
     // Coral Scoring Triggers
     var headingAlignReefCommand = Commands.sequence(
-      DriveCommands.headingAlignCommand(drive, () -> scoringHelper.getSelectedScorePose().getRotation())
-          .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
+        DriveCommands.headingAlignCommand(drive, () -> scoringHelper.getSelectedScorePose().getRotation())
+            .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
 
     keyboard
         .button(12)
         .whileTrue(headingAlignReefCommand
-            // AutoScore.getAutoScoreCommand(
-            //     drive, superstructure, vision, scoringHelper)
-                );
+        // AutoScore.getAutoScoreCommand(
+        // drive, superstructure, vision, scoringHelper)
+        );
 
     keyboard
         .button(13)
@@ -560,17 +565,16 @@ public class RobotContainer {
                 () -> disableHeadingAutoAlign)
                 .unless(() -> (driver.getHID().getXButton() || driver.getHID().getBButton())));
 
-    driver
-        .leftBumper()
-        .whileTrue(
-            superstructure.scoreCommand(true)
-                .onlyIf(driver.rightTrigger()));
+    // TODO: make it so theres only one trigger declaration so it don't mess with
+    // stuff
 
     driver
         .rightBumper()
         .whileTrue(
-            superstructure.scoreCommand(false)
-                .onlyIf(driver.rightTrigger()));
+            Commands.either(
+                superstructure.scoreCommand(false),
+                superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE),
+                () -> driver.getRT()));
 
     // Modal
     driver
@@ -583,11 +587,6 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() -> disableHeadingAutoAlign = !disableHeadingAutoAlign));
 
     // Misc
-    driver
-        .rightBumper()
-        .whileTrue(
-            superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE)
-                .unless(driver.rightTrigger()));
 
     driver
         .povUp()
@@ -612,24 +611,25 @@ public class RobotContainer {
     driver
         .leftTrigger()
         .whileTrue(
-            arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(
-                roller.setGoalCommand(Roller.Goal.INTAKE)).unless(driver.leftBumper()));
+            Commands.either(
+                roller.setGoalCommand(Roller.Goal.SCORE),
+                arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(
+                    roller.setGoalCommand(Roller.Goal.INTAKE)),
+                driver.leftBumper()));
 
     // Align
     driver
         .leftBumper()
-        .whileTrue(
+        .whileTrue(Commands.either(
+            superstructure.scoreCommand(true),
             arm.setGoalCommand(Arm.Goal.SCORE).alongWith(
                 Commands.startEnd(
                     () -> drive.setHeadingGoal(
                         () -> AllianceFlipUtil.apply(Rotation2d.kCCW_90deg)),
-                    drive::clearHeadingGoal))
-                .unless(driver.rightTrigger()));
+                    drive::clearHeadingGoal)),
+            driver.rightTrigger()));
 
     // Score
-    driver
-        .leftTrigger()
-        .whileTrue(roller.setGoalCommand(Roller.Goal.SCORE).onlyIf(driver.leftBumper()));
   }
 
   public void updateAlerts() {

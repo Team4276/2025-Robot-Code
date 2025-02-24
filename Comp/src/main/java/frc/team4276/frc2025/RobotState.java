@@ -64,7 +64,7 @@ public class RobotState {
     trajectorySetpoint = setpoint;
   }
 
-  public void addDriveSpeeds(ChassisSpeeds speeds){
+  public void addDriveSpeeds(ChassisSpeeds speeds) {
     robotVelocity = speeds;
   }
 
@@ -119,7 +119,7 @@ public class RobotState {
   }
 
   @AutoLogOutput(key = "RobotState/FieldVelocity")
-  public ChassisSpeeds getFieldVelocity(){
+  public ChassisSpeeds getFieldVelocity() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotVelocity, getEstimatedPose().getRotation());
   }
 }

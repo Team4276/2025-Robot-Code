@@ -37,7 +37,7 @@ public class Vision extends SubsystemBase {
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
-  private boolean[] camerasEnabled = { true, true };
+  private boolean[] camerasEnabled = { true, false };
 
   public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -124,9 +124,13 @@ public class Vision extends SubsystemBase {
           }
 
           if (robotPose3d == null) {
-            robotPosesRejected.add(robotPose3d);
             continue;
           }
+
+          // if (avgTagDist > maxDist && observation.tagCount() == 1) {
+          // robotPosesRejected.add(robotPose3d);
+          // continue;
+          // }
 
           if (!camerasEnabled[cameraIndex]) {
             robotPosesRejected.add(robotPose3d);

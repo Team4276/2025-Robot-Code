@@ -212,10 +212,11 @@ public class Drive extends SubsystemBase {
 
         break;
       case TRAJECTORY:
-        desiredSpeeds = trajectoryController.update(currentPose);
+        desiredSpeeds = trajectoryController.update(RobotState.getInstance().getEstimatedOdomPose());
 
         if (isHeadingControlled) {
-          desiredSpeeds.omegaRadiansPerSecond = headingController.update(currentPose.getRotation().getRadians());
+          desiredSpeeds.omegaRadiansPerSecond = headingController.update(
+              RobotState.getInstance().getEstimatedOdomPose().getRotation().getRadians());
         }
 
         break;
@@ -237,7 +238,7 @@ public class Drive extends SubsystemBase {
       // Calculate setpoints
       ChassisSpeeds setpointSpeeds;
       SwerveModuleState[] setpointStates;
-      if (useSetpointGenerator) {
+      if (useSetpointGenerator && mode != DriveMode.TRAJECTORY) {
         prevSetpoint = swerveSetpointGenerator.generateSetpoint(prevSetpoint, desiredSpeeds, 0.02);
         setpointSpeeds = prevSetpoint.robotRelativeSpeeds();
         setpointStates = prevSetpoint.moduleStates();
@@ -320,8 +321,11 @@ public class Drive extends SubsystemBase {
   }
 
   public boolean disableBackVision() {
-    return isAutoHeadingAligned()
-        && getAutoAlignDistanceToGoal().getTranslation().getNorm() < disableBackVisionDistance;
+    return
+    // isAutoHeadingAligned()
+    // && getAutoAlignDistanceToGoal().getTranslation().getNorm() <
+    // disableBackVisionDistance;
+    true;
   }
 
   public boolean isAutoAligned() {

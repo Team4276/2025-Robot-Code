@@ -78,13 +78,13 @@ public class Superstructure extends SubsystemBase {
     if (wantScore) {
       endeffector.setGoal(currentGoal == Goal.L1 ? (leftL1 ? EndEffector.Goal.FAVOR_LEFT : EndEffector.Goal.FAVOR_RIGHT)
           : EndEffector.Goal.SCORE);
-          hasCoral = false;
+      hasCoral = false;
     } else {
       endeffector.setGoal(EndEffector.Goal.IDLE);
 
     }
 
-    if(displace){
+    if (displace) {
       displacer.setGoal(Displacer.Goal.VROOOM);
     }
 
@@ -111,15 +111,15 @@ public class Superstructure extends SubsystemBase {
         elevator.setGoal(Elevator.Goal.STOW);
         displacer.setGoal(Displacer.Goal.IDLE);
 
-        if (sensorsInputs.backTripped || cleared5){
+        if (sensorsInputs.backTripped || cleared5) {
           cleared5 = true;
           endeffector.setGoal(EndEffector.Goal.IDLE);
-        } else if (sensorsInputs.backCleared || cleared4){
+        } else if (sensorsInputs.backCleared || cleared4) {
           cleared4 = true;
           endeffector.setGoal(EndEffector.Goal.REVERSE);
         } else {
           endeffector.setGoal(EndEffector.Goal.SLOINTAKE);
-          
+
         }
 
         break;
@@ -210,6 +210,10 @@ public class Superstructure extends SubsystemBase {
     desiredGoal = () -> goal;
   }
 
+  public Goal getGoal() {
+    return currentGoal;
+  }
+
   public Command setGoalCommand(Goal goal) {
     return setGoalCommand(() -> goal);
   }
@@ -219,7 +223,7 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command scoreCommand(boolean isLeftL1) {
-    return startEnd(() -> {
+    return Commands.startEnd(() -> {
       wantScore = true;
       leftL1 = isLeftL1;
     },
@@ -259,7 +263,7 @@ public class Superstructure extends SubsystemBase {
     return hasCoral;
   }
 
-  public Command toggleDisplacerCommand(){
+  public Command toggleDisplacerCommand() {
     return Commands.runOnce(() -> displace = !displace);
   }
 }

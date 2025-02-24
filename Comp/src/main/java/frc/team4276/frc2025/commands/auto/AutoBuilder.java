@@ -20,8 +20,8 @@ import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.roller.Roller;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
 
-public class AutoBuilder {
-  private final Drive drive;
+public class AutoBuilder { // TODO: fix auto not intaking
+  private final Drive drive; // TODO: add drive to pose auto
   private final Superstructure superstructure;
   private final Arm arm;
   private final Roller roller;
@@ -90,14 +90,16 @@ public class AutoBuilder {
 
     } else {
       trajs.add(getPathPlannerTrajectoryFromChoreo("c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise));
-      trajs.add(getPathPlannerTrajectoryFromChoreo("c_sc_" + stations.get(0) + "_" + reefs.get(0).toString(),
-          mirrorLengthwise, 1));
-
+      if (!(reefs.size() == 1 && cancelLastIntake)) {
+        trajs.add(getPathPlannerTrajectoryFromChoreo("c_sc_" + stations.get(0) + "_" + reefs.get(0).toString(),
+            mirrorLengthwise, 1));
+      }
     }
 
     for (int i = 1; i < reefs.size(); i++) {
       trajs.add(getPathPlannerTrajectoryFromChoreo("c_sc_" + stations.get(i - 1) + "_" + reefs.get(i).toString(),
           mirrorLengthwise, 0));
+
       trajs.add(getPathPlannerTrajectoryFromChoreo("c_sc_" + stations.get(i) + "_" + reefs.get(i).toString(),
           mirrorLengthwise, 1));
     }
@@ -215,6 +217,23 @@ public class AutoBuilder {
             AutoQuestionResponse.CLOSE,
             AutoQuestionResponse.CLOSE,
             AutoQuestionResponse.CLOSE),
+        false);
+  }
+
+  public Command test3Coral() {
+    return coralScoreAuto(
+        List.of(
+            AutoQuestionResponse.E,
+            AutoQuestionResponse.D,
+            AutoQuestionResponse.C),
+        List.of(
+            AutoQuestionResponse.L2,
+            AutoQuestionResponse.L1_RIGHT,
+            AutoQuestionResponse.L1_LEFT),
+        List.of(
+            AutoQuestionResponse.FAR,
+            AutoQuestionResponse.FAR,
+            AutoQuestionResponse.FAR),
         false);
   }
 
