@@ -55,13 +55,13 @@ public class AutoBuilder { // TODO: fix auto not intaking
         followTrajectory(drive, traj));
   }
 
-  public Command shrimpleCoralAuto() {
+  public Command ECDshrimpleCoralAuto() {
     // Check if need to flip paths to barge side
     boolean mirrorLengthwise = autoSelector.getResponses().get(0) == AutoQuestionResponse.NO;
 
     PathPlannerTrajectory[] trajs = new PathPlannerTrajectory[9];
     for (int i = 0; i < 9; i++) {
-      trajs[i] = getPathPlannerTrajectoryFromChoreo("c_f", mirrorLengthwise, i);
+      trajs[i] = getPathPlannerTrajectoryFromChoreo("c_f_ECD", mirrorLengthwise, i);
     }
 
     return Commands.sequence(
@@ -107,6 +107,55 @@ public class AutoBuilder { // TODO: fix auto not intaking
 
         followTrajectory(drive, trajs[8]),
         superstructure.setGoalCommand(Goal.L3)
+            .withDeadline(Commands.waitUntil(() -> superstructure.atGoal())
+                .andThen(scoreCommand(superstructure)))
+
+    );
+  }
+
+  public Command FEBAshrimpleCoralAuto() {
+    // Check if need to flip paths to barge side
+    boolean mirrorLengthwise = autoSelector.getResponses().get(0) == AutoQuestionResponse.NO;
+
+    PathPlannerTrajectory[] trajs = new PathPlannerTrajectory[9];
+    for (int i = 0; i < 7; i++) {
+      trajs[i] = getPathPlannerTrajectoryFromChoreo("c_f_FEBA", mirrorLengthwise, i);
+    }
+
+    return Commands.sequence(
+        notificationCommand("Run path on " + (mirrorLengthwise ? "barge side" : "processor side")),
+        resetPose(trajs[0].getInitialPose()),
+        Commands.waitSeconds(autoSelector.getDelayInput()),
+
+        followTrajectory(drive, trajs[0]),
+        superstructure.setGoalCommand(Goal.L2)
+            .withDeadline(Commands.waitUntil(() -> superstructure.atGoal())
+                .andThen(scoreCommand(superstructure))),
+
+        followTrajectory(drive, trajs[1]),
+        superstructure.setGoalCommand(Goal.INTAKE)
+            .withTimeout(intakeWaitTime),
+
+        followTrajectory(drive, trajs[2]),
+        superstructure.setGoalCommand(Goal.L2)
+            .withDeadline(Commands.waitUntil(() -> superstructure.atGoal())
+                .andThen(scoreCommand(superstructure))),
+
+        followTrajectory(drive, trajs[3]),
+        superstructure.setGoalCommand(Goal.INTAKE)
+            .withTimeout(intakeWaitTime),
+
+        followTrajectory(drive, trajs[4]),
+        superstructure.setGoalCommand(Goal.L2)
+            .withDeadline(Commands.waitUntil(() -> superstructure.atGoal())
+                .andThen(scoreCommand(superstructure))),
+
+        followTrajectory(drive, trajs[5]),
+        superstructure.setGoalCommand(Goal.INTAKE)
+            .withTimeout(intakeWaitTime),
+
+        followTrajectory(drive, trajs[6]),
+        superstructure.setGoalCommand(Goal.L2)
             .withDeadline(Commands.waitUntil(() -> superstructure.atGoal())
                 .andThen(scoreCommand(superstructure)))
 

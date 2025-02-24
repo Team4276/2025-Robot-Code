@@ -264,7 +264,18 @@ public class RobotContainer {
     autoBuilder = new AutoBuilder(drive, superstructure, arm, roller, autoSelector);
 
     // Set up auto routines
-    autoSelector.addRoutine("Box Test", () -> autoBuilder.testTraj("z_BoxTest"));
+    autoSelector.addRoutine("(ECD) Shrimple Coral Auto",
+        List.of(
+            new AutoQuestion("Is Processor Side?", List.of(
+                AutoQuestionResponse.YES,
+                AutoQuestionResponse.NO))),
+        () -> autoBuilder.ECDshrimpleCoralAuto());
+    autoSelector.addRoutine("(FEBA) Shrimple Coral Auto",
+        List.of(
+            new AutoQuestion("Is Processor Side?", List.of(
+                AutoQuestionResponse.YES,
+                AutoQuestionResponse.NO))),
+        () -> autoBuilder.FEBAshrimpleCoralAuto());
     autoSelector.addRoutine("RP Auto",
         List.of(
             new AutoQuestion("Is Processor Side?", List.of(
@@ -300,17 +311,12 @@ public class RobotContainer {
                 AutoQuestionResponse.YES,
                 AutoQuestionResponse.NO))),
         () -> autoBuilder.test3Coral());
-    autoSelector.addRoutine("Shrimple Coral Auto",
-        List.of(
-            new AutoQuestion("Is Processor Side?", List.of(
-                AutoQuestionResponse.YES,
-                AutoQuestionResponse.NO))),
-        () -> autoBuilder.shrimpleCoralAuto());
 
   }
 
   private void configureTuningRoutines() {
     // Set up SysId routines
+    autoSelector.addRoutine("Box Test", () -> autoBuilder.testTraj("z_BoxTest"));
     autoSelector.addRoutine(
         "Drive Wheel Radius Characterization", () -> new WheelRadiusCharacterization(drive));
     autoSelector.addRoutine(
@@ -464,8 +470,9 @@ public class RobotContainer {
 
     // Coral Scoring Triggers
     // var headingAlignReefCommand = Commands.sequence(
-    //     DriveCommands.headingAlignCommand(drive, () -> scoringHelper.getSelectedScorePose().getRotation())
-    //         .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
+    // DriveCommands.headingAlignCommand(drive, () ->
+    // scoringHelper.getSelectedScorePose().getRotation())
+    // .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
 
     keyboard
         .button(12)
@@ -652,7 +659,7 @@ public class RobotContainer {
             roller.setGoalCommand(Roller.Goal.SCORE));
   }
 
-  public void configureUI(){
+  public void configureUI() {
     ElasticUI.setAlignToggleSuppliers(() -> disableHeadingAutoAlign, () -> disableTranslationAutoAlign);
   }
 
