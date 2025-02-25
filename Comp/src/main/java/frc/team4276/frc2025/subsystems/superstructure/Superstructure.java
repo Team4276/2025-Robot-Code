@@ -71,7 +71,7 @@ public class Superstructure extends SubsystemBase {
 
     currentGoal = desiredGoal.get();
 
-    if (wantUnjam){
+    if (wantUnjam) {
       currentGoal = Goal.UNJAM;
     }
 
@@ -210,6 +210,10 @@ public class Superstructure extends SubsystemBase {
     desiredGoal = () -> goal;
   }
 
+  public void setGoal(Supplier<Goal> goal) {
+    desiredGoal = goal;
+  }
+
   public Goal getGoal() {
     return currentGoal;
   }
@@ -219,7 +223,7 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command setGoalCommand(Supplier<Goal> goal) {
-    return startEnd(() -> setGoal(goal.get()), () -> setGoal(Goal.STOW));
+    return startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW));
   }
 
   public Command scoreCommand(boolean isLeftL1) {

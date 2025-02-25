@@ -19,19 +19,23 @@ import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.roller.Roller;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
+import frc.team4276.frc2025.subsystems.vision.Vision;
 
 public class AutoBuilder { // TODO: fix auto not intaking
   private final Drive drive; // TODO: add drive to pose auto
   private final Superstructure superstructure;
   private final Arm arm;
   private final Roller roller;
+  private final Vision vision;
   private final AutoSelector autoSelector;
 
-  public AutoBuilder(Drive drive, Superstructure superstructure, Arm arm, Roller roller, AutoSelector autoSelector) {
+  public AutoBuilder(Drive drive, Superstructure superstructure, Arm arm, Roller roller, Vision vision,
+      AutoSelector autoSelector) {
     this.drive = drive;
     this.superstructure = superstructure;
     this.arm = arm;
     this.roller = roller;
+    this.vision = vision;
     this.autoSelector = autoSelector;
   }
 
@@ -49,7 +53,6 @@ public class AutoBuilder { // TODO: fix auto not intaking
     var traj = getPathPlannerTrajectoryFromChoreo(name, mirrorLengthwise);
 
     return Commands.sequence(
-        notificationCommand("Run path on " + (mirrorLengthwise ? "barge side" : "processor side")),
         resetPose(traj.getInitialPose()),
         Commands.waitSeconds(autoSelector.getDelayInput()),
         followTrajectory(drive, traj));
@@ -65,14 +68,15 @@ public class AutoBuilder { // TODO: fix auto not intaking
     }
 
     return Commands.sequence(
-        notificationCommand("Run path on " + (mirrorLengthwise ? "barge side" : "processor side")),
         resetPose(trajs[0].getInitialPose()),
         Commands.waitSeconds(autoSelector.getDelayInput()),
 
+        Commands.runOnce(() -> vision.setEnableCamera(0, true)),
         followTrajectory(drive, trajs[0]),
         superstructure.setGoalCommand(Goal.L2)
             .withDeadline(Commands.waitUntil(() -> superstructure.atGoal())
                 .andThen(scoreCommand(superstructure))),
+        Commands.runOnce(() -> vision.setEnableCamera(0, false)),
 
         followTrajectory(drive, trajs[1]),
         superstructure.setGoalCommand(Goal.INTAKE)
@@ -123,7 +127,6 @@ public class AutoBuilder { // TODO: fix auto not intaking
     }
 
     return Commands.sequence(
-        notificationCommand("Run path on " + (mirrorLengthwise ? "barge side" : "processor side")),
         resetPose(trajs[0].getInitialPose()),
         Commands.waitSeconds(autoSelector.getDelayInput()),
 
@@ -230,7 +233,6 @@ public class AutoBuilder { // TODO: fix auto not intaking
     }
 
     return Commands.sequence(
-        notificationCommand("Run path on " + (mirrorLengthwise ? "barge side" : "processor side")),
         resetPose(trajs.get(0).getInitialPose()),
         Commands.waitSeconds(autoSelector.getDelayInput()),
         scoringCommands);

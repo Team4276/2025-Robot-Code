@@ -19,7 +19,7 @@ public class ElevatorConstants {
   public static final double encoderVelocityFactor = 1.0 / 60.0;
   public static final boolean invertEncoder = true;
 
-  public static final double kp = 0.04; // 0.04
+  public static final double kp = 0.1;
   public static final double ki = 0.0;
   public static final double kd = 0.0;
 
@@ -35,6 +35,6 @@ public class ElevatorConstants {
 
   public static final double maxPosition = Units.inchesToMeters(25.5); // m
 
-  public static final double tolerance = 1.0; // m
+  public static final double tolerance = 0.05; // m
 
 }

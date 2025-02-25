@@ -212,11 +212,11 @@ public class Drive extends SubsystemBase {
 
         break;
       case TRAJECTORY:
-        desiredSpeeds = trajectoryController.update(RobotState.getInstance().getEstimatedOdomPose());
+        desiredSpeeds = trajectoryController.update(currentPose);
 
         if (isHeadingControlled) {
           desiredSpeeds.omegaRadiansPerSecond = headingController.update(
-              RobotState.getInstance().getEstimatedOdomPose().getRotation().getRadians());
+              currentPose.getRotation().getRadians());
         }
 
         break;

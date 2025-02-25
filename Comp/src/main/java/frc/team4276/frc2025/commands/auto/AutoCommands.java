@@ -21,7 +21,7 @@ public class AutoCommands {
   }
 
   public static final double scoreWaitTime = 0.5;
-  public static final double intakeWaitTime = 2.0;
+  public static final double intakeWaitTime = 1.0;
 
   public static Command resetPose(Pose2d pose) {
     return Commands.runOnce(() -> RobotState.getInstance().resetPose(pose));

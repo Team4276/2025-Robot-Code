@@ -42,11 +42,11 @@ public class Displacer {
     io.updateInputs(inputs);
     Logger.processInputs("Displacer", inputs);
 
-    if(goal != Goal.VROOOM){
+    if (goal != Goal.VROOOM) {
       hasSpiked = false;
 
-    } else if(inputs.supplyCurrentAmps > 20.0){
-      hasSpiked = true;
+    } else if (inputs.supplyCurrentAmps > 20.0) {
+      // hasSpiked = true;
     }
 
     io.runVolts(hasSpiked ? 0.0 : goal.getVolts());

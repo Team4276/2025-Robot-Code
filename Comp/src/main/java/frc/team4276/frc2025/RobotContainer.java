@@ -261,7 +261,7 @@ public class RobotContainer {
   }
 
   private void configureAutos() {
-    autoBuilder = new AutoBuilder(drive, superstructure, arm, roller, autoSelector);
+    autoBuilder = new AutoBuilder(drive, superstructure, arm, roller, vision, autoSelector);
 
     // Set up auto routines
     autoSelector.addRoutine("(ECD) Shrimple Coral Auto",
@@ -679,6 +679,13 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoSelector.getCommand();
+    return Commands.runOnce(() -> {
+      vision.setEnableCamera(0, false);
+      vision.setEnableCamera(1, false);
+    }).andThen(autoSelector.getCommand()).andThen(
+        Commands.runOnce(() -> {
+          vision.setEnableCamera(0, true);
+          vision.setEnableCamera(1, false);
+        }));
   }
 }

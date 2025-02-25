@@ -7,6 +7,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.team4276.frc2025.Constants;
 import frc.team4276.frc2025.Constants.Mode;
@@ -45,16 +46,18 @@ public class Elevator {
   private Goal goal = Goal.STOW;
 
   private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Elevator/maxVel", 2.75);
-  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", 2.0);
+  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Elevator/maxAccel", 3.0);
 
   private final LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.20);
   private final LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 9.0);
   private final LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.15);
+  private final LoggedTunableNumber kA = new LoggedTunableNumber("Elevator/kA", 0.01);
 
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-  private ElevatorFeedforward ff = new ElevatorFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), 0.0);
+  private ElevatorFeedforward ff = new ElevatorFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(),
+      kA.getAsDouble());
   private TrapezoidProfile profile = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(maxVel.getAsDouble(), maxAccel.getAsDouble()));
   private TrapezoidProfile.State setpointState = new TrapezoidProfile.State();
@@ -70,12 +73,17 @@ public class Elevator {
    */
   private double homedPosition = 0.0;
 
+  private Timer atGoalTimer = new Timer();
+  private final double atGoalTime = 0.2;
+
   private final ElevatorViz goalViz;
   private final ElevatorViz measuredViz;
 
   public Elevator(ElevatorIO io) {
     this.io = io;
     io.setBrakeMode(true);
+
+    atGoalTimer.restart();
 
     goalViz = new ElevatorViz("Goal", Color.kGreen);
     measuredViz = new ElevatorViz("Measured", Color.kBlack);
@@ -112,7 +120,7 @@ public class Elevator {
       setpointState = new TrapezoidProfile.State(getPositionMetres(), 0.0);
 
       if (Constants.isTuning) {
-        ff = new ElevatorFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), 0.0);
+        ff = new ElevatorFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), kA.getAsDouble());
         profile = new TrapezoidProfile(
             new TrapezoidProfile.Constraints(maxVel.getAsDouble(), maxAccel.getAsDouble()));
       }
@@ -122,6 +130,10 @@ public class Elevator {
         io.setBrakeMode(true);
         wasDisabled = false;
         hasFlippedCoast = false;
+      }
+
+      if (!atGoal()) {
+        atGoalTimer.reset();
       }
 
       if (goal != Goal.STOW) {
@@ -173,7 +185,12 @@ public class Elevator {
   }
 
   public boolean atGoal() {
-    return Constants.getMode() == Mode.SIM ? true : MathUtil.isNear(goal.getPositionMetres(), getPositionMetres(), tolerance);
+    return Constants.getMode() == Mode.SIM ? true
+        : MathUtil.isNear(goal.getPositionMetres(), getPositionMetres(), tolerance);
+  }
+
+  public boolean atGoalDebounce() {
+    return atGoalTimer.get() > atGoalTime;
   }
 
   public void runCharacterization(double output) {
