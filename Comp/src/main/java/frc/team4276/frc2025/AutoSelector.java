@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.drivers.VirtualSubsystem;
 
 import java.util.ArrayList;
@@ -52,8 +53,12 @@ public class AutoSelector extends VirtualSubsystem {
   private final List<StringPublisher> questionPublishers;
   private final List<LoggedDashboardChooser<AutoQuestionResponse>> questionChoosers;
 
+  private boolean autoChanged = true;
+
   private final LoggedNetworkNumber coralInput;
   private final LoggedNetworkNumber delayInput;
+  private int prevCoralInput = 1;
+  private double prevDelayInput = 0.0;
 
   private AutoRoutine lastRoutine;
   private List<AutoQuestionResponse> lastResponses = List.of(
@@ -117,14 +122,26 @@ public class AutoSelector extends VirtualSubsystem {
     return delayInput.get();
   }
 
+  private boolean wasRed = false;
+
   public void periodic() {
     // Skip updates when actively running in auto
     if (DriverStation.isAutonomousEnabled() && lastRoutine != null && lastResponses != null) {
       return;
     }
 
+    if(AllianceFlipUtil.shouldFlip() != wasRed){
+      autoChanged = true;
+    }
+
+    wasRed = AllianceFlipUtil.shouldFlip();
+
     SmartDashboard.putNumber("Comp/Auto/Num Coral Submitted ", getCoralInput());
     SmartDashboard.putNumber("Comp/Auto/Delay Input Submitted ", getDelayInput());
+
+    if(getCoralInput() != prevCoralInput || getDelayInput() != prevDelayInput){
+      autoChanged = true;
+    }
 
     // Update the list of questions
     var selectedRoutine = routineChooser.get();
@@ -133,6 +150,7 @@ public class AutoSelector extends VirtualSubsystem {
     }
 
     if (!selectedRoutine.equals(lastRoutine)) {
+      autoChanged = true;
       var questions = selectedRoutine.questions();
       questionChoosers.clear();
       for (int i = 0; i < maxQuestions; i++) {
@@ -163,12 +181,22 @@ public class AutoSelector extends VirtualSubsystem {
       var responseString = questionChoosers.get(i).get();
       if (cachedResponses.get(i) != responseString) {
         // TODO: stop if invalid auto
+        autoChanged = true;
       }
       lastResponses.add(
           responseString == null
               ? lastRoutine.questions().get(i).responses().get(0)
               : responseString);
     }
+  }
+
+  public boolean hasAutoChanged(){
+    if(autoChanged){
+      autoChanged = false;
+      return true;
+    }
+
+    return false;
   }
 
   /** A customizable auto routine associated with a single command. */

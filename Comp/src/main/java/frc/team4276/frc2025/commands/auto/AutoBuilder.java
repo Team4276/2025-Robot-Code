@@ -71,12 +71,12 @@ public class AutoBuilder { // TODO: fix auto not intaking
         resetPose(trajs[0].getInitialPose()),
         Commands.waitSeconds(autoSelector.getDelayInput()),
 
-        Commands.runOnce(() -> vision.setEnableCamera(0, true)),
+        vision.setCamerasEnabledCommand(true),
         followTrajectory(drive, trajs[0]),
         superstructure.setGoalCommand(Goal.L2)
             .withDeadline(Commands.waitUntil(() -> superstructure.atGoal())
                 .andThen(scoreCommand(superstructure))),
-        Commands.runOnce(() -> vision.setEnableCamera(0, false)),
+        vision.setCamerasEnabledCommand(false),
 
         followTrajectory(drive, trajs[1]),
         superstructure.setGoalCommand(Goal.INTAKE)

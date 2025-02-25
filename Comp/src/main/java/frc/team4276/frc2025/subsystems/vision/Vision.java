@@ -24,6 +24,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.field.FieldConstants;
@@ -210,6 +212,18 @@ public class Vision extends SubsystemBase {
   }
 
   public void setEnableCamera(int cameraIndex, boolean enable) {
-    camerasEnabled[cameraIndex] = enable;
+    if(cameraIndex < camerasEnabled.length){
+      camerasEnabled[cameraIndex] = enable;
+    }
+  }
+
+  public void setCamerasEnabled(boolean... enabled){
+    for(int i = 0; i < enabled.length; i++){
+      setEnableCamera(i, enabled[i]);
+    }
+  }
+
+  public Command setCamerasEnabledCommand(boolean... enabled){
+    return Commands.runOnce(() -> setCamerasEnabled(enabled));
   }
 }

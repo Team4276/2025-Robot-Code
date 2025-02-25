@@ -7,7 +7,7 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
-import frc.team4276.util.drivers.ObjectSensor;
+// import frc.team4276.util.drivers.ObjectSensor;
 
 public class EndEffector {
   private static final LoggedTunableNumber favorVolts = new LoggedTunableNumber("EndEffector/FavorVolts", 10.0);
@@ -49,11 +49,11 @@ public class EndEffector {
   private final EndEffectorIO io;
   private final EndEffectorIOInputsAutoLogged inputs = new EndEffectorIOInputsAutoLogged();
 
-  private final ObjectSensor coralSensor;
+  // private final ObjectSensor coralSensor;
 
   public EndEffector(EndEffectorIO io) {
     this.io = io;
-    coralSensor = new ObjectSensor("EndEffector");
+    // coralSensor = new ObjectSensor("EndEffector");
   }
 
   public void periodic() {
@@ -63,12 +63,12 @@ public class EndEffector {
     if (DriverStation.isDisabled()) {
       goal = Goal.IDLE;
     }
-    coralSensor.update(inputs.leftSupplyCurrentAmps, inputs.leftVelocity,
-        (goal.getLeftVolts() + goal.getRightVolts()) == 0); // average them? The favor left and favor right complicates
-                                                            // it ill figure it out after testing
-    if (coralSensor.getDetection()) {
-      System.out.println("detected");
-    }
+    // coralSensor.update(inputs.leftSupplyCurrentAmps, inputs.leftVelocity,
+    //     (goal.getLeftVolts() + goal.getRightVolts()) == 0); // average them? The favor left and favor right complicates
+    //                                                         // it ill figure it out after testing
+    // if (coralSensor.getDetection()) {
+    //   System.out.println("detected");
+    // }
     io.runVolts(goal.getLeftVolts(), goal.getRightVolts());
     Logger.recordOutput("EndEffector/Goal", goal);
   }

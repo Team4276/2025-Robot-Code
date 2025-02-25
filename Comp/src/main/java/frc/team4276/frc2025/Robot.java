@@ -191,6 +191,19 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
+    if(robotContainer.hasAutoChanged()){
+      autonomousCommand = robotContainer.getAutonomousCommand();
+    }
+  }
+
+  @Override
+  public void disabledExit() {
+    if(DriverStation.isFMSAttached()){
+      robotContainer.setToggles(true, true);
+    } else {
+      robotContainer.setToggles(false, false);
+
+    }
   }
 
   /**
@@ -199,9 +212,9 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void autonomousInit() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
     autoMessagePrinted = false;
     autoStart = Timer.getFPGATimestamp();
+    System.out.println("Auto Started");
 
     if (!Constants.isTuning) {
       Elastic.selectTab("Auto");
