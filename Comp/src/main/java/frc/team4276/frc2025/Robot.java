@@ -199,9 +199,9 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledExit() {
     if(DriverStation.isFMSAttached()){
-      robotContainer.setToggles(true, true);
-    } else {
       robotContainer.setToggles(false, false);
+    } else {
+      robotContainer.setToggles(true, true);
 
     }
   }

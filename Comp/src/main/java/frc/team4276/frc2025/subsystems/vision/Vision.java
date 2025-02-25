@@ -222,6 +222,10 @@ public class Vision extends SubsystemBase {
       setEnableCamera(i, enabled[i]);
     }
   }
+  
+  public Command setEnableCameraCommand(int cameraIndex, boolean enabled){
+    return Commands.runOnce(() -> setEnableCamera(cameraIndex, enabled));
+  }
 
   public Command setCamerasEnabledCommand(boolean... enabled){
     return Commands.runOnce(() -> setCamerasEnabled(enabled));

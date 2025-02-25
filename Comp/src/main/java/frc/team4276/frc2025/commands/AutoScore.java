@@ -34,8 +34,7 @@ public class AutoScore {
         .alongWith(
             Commands
                 .waitUntil(() -> drive.disableBackVision())
-                .andThen(() -> vision.setEnableCamera(1,
-                    false)))
+                .andThen(vision.setEnableCameraCommand(1, false)))
         .finallyDo(() -> vision.setEnableCamera(1, false));
   }
 }
