@@ -2,8 +2,10 @@ package frc.team4276.frc2025.field;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import frc.team4276.util.AllianceFlipUtil;
 
 public class FieldConstants {
   public static final double fieldLength = Units.inchesToMeters(690.875958);
@@ -12,106 +14,64 @@ public class FieldConstants {
       Units.inchesToMeters(345.437979),
       Units.inchesToMeters(158.5));
 
-  public static class POIs {
-    public Translation2d reefCenter = Translation2d.kZero;
-    // starts at the right most post just under the 0 degree line and moves
-    // counterclockwise around the reef
-    public Pose2d[] reefAlign = new Pose2d[12];
-    public Pose2d[] reefScore = new Pose2d[12];
-  }
+  public static final double reefToFieldCenter = 4.284788;
 
-  public static final double alignOffset = 40; // inches
-  public static final double scoringOffset = 31; // inches
+  public static final Pose2d blueReefCenter = new Pose2d(
+      fieldCenter.minus(new Translation2d(reefToFieldCenter, 0.0)), Rotation2d.kZero);
+
+  public static final double alignOffset = Units.inchesToMeters(9.0);
+  public static final double scoringOffset = Units.inchesToMeters(31.0);
+  public static final double reefCenterToTag = Units.inchesToMeters(20.738196);
+  public static final double tagToReef = Units.inchesToMeters(6.468853);
 
   public static final Translation2d reefToLeftAlign = new Translation2d(
-      Units.inchesToMeters(20.738196 + alignOffset), Units.inchesToMeters(-6.468853));
-  public static final Translation2d reefToRightAlign = new Translation2d(
-      Units.inchesToMeters(20.738196 + alignOffset), Units.inchesToMeters(6.468853));
+      reefCenterToTag + scoringOffset + alignOffset, -tagToReef);
+  public static final Translation2d reefToRightAlign = reefToLeftAlign.plus(new Translation2d(0.0, 2.0 * tagToReef));
 
   public static final Translation2d reefToLeftScore = new Translation2d(
-      Units.inchesToMeters(20.738196 + scoringOffset), Units.inchesToMeters(-6.468853));
-  public static final Translation2d reefToRightScore = new Translation2d(
-      Units.inchesToMeters(20.738196 + scoringOffset), Units.inchesToMeters(6.468853));
+      reefCenterToTag + scoringOffset, -tagToReef);
+  public static final Translation2d reefToRightScore = reefToLeftScore.plus(new Translation2d(0.0, 2.0 * tagToReef));
 
-  public static final POIs bluePOIs = new POIs();
+  public static final Pose2d[] blueReefToScore = new Pose2d[12];
+  public static final Pose2d[] blueReefToAlign = new Pose2d[12];
+  public static final Pose2d[] redReefToScore = new Pose2d[12];
+  public static final Pose2d[] redReefToAlign = new Pose2d[12];
   static {
-    bluePOIs.reefCenter = fieldCenter.plus(new Translation2d(-4.284788, 0.0));
-    bluePOIs.reefAlign[0] = new Pose2d(bluePOIs.reefCenter.plus(reefToLeftAlign), Rotation2d.fromDegrees(180.0));
-    bluePOIs.reefAlign[1] = new Pose2d(bluePOIs.reefCenter.plus(reefToRightAlign), Rotation2d.fromDegrees(180.0));
-    bluePOIs.reefAlign[2] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToLeftAlign.rotateBy(Rotation2d.fromDegrees(60.0))),
-        Rotation2d.fromDegrees(240.0));
-    bluePOIs.reefAlign[3] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToRightAlign.rotateBy(Rotation2d.fromDegrees(60.0))),
-        Rotation2d.fromDegrees(240.0));
-    bluePOIs.reefAlign[4] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToLeftAlign.rotateBy(Rotation2d.fromDegrees(120.0))),
-        Rotation2d.fromDegrees(300.0));
-    bluePOIs.reefAlign[5] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToRightAlign.rotateBy(Rotation2d.fromDegrees(120.0))),
-        Rotation2d.fromDegrees(300.0));
-    bluePOIs.reefAlign[6] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToLeftAlign.rotateBy(Rotation2d.fromDegrees(180.0))),
-        Rotation2d.fromDegrees(0.0));
-    bluePOIs.reefAlign[7] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToRightAlign.rotateBy(Rotation2d.fromDegrees(180.0))),
-        Rotation2d.fromDegrees(0.0));
-    bluePOIs.reefAlign[8] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToLeftAlign.rotateBy(Rotation2d.fromDegrees(240.0))),
-        Rotation2d.fromDegrees(60.0));
-    bluePOIs.reefAlign[9] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToRightAlign.rotateBy(Rotation2d.fromDegrees(240.0))),
-        Rotation2d.fromDegrees(60.0));
-    bluePOIs.reefAlign[10] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToLeftAlign.rotateBy(Rotation2d.fromDegrees(300.0))),
-        Rotation2d.fromDegrees(120.0));
-    bluePOIs.reefAlign[11] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToRightAlign.rotateBy(Rotation2d.fromDegrees(300.0))),
-        Rotation2d.fromDegrees(120.0));
-
-    bluePOIs.reefScore[0] = new Pose2d(bluePOIs.reefCenter.plus(reefToLeftScore), Rotation2d.fromDegrees(180.0));
-    bluePOIs.reefScore[1] = new Pose2d(bluePOIs.reefCenter.plus(reefToRightScore), Rotation2d.fromDegrees(180.0));
-    bluePOIs.reefScore[2] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToLeftScore.rotateBy(Rotation2d.fromDegrees(60.0))),
-        Rotation2d.fromDegrees(240.0));
-    bluePOIs.reefScore[3] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToRightScore.rotateBy(Rotation2d.fromDegrees(60.0))),
-        Rotation2d.fromDegrees(240.0));
-    bluePOIs.reefScore[4] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToLeftScore.rotateBy(Rotation2d.fromDegrees(120.0))),
-        Rotation2d.fromDegrees(300.0));
-    bluePOIs.reefScore[5] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToRightScore.rotateBy(Rotation2d.fromDegrees(120.0))),
-        Rotation2d.fromDegrees(300.0));
-    bluePOIs.reefScore[6] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToLeftScore.rotateBy(Rotation2d.fromDegrees(180.0))),
-        Rotation2d.fromDegrees(0.0));
-    bluePOIs.reefScore[7] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToRightScore.rotateBy(Rotation2d.fromDegrees(180.0))),
-        Rotation2d.fromDegrees(0.0));
-    bluePOIs.reefScore[8] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToLeftScore.rotateBy(Rotation2d.fromDegrees(240.0))),
-        Rotation2d.fromDegrees(60.0));
-    bluePOIs.reefScore[9] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToRightScore.rotateBy(Rotation2d.fromDegrees(240.0))),
-        Rotation2d.fromDegrees(60.0));
-    bluePOIs.reefScore[10] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToLeftScore.rotateBy(Rotation2d.fromDegrees(300.0))),
-        Rotation2d.fromDegrees(120.0));
-    bluePOIs.reefScore[11] = new Pose2d(
-        bluePOIs.reefCenter.plus(reefToRightScore.rotateBy(Rotation2d.fromDegrees(300.0))),
-        Rotation2d.fromDegrees(120.0));
+    for (int i = 0; i < 12; i++) {
+      var angle = Rotation2d.fromDegrees(i * 60);
+      blueReefToScore[i] = blueReefCenter.plus(new Transform2d(reefToLeftScore.rotateBy(angle), angle));
+      blueReefToAlign[i] = blueReefCenter.plus(new Transform2d(reefToLeftAlign.rotateBy(angle), angle));
+      redReefToScore[i] = AllianceFlipUtil.apply(blueReefToScore[i]);
+      redReefToAlign[i] = AllianceFlipUtil.apply(blueReefToAlign[i]);
+      i++;
+      blueReefToScore[i] = blueReefCenter.plus(new Transform2d(reefToRightScore.rotateBy(angle), angle));
+      blueReefToAlign[i] = blueReefCenter.plus(new Transform2d(reefToRightAlign.rotateBy(angle), angle));
+      redReefToScore[i] = AllianceFlipUtil.apply(blueReefToScore[i]);
+      redReefToAlign[i] = AllianceFlipUtil.apply(blueReefToAlign[i]);
+    }
   }
 
-  public static final POIs redPOIs = new POIs();
-  static {
-    redPOIs.reefCenter = fieldCenter.plus(new Translation2d(4.284793, 0.0));
-    var distanceBetweenReefs = redPOIs.reefCenter.getDistance(bluePOIs.reefCenter);
-    for (int i = 0; i < bluePOIs.reefAlign.length; i++) {
-      redPOIs.reefAlign[i] = new Pose2d(bluePOIs.reefAlign[i].getX() + distanceBetweenReefs,
-          bluePOIs.reefAlign[i].getY(), bluePOIs.reefAlign[i].getRotation());
-      redPOIs.reefScore[i] = new Pose2d(bluePOIs.reefScore[i].getX() + distanceBetweenReefs,
-          bluePOIs.reefScore[i].getY(), bluePOIs.reefScore[i].getRotation());
+  public enum Reef {
+    // A(),
+    // B,
+    // C,
+    // D,
+    // E,
+    // F,
+    // G,
+    // H,
+    // I,
+    // J,
+    // K,
+    // L;
+    ;
+    private final Pose2d score;
+    private final Pose2d align;
+
+    private Reef(Pose2d score, Pose2d align) {
+      this.score = score;
+      this.align = align;
     }
+
   }
 }

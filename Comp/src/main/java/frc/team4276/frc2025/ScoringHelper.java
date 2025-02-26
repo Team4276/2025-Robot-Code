@@ -9,7 +9,7 @@ import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
 import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.drivers.VirtualSubsystem;
 
-public class ScoringHelper extends VirtualSubsystem { //TODO: switch to fms naming convention
+public class ScoringHelper extends VirtualSubsystem { // TODO: switch to fms naming convention
   private final int[] redScoringTable = {
       9,
       8,
@@ -163,11 +163,13 @@ public class ScoringHelper extends VirtualSubsystem { //TODO: switch to fms nami
   }
 
   public Pose2d getSelectedAlignPose() {
-    return RobotState.getInstance().getPOIs().reefAlign[getSelectedReef()];
+    // return RobotState.getInstance().getPOIs().reefAlign[getSelectedReef()];
+    return Pose2d.kZero;
   }
 
   public Pose2d getSelectedScorePose() {
-    return RobotState.getInstance().getPOIs().reefScore[getSelectedReef()];
+    // return RobotState.getInstance().getPOIs().reefScore[getSelectedReef()];
+    return Pose2d.kZero;
   }
 
   private int getSelectedTableIndex() {
