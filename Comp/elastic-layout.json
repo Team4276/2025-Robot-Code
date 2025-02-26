@@ -278,7 +278,7 @@
             "type": "Field",
             "properties": {
               "topic": "/SmartDashboard/Field",
-              "period": 0.02,
+              "period": 0.06,
               "field_game": "Crescendo",
               "robot_width": 0.85,
               "robot_length": 0.85,
@@ -298,7 +298,7 @@
             "type": "Text Display",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Superstructure/CurrentGoal",
-              "period": 0.02,
+              "period": 0.06,
               "data_type": "string",
               "show_submit_button": false
             }
@@ -311,8 +311,8 @@
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SelectedReef0",
-              "period": 0.02,
+              "topic": "/SmartDashboard/Comp/ReefScoring/G",
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294967040,
               "false_color": 4278190080,
@@ -328,8 +328,8 @@
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SelectedReef2",
-              "period": 0.02,
+              "topic": "/SmartDashboard/Comp/ReefScoring/I",
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294967040,
               "false_color": 4278190080,
@@ -345,8 +345,8 @@
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SelectedReef3",
-              "period": 0.02,
+              "topic": "/SmartDashboard/Comp/ReefScoring/J",
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294967040,
               "false_color": 4278190080,
@@ -362,8 +362,8 @@
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SelectedReef4",
-              "period": 0.02,
+              "topic": "/SmartDashboard/Comp/ReefScoring/K",
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294967040,
               "false_color": 4278190080,
@@ -379,8 +379,8 @@
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SelectedReef5",
-              "period": 0.02,
+              "topic": "/SmartDashboard/Comp/ReefScoring/L",
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294967040,
               "false_color": 4278190080,
@@ -396,8 +396,8 @@
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SelectedReef6",
-              "period": 0.02,
+              "topic": "/SmartDashboard/Comp/ReefScoring/A",
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294967040,
               "false_color": 4278190080,
@@ -413,8 +413,8 @@
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SelectedReef7",
-              "period": 0.02,
+              "topic": "/SmartDashboard/Comp/ReefScoring/B",
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294967040,
               "false_color": 4278190080,
@@ -430,8 +430,8 @@
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SelectedReef9",
-              "period": 0.02,
+              "topic": "/SmartDashboard/Comp/ReefScoring/D",
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294967040,
               "false_color": 4278190080,
@@ -447,8 +447,8 @@
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SelectedReef8",
-              "period": 0.02,
+              "topic": "/SmartDashboard/Comp/ReefScoring/C",
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294967040,
               "false_color": 4278190080,
@@ -464,8 +464,8 @@
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SelectedReef10",
-              "period": 0.02,
+              "topic": "/SmartDashboard/Comp/ReefScoring/E",
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294967040,
               "false_color": 4278190080,
@@ -481,8 +481,8 @@
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SelectedReef11",
-              "period": 0.02,
+              "topic": "/SmartDashboard/Comp/ReefScoring/F",
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294967040,
               "false_color": 4278190080,
@@ -498,8 +498,8 @@
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SuperstructureGoal0",
-              "period": 0.02,
+              "topic": "/SmartDashboard/Comp/ReefScoring/L1",
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294902010,
               "false_color": 4278190080,
@@ -515,8 +515,8 @@
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SuperstructureGoal1",
-              "period": 0.02,
+              "topic": "/SmartDashboard/Comp/ReefScoring/L2",
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294902010,
               "false_color": 4278190080,
@@ -532,8 +532,8 @@
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SuperstructureGoal2",
-              "period": 0.02,
+              "topic": "/SmartDashboard/Comp/ReefScoring/L3",
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294902010,
               "false_color": 4278190080,
@@ -549,9 +549,8 @@
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SuperstructureGoal3",
-              "period": 0.02,
-              "data_type": "boolean",
+              "topic": "/SmartDashboard/Comp/ReefScoring/L4",
+              "period": 0.06,
               "true_color": 4294902010,
               "false_color": 4278190080,
               "true_icon": "None",
@@ -567,7 +566,7 @@
             "type": "Boolean Box",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/AutoAlignController/atGoal",
-              "period": 0.02,
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4278255360,
               "false_color": 4278190080,
@@ -584,7 +583,7 @@
             "type": "Boolean Box",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Elevator/AtGoal",
-              "period": 0.02,
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4278255360,
               "false_color": 4278190080,
@@ -600,7 +599,7 @@
             "height": 192.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/SelectedReef1",
+              "topic": "/SmartDashboard/Comp/ReefScoring/H",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294967040,
@@ -618,7 +617,7 @@
             "type": "Text Display",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Superstructure/DesiredGoal",
-              "period": 0.02,
+              "period": 0.06,
               "data_type": "string",
               "show_submit_button": false
             }
@@ -632,7 +631,7 @@
             "type": "Boolean Box",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Superstructure/Displace",
-              "period": 0.02,
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4278255360,
               "false_color": 4294901760,
@@ -649,7 +648,7 @@
             "type": "Boolean Box",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Superstructure/WantScore",
-              "period": 0.02,
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4278255615,
               "false_color": 4278190080,
@@ -666,7 +665,7 @@
             "type": "Boolean Box",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Superstructure/HasCoral",
-              "period": 0.02,
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4278255360,
               "false_color": 4294901760,
@@ -683,7 +682,7 @@
             "type": "FMSInfo",
             "properties": {
               "topic": "/FMSInfo",
-              "period": 0.02
+              "period": 0.06
             }
           },
           {
@@ -695,7 +694,7 @@
             "type": "Match Time",
             "properties": {
               "topic": "/SmartDashboard/Match Time",
-              "period": 0.02,
+              "period": 0.06,
               "data_type": "double",
               "time_display_mode": "Minutes and Seconds",
               "red_start_time": 15,
@@ -711,7 +710,7 @@
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Heading Align Enabled",
-              "period": 0.02,
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4278255360,
               "false_color": 4294901760,
@@ -728,7 +727,7 @@
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Drive Align Enabled",
-              "period": 0.02,
+              "period": 0.06,
               "data_type": "boolean",
               "true_color": 4278255360,
               "false_color": 4294901760,
