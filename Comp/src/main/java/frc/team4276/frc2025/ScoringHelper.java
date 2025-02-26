@@ -5,61 +5,16 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
+import frc.team4276.frc2025.field.FieldConstants.Reef;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
-import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.drivers.VirtualSubsystem;
 
-public class ScoringHelper extends VirtualSubsystem { // TODO: switch to fms naming convention
-  private final int[] redScoringTable = {
-      9,
-      8,
-      10,
-      11,
-      0,
-      1,
-      2,
-      3,
-      5,
-      4,
-      7,
-      6
-  };
-
-  private final int[] blueScoringTable = {
-      3,
-      2,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9,
-      11,
-      10,
-      1,
-      0
-  };
-
-  private final int[] redVizTable = {
-      6,
-      7,
-      8,
-      9,
-      10,
-      11,
-      0,
-      1,
-      2,
-      3,
-      4,
-      5,
-  };
-
+public class ScoringHelper extends VirtualSubsystem {
   private final CommandGenericHID buttonBoard;
   private final CommandGenericHID keyboard;
   private final boolean useKeyboard;
 
-  private boolean isRight = true;
+  private boolean isRight = false;
   private Goal level = Goal.L1;
   private int side = 0;
 
@@ -78,41 +33,43 @@ public class ScoringHelper extends VirtualSubsystem { // TODO: switch to fms nam
     }
 
     for (int i = 0; i < 12; i++) {
-      int currentIndex = AllianceFlipUtil.shouldFlip() ? redVizTable[i] : i;
-      SmartDashboard.putBoolean(
-          "Comp/SelectedReef" + currentIndex, getSelectedReef() == i);
+      SmartDashboard.putBoolean("Comp/ReefScoring/" + Reef.values()[i].toString(),
+          getSelectedReef() == Reef.values()[i]);
     }
 
-    for (int i = 0; i < 4; i++) {
-      SmartDashboard.putBoolean("Comp/SuperstructureGoal" + i, getSuperstructureGoal().ordinal() - 2 == i);
-    }
+    // SmartDashboard.putBoolean("Comp/ReefScoring/L4", getSuperstructureGoal() ==
+    // Goal.L4);
+    SmartDashboard.putBoolean("Comp/ReefScoring/L3", getSuperstructureGoal() == Goal.L3);
+    SmartDashboard.putBoolean("Comp/ReefScoring/L2", getSuperstructureGoal() == Goal.L2);
+    SmartDashboard.putBoolean("Comp/ReefScoring/L1", getSuperstructureGoal() == Goal.L1);
 
     Logger.recordOutput("ScoringHelper/SelectedAlignPose", getSelectedAlignPose());
     Logger.recordOutput("ScoringHelper/SelectedScorePose", getSelectedScorePose());
     Logger.recordOutput("ScoringHelper/IsRight", isRight);
     Logger.recordOutput("ScoringHelper/Side", side);
     Logger.recordOutput("ScoringHelper/Level", level);
+    Logger.recordOutput("ScoringHelper/SelectedReef", getSelectedReef());
   }
 
   private void updateButtonBoard() {
     // Update Positions
     if (buttonBoard.getHID().getRawButtonPressed(9)) {
-      isRight = true;
-    } else if (buttonBoard.getHID().getRawButtonPressed(10)) {
       isRight = false;
+    } else if (buttonBoard.getHID().getRawButtonPressed(10)) {
+      isRight = true;
     }
 
-    if (buttonBoard.getHID().getRawButtonPressed(6)) {
+    if (buttonBoard.getHID().getRawButtonPressed(4)) {
       side = 0;
-    } else if (buttonBoard.getHID().getRawButtonPressed(5)) {
-      side = 1;
-    } else if (buttonBoard.getHID().getRawButtonPressed(4)) {
-      side = 2;
     } else if (buttonBoard.getHID().getRawButtonPressed(3)) {
-      side = 3;
+      side = 1;
     } else if (buttonBoard.getHID().getRawButtonPressed(2)) {
-      side = 4;
+      side = 2;
     } else if (buttonBoard.getHID().getRawButtonPressed(1)) {
+      side = 3;
+    } else if (buttonBoard.getHID().getRawButtonPressed(6)) {
+      side = 4;
+    } else if (buttonBoard.getHID().getRawButtonPressed(5)) {
       side = 5;
     }
 
@@ -131,9 +88,9 @@ public class ScoringHelper extends VirtualSubsystem { // TODO: switch to fms nam
   private void updateKeyboard() {
     // Update Positions
     if (keyboard.getHID().getRawButtonPressed(1)) {
-      isRight = true;
-    } else if (keyboard.getHID().getRawButtonPressed(2)) {
       isRight = false;
+    } else if (keyboard.getHID().getRawButtonPressed(2)) {
+      isRight = true;
     }
 
     if (keyboard.getHID().getRawButtonPressed(3)) {
@@ -162,35 +119,25 @@ public class ScoringHelper extends VirtualSubsystem { // TODO: switch to fms nam
     }
   }
 
-  public Pose2d getSelectedAlignPose() {
-    // return RobotState.getInstance().getPOIs().reefAlign[getSelectedReef()];
-    return Pose2d.kZero;
-  }
-
-  public Pose2d getSelectedScorePose() {
-    // return RobotState.getInstance().getPOIs().reefScore[getSelectedReef()];
-    return Pose2d.kZero;
-  }
-
-  private int getSelectedTableIndex() {
-    return side * 2 + (isRight ? 0 : 1);
-  }
-
-  private int getSelectedReefWithIndex(int index) {
-    int[] selectedTable = AllianceFlipUtil.shouldFlip() ? redScoringTable : blueScoringTable;
-
-    return selectedTable[index];
-  }
-
-  private int getSelectedReef() {
-    return getSelectedReefWithIndex(getSelectedTableIndex());
-  }
-
   public Goal getSuperstructureGoal() {
     return level;
   }
 
-  public boolean isRight() {
-    return isRight;
+  public Pose2d getSelectedAlignPose() {
+    return getSelectedReef().getAlign();
+  }
+
+  public Pose2d getSelectedScorePose() {
+    return getSelectedReef().getScore();
+  }
+
+  public Reef getSelectedReef() {
+    if (side > 1 && side < 5) {
+      return Reef.values()[(side * 2) + (isRight ? 0 : 1)];
+
+    } else {
+      return Reef.values()[(side * 2) + (isRight ? 1 : 0)];
+
+    }
   }
 }

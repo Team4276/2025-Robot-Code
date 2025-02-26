@@ -130,7 +130,7 @@ public class AutoSelector extends VirtualSubsystem {
       return;
     }
 
-    if(AllianceFlipUtil.shouldFlip() != wasRed){
+    if (AllianceFlipUtil.shouldFlip() != wasRed) {
       autoChanged = true;
     }
 
@@ -139,7 +139,7 @@ public class AutoSelector extends VirtualSubsystem {
     SmartDashboard.putNumber("Comp/Auto/Num Coral Submitted ", getCoralInput());
     SmartDashboard.putNumber("Comp/Auto/Delay Input Submitted ", getDelayInput());
 
-    if(getCoralInput() != prevCoralInput || getDelayInput() != prevDelayInput){
+    if (getCoralInput() != prevCoralInput || getDelayInput() != prevDelayInput) {
       autoChanged = true;
     }
 
@@ -180,7 +180,6 @@ public class AutoSelector extends VirtualSubsystem {
       questionChoosers.get(i).periodic();
       var responseString = questionChoosers.get(i).get();
       if (cachedResponses.get(i) != responseString) {
-        // TODO: stop if invalid auto
         autoChanged = true;
       }
       lastResponses.add(
@@ -190,8 +189,8 @@ public class AutoSelector extends VirtualSubsystem {
     }
   }
 
-  public boolean hasAutoChanged(){
-    if(autoChanged){
+  public boolean hasAutoChanged() {
+    if (autoChanged) {
       autoChanged = false;
       return true;
     }

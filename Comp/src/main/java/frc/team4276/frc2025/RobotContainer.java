@@ -89,7 +89,7 @@ public class RobotContainer {
   private AutoBuilder autoBuilder;
 
   // Controller
-  private boolean useKeyboard = false;
+  private boolean useKeyboard = true;
   // private boolean isDemo = false;
 
   private final VikXboxController driver = new VikXboxController(0);
@@ -366,13 +366,13 @@ public class RobotContainer {
     if (useKeyboard && Constants.getMode() == Mode.SIM) {
       configureKeyBoardBindings();
 
-    } 
-    
-    // else if (isDemo) {
-    //   configureDemoBindings();
+    }
 
-    // } 
-    
+    // else if (isDemo) {
+    // configureDemoBindings();
+
+    // }
+
     else {
       configureControllerBindings();
 
@@ -380,71 +380,73 @@ public class RobotContainer {
   }
 
   // private void configureDemoBindings() {
-  //   drive.setDefaultCommand(
-  //       drive.run(
-  //           () -> drive.feedTeleopInput(
-  //               -driver.getLeftWithDeadband().y,
-  //               -driver.getLeftWithDeadband().x,
-  //               -driver.getRightWithDeadband().x)));
+  // drive.setDefaultCommand(
+  // drive.run(
+  // () -> drive.feedTeleopInput(
+  // -driver.getLeftWithDeadband().y,
+  // -driver.getLeftWithDeadband().x,
+  // -driver.getRightWithDeadband().x)));
 
-  //   // drive.setDefaultCommand(
-  //   // drive.run(
-  //   // () -> drive.feedTeleopInput(
-  //   // 0.0,
-  //   // 0.0,
-  //   // 0.0)));
+  // // drive.setDefaultCommand(
+  // // drive.run(
+  // // () -> drive.feedTeleopInput(
+  // // 0.0,
+  // // 0.0,
+  // // 0.0)));
 
-  //   // Reset gyro to 0° when A button is pressed
-  //   driver
-  //       .a()
-  //       .onTrue(
-  //           Commands.runOnce(
-  //               () -> RobotState.getInstance()
-  //                   .resetPose(
-  //                       new Pose2d(
-  //                           RobotState.getInstance().getEstimatedPose().getTranslation(),
-  //                           AllianceFlipUtil.apply(Rotation2d.kZero))),
-  //               drive)
-  //               .ignoringDisable(false));
+  // // Reset gyro to 0° when A button is pressed
+  // driver
+  // .a()
+  // .onTrue(
+  // Commands.runOnce(
+  // () -> RobotState.getInstance()
+  // .resetPose(
+  // new Pose2d(
+  // RobotState.getInstance().getEstimatedPose().getTranslation(),
+  // AllianceFlipUtil.apply(Rotation2d.kZero))),
+  // drive)
+  // .ignoringDisable(false));
 
-  //   driver
-  //       .povDown()
-  //       .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L1));
+  // driver
+  // .povDown()
+  // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L1));
 
-  //   driver
-  //       .povLeft()
-  //       .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L2));
+  // driver
+  // .povLeft()
+  // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L2));
 
-  //   driver
-  //       .povUp()
-  //       .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L3));
+  // driver
+  // .povUp()
+  // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L3));
 
-  //   driver
-  //       .rightBumper()
-  //       .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.INTAKE));
+  // driver
+  // .rightBumper()
+  // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.INTAKE));
 
-  //   // driver
-  //   // .rightTrigger()
-  //   // .whileTrue(superstructure.scoreCommand());
+  // // driver
+  // // .rightTrigger()
+  // // .whileTrue(superstructure.scoreCommand());
 
-  //   // superstructure.setDefaultCommand(
-  //   // superstructure.run(() -> superstructure.acceptCharacterizationInput(
-  //   // 3.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
-  //   // // 0.0
-  //   // )));
+  // // superstructure.setDefaultCommand(
+  // // superstructure.run(() -> superstructure.acceptCharacterizationInput(
+  // // 3.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
+  // // // 0.0
+  // // )));
 
-  //   // arm.setDefaultCommand(
-  //   // arm.run(() -> arm.runCharacterization(
-  //   // // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
-  //   // 0.0)));
+  // // arm.setDefaultCommand(
+  // // arm.run(() -> arm.runCharacterization(
+  // // // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
+  // // 0.0)));
 
-  //   // driver
-  //   // .povDown()
-  //   // .whileTrue(arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(roller.setGoalCommand(Roller.Goal.INTAKE)));
+  // // driver
+  // // .povDown()
+  // //
+  // .whileTrue(arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(roller.setGoalCommand(Roller.Goal.INTAKE)));
 
-  //   // driver
-  //   // .povUp()
-  //   // .whileTrue(arm.setGoalCommand(Arm.Goal.SCORE).alongWith(roller.setGoalCommand(Roller.Goal.SCORE)));
+  // // driver
+  // // .povUp()
+  // //
+  // .whileTrue(arm.setGoalCommand(Arm.Goal.SCORE).alongWith(roller.setGoalCommand(Roller.Goal.SCORE)));
   // }
 
   private void configureKeyBoardBindings() {
@@ -654,7 +656,7 @@ public class RobotContainer {
             arm.setGoalCommand(Arm.Goal.SCORE)
                 .alongWith(
                     DriveCommands.headingAlignCommand(drive, () -> AllianceFlipUtil.apply(Rotation2d.kCCW_90deg))
-                    .unless(() -> disableHeadingAutoAlign)));
+                        .unless(() -> disableHeadingAutoAlign)));
 
     // Score
     driver
@@ -668,7 +670,7 @@ public class RobotContainer {
     ElasticUI.setAlignToggleSuppliers(() -> disableHeadingAutoAlign, () -> disableTranslationAutoAlign);
   }
 
-  public void setToggles(boolean disableHeadingAutoAlign, boolean disableTranslationAutoAlign){
+  public void setToggles(boolean disableHeadingAutoAlign, boolean disableTranslationAutoAlign) {
     this.disableHeadingAutoAlign = disableHeadingAutoAlign;
     this.disableTranslationAutoAlign = disableTranslationAutoAlign;
   }

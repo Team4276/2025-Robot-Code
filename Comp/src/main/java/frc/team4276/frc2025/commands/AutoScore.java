@@ -31,10 +31,7 @@ public class AutoScore {
         DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose).until(drive::isAutoAligned)
             .alongWith(
                 superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)))
-        .alongWith(
-            Commands
-                .waitUntil(() -> drive.disableBackVision())
-                .andThen(vision.setEnableCameraCommand(1, false)))
+        .alongWith(vision.setEnableCameraCommand(1, false))
         .finallyDo(() -> vision.setEnableCamera(1, false));
   }
 }

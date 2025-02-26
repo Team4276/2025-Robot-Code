@@ -71,6 +71,7 @@ public class Vision extends SubsystemBase {
     List<Pose3d> allRobotPoses = new LinkedList<>();
     List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
     List<Pose3d> allRobotPosesRejected = new LinkedList<>();
+    List<Pose3d> allRobotPosesCanceled = new LinkedList<>();
 
     // Loop over cameras
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
@@ -82,6 +83,7 @@ public class Vision extends SubsystemBase {
       List<Pose3d> robotPoses = new LinkedList<>();
       List<Pose3d> robotPosesAccepted = new LinkedList<>();
       List<Pose3d> robotPosesRejected = new LinkedList<>();
+      List<Pose3d> robotPosesCanceled = new LinkedList<>();
 
       // Add tag poses
       for (int tagId : inputs[cameraIndex].tagIds) {
@@ -134,11 +136,6 @@ public class Vision extends SubsystemBase {
           // continue;
           // }
 
-          if (!camerasEnabled[cameraIndex]) {
-            robotPosesRejected.add(robotPose3d);
-            continue;
-          }
-
           // Exit if robot pose is off the field
           if (robotPose3d.getX() < -fieldBorderMargin
               || robotPose3d.getX() > FieldConstants.fieldLength + fieldBorderMargin
@@ -150,8 +147,6 @@ public class Vision extends SubsystemBase {
             continue;
           }
 
-          robotPosesAccepted.add(robotPose3d);
-
           // Calculate standard deviations
           double stdDevFactor = Math.pow(avgTagDist, 2.0) / observation.tagCount();
           double linearStdDev = linearStdDevBaseline * stdDevFactor;
@@ -162,10 +157,19 @@ public class Vision extends SubsystemBase {
           }
 
           // Send vision observation
-          consumer.accept(
-              robotPose3d.toPose2d(),
-              observation.timestamp(),
-              VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+
+          if (!camerasEnabled[cameraIndex]) {
+            robotPosesCanceled.add(robotPose3d);
+          } else {
+            robotPosesAccepted.add(robotPose3d);
+
+            consumer.accept(
+                robotPose3d.toPose2d(),
+                observation.timestamp(),
+                VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+
+          }
+
         }
 
         // Log camera datadata
@@ -182,11 +186,15 @@ public class Vision extends SubsystemBase {
             "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesRejected",
             robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
         Logger.recordOutput(
+            "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesCanceled",
+            robotPosesCanceled.toArray(new Pose3d[robotPosesCanceled.size()]));
+        Logger.recordOutput(
             "Vision/Camera" + Integer.toString(cameraIndex) + "/Enabled", camerasEnabled[cameraIndex]);
         allTagPoses.addAll(tagPoses);
         allRobotPoses.addAll(robotPoses);
         allRobotPosesAccepted.addAll(robotPosesAccepted);
         allRobotPosesRejected.addAll(robotPosesRejected);
+        allRobotPosesCanceled.addAll(robotPosesCanceled);
       }
 
       // Log summary data
@@ -200,6 +208,9 @@ public class Vision extends SubsystemBase {
       Logger.recordOutput(
           "Vision/Summary/RobotPosesRejected",
           allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));
+      Logger.recordOutput(
+          "Vision/Summary/RobotPosesCanceled",
+          allRobotPosesCanceled.toArray(new Pose3d[allRobotPosesCanceled.size()]));
     }
   }
 
@@ -212,22 +223,22 @@ public class Vision extends SubsystemBase {
   }
 
   public void setEnableCamera(int cameraIndex, boolean enable) {
-    if(cameraIndex < camerasEnabled.length){
+    if (cameraIndex < camerasEnabled.length) {
       camerasEnabled[cameraIndex] = enable;
     }
   }
 
-  public void setCamerasEnabled(boolean... enabled){
-    for(int i = 0; i < enabled.length; i++){
+  public void setCamerasEnabled(boolean... enabled) {
+    for (int i = 0; i < enabled.length; i++) {
       setEnableCamera(i, enabled[i]);
     }
   }
-  
-  public Command setEnableCameraCommand(int cameraIndex, boolean enabled){
+
+  public Command setEnableCameraCommand(int cameraIndex, boolean enabled) {
     return Commands.runOnce(() -> setEnableCamera(cameraIndex, enabled));
   }
 
-  public Command setCamerasEnabledCommand(boolean... enabled){
+  public Command setCamerasEnabledCommand(boolean... enabled) {
     return Commands.runOnce(() -> setCamerasEnabled(enabled));
   }
 }

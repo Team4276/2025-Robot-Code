@@ -191,14 +191,14 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    if(robotContainer.hasAutoChanged()){
+    if (robotContainer.hasAutoChanged()) {
       autonomousCommand = robotContainer.getAutonomousCommand();
     }
   }
 
   @Override
   public void disabledExit() {
-    if(DriverStation.isFMSAttached()){
+    if (DriverStation.isFMSAttached()) {
       robotContainer.setToggles(false, false);
     } else {
       robotContainer.setToggles(true, true);
