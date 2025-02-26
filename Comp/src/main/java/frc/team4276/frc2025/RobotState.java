@@ -12,22 +12,22 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.team4276.util.dashboard.ElasticUI;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class RobotState {
-  private SwerveModulePosition[] lastWheelPositions = new SwerveModulePosition[] {
-      new SwerveModulePosition(),
-      new SwerveModulePosition(),
-      new SwerveModulePosition(),
-      new SwerveModulePosition()
-  };
+  private SwerveModulePosition[] lastWheelPositions =
+      new SwerveModulePosition[] {
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition()
+      };
   private Rotation2d lastGyroAngle = Rotation2d.kZero;
 
-  private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kinematics, lastGyroAngle,
-      lastWheelPositions, Pose2d.kZero);
-  private SwerveDrivePoseEstimator poseEstimatorOdom = new SwerveDrivePoseEstimator(kinematics, lastGyroAngle,
-      lastWheelPositions, Pose2d.kZero);
+  private SwerveDrivePoseEstimator poseEstimator =
+      new SwerveDrivePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions, Pose2d.kZero);
+  private SwerveDrivePoseEstimator poseEstimatorOdom =
+      new SwerveDrivePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions, Pose2d.kZero);
 
   private ChassisSpeeds robotVelocity = new ChassisSpeeds();
 
@@ -67,8 +67,9 @@ public class RobotState {
     // Update gyro angle
     if (yaw == null) {
       // Derive from kinematics
-      yaw = lastGyroAngle.rotateBy(
-          new Rotation2d(kinematics.toTwist2d(lastWheelPositions, wheelPositions).dtheta));
+      yaw =
+          lastGyroAngle.rotateBy(
+              new Rotation2d(kinematics.toTwist2d(lastWheelPositions, wheelPositions).dtheta));
       lastGyroAngle = yaw;
     }
 

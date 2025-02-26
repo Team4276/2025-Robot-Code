@@ -10,37 +10,43 @@ import frc.team4276.util.AllianceFlipUtil;
 public class FieldConstants {
   public static final double fieldLength = Units.inchesToMeters(690.875958);
   public static final double fieldWidth = Units.inchesToMeters(317);
-  public static final Translation2d fieldCenter = new Translation2d(
-      Units.inchesToMeters(345.437979),
-      Units.inchesToMeters(158.5));
+  public static final Translation2d fieldCenter =
+      new Translation2d(Units.inchesToMeters(345.437979), Units.inchesToMeters(158.5));
 
   public static final double reefToFieldCenter = 4.284788;
 
-  public static final Pose2d blueReefCenter = new Pose2d(
-      fieldCenter.minus(new Translation2d(reefToFieldCenter, 0.0)), Rotation2d.kZero);
+  public static final Pose2d blueReefCenter =
+      new Pose2d(fieldCenter.minus(new Translation2d(reefToFieldCenter, 0.0)), Rotation2d.kZero);
 
   public static final double alignOffset = Units.inchesToMeters(9.0);
   public static final double scoringOffset = Units.inchesToMeters(31.0);
   public static final double reefCenterToTag = Units.inchesToMeters(20.738196);
   public static final double tagToReef = Units.inchesToMeters(6.468853);
 
-  public static final Translation2d reefToLeftAlign = new Translation2d(
-      -1.0 * (reefCenterToTag + scoringOffset + alignOffset), tagToReef);
-  public static final Translation2d reefToRightAlign = reefToLeftAlign.plus(new Translation2d(0.0, -2.0 * tagToReef));
+  public static final Translation2d reefToLeftAlign =
+      new Translation2d(-1.0 * (reefCenterToTag + scoringOffset + alignOffset), tagToReef);
+  public static final Translation2d reefToRightAlign =
+      reefToLeftAlign.plus(new Translation2d(0.0, -2.0 * tagToReef));
 
-  public static final Translation2d reefToLeftScore = new Translation2d(
-      -1.0 * (reefCenterToTag + scoringOffset), tagToReef);
-  public static final Translation2d reefToRightScore = reefToLeftScore.plus(new Translation2d(0.0, -2.0 * tagToReef));
+  public static final Translation2d reefToLeftScore =
+      new Translation2d(-1.0 * (reefCenterToTag + scoringOffset), tagToReef);
+  public static final Translation2d reefToRightScore =
+      reefToLeftScore.plus(new Translation2d(0.0, -2.0 * tagToReef));
 
   public static final Pose2d[] blueReefToScore = new Pose2d[12];
   public static final Pose2d[] blueReefToAlign = new Pose2d[12];
+
   static {
     for (int i = 0; i < 6; i++) {
       var angle = Rotation2d.fromDegrees(i * 60);
-      blueReefToScore[i * 2] = blueReefCenter.plus(new Transform2d(reefToLeftScore.rotateBy(angle), angle));
-      blueReefToAlign[i * 2] = blueReefCenter.plus(new Transform2d(reefToLeftAlign.rotateBy(angle), angle));
-      blueReefToScore[i * 2 + 1] = blueReefCenter.plus(new Transform2d(reefToRightScore.rotateBy(angle), angle));
-      blueReefToAlign[i * 2 + 1] = blueReefCenter.plus(new Transform2d(reefToRightAlign.rotateBy(angle), angle));
+      blueReefToScore[i * 2] =
+          blueReefCenter.plus(new Transform2d(reefToLeftScore.rotateBy(angle), angle));
+      blueReefToAlign[i * 2] =
+          blueReefCenter.plus(new Transform2d(reefToLeftAlign.rotateBy(angle), angle));
+      blueReefToScore[i * 2 + 1] =
+          blueReefCenter.plus(new Transform2d(reefToRightScore.rotateBy(angle), angle));
+      blueReefToAlign[i * 2 + 1] =
+          blueReefCenter.plus(new Transform2d(reefToRightAlign.rotateBy(angle), angle));
     }
   }
 
@@ -80,18 +86,14 @@ public class FieldConstants {
 
     public Pose2d getAlign() {
       return AllianceFlipUtil.apply(align);
-
     }
 
     public Pose2d getBlueAlign() {
       return align;
-
     }
 
     public Pose2d getRedAlign() {
       return AllianceFlipUtil.flip(align);
-
     }
-
   }
 }

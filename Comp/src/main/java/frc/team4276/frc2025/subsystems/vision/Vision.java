@@ -1,16 +1,3 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.team4276.frc2025.subsystems.vision;
 
 import static frc.team4276.frc2025.subsystems.vision.VisionConstants.*;
@@ -39,7 +26,7 @@ public class Vision extends SubsystemBase {
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
-  private boolean[] camerasEnabled = { true, false };
+  private boolean[] camerasEnabled = {true, false};
 
   public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -54,8 +41,9 @@ public class Vision extends SubsystemBase {
     // Initialize disconnected alerts
     this.disconnectedAlerts = new Alert[io.length];
     for (int i = 0; i < inputs.length; i++) {
-      disconnectedAlerts[i] = new Alert(
-          "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
+      disconnectedAlerts[i] =
+          new Alert(
+              "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
     }
   }
 
@@ -117,8 +105,8 @@ public class Vision extends SubsystemBase {
             Rotation2d currentRotation = RobotState.getInstance().getEstimatedPose().getRotation();
             Rotation2d visionRotation0 = observation.pose1().toPose2d().getRotation();
             Rotation2d visionRotation1 = observation.pose2().toPose2d().getRotation();
-            if (Math.abs(currentRotation.minus(visionRotation0).getRadians()) < Math
-                .abs(currentRotation.minus(visionRotation1).getRadians())) {
+            if (Math.abs(currentRotation.minus(visionRotation0).getRadians())
+                < Math.abs(currentRotation.minus(visionRotation1).getRadians())) {
               robotPose3d = observation.pose1();
               avgTagDist = observation.avgTagDistance1();
             } else {
@@ -167,9 +155,7 @@ public class Vision extends SubsystemBase {
                 robotPose3d.toPose2d(),
                 observation.timestamp(),
                 VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
-
           }
-
         }
 
         // Log camera datadata
@@ -189,7 +175,8 @@ public class Vision extends SubsystemBase {
             "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesCanceled",
             robotPosesCanceled.toArray(new Pose3d[robotPosesCanceled.size()]));
         Logger.recordOutput(
-            "Vision/Camera" + Integer.toString(cameraIndex) + "/Enabled", camerasEnabled[cameraIndex]);
+            "Vision/Camera" + Integer.toString(cameraIndex) + "/Enabled",
+            camerasEnabled[cameraIndex]);
         allTagPoses.addAll(tagPoses);
         allRobotPoses.addAll(robotPoses);
         allRobotPosesAccepted.addAll(robotPosesAccepted);

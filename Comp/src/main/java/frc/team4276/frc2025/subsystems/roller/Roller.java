@@ -1,14 +1,12 @@
 package frc.team4276.frc2025.subsystems.roller;
 
-import java.util.function.DoubleSupplier;
-
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
+import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Roller extends SubsystemBase {
   public enum Goal {
@@ -26,7 +24,6 @@ public class Roller extends SubsystemBase {
     private double getVolts() {
       return voltageGoal.getAsDouble();
     }
-
   }
 
   private Goal goal = Goal.IDLE;
@@ -63,7 +60,6 @@ public class Roller extends SubsystemBase {
 
     } else {
       io.runVolts(goal.getVolts());
-
     }
     Logger.recordOutput("Roller/Goal", goal);
   }

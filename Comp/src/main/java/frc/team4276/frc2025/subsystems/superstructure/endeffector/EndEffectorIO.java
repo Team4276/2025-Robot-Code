@@ -9,13 +9,11 @@ public interface EndEffectorIO {
     public double leftAppliedVoltage = 0.0;
     public double leftSupplyCurrentAmps = 0.0;
     public double leftTempCelsius = 0.0;
-    public double leftVelocity = 0.0;
 
     public boolean rightConnected = true;
     public double rightAppliedVoltage = 0.0;
     public double rightSupplyCurrentAmps = 0.0;
     public double rightTempCelsius = 0.0;
-    public double rightVelocity = 0.0;
 
     public double torqueCurrentAmps = 0.0;
   }

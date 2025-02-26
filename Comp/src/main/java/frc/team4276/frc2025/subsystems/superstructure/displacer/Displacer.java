@@ -1,13 +1,11 @@
 package frc.team4276.frc2025.subsystems.superstructure.displacer;
 
-import java.util.function.DoubleSupplier;
-
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
-
-import frc.team4276.util.dashboard.LoggedTunableNumber;
 import frc.team4276.frc2025.subsystems.roller.RollerIO;
 import frc.team4276.frc2025.subsystems.roller.RollerIOInputsAutoLogged;
+import frc.team4276.util.dashboard.LoggedTunableNumber;
+import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Displacer {
   public enum Goal {
@@ -24,7 +22,6 @@ public class Displacer {
     private double getVolts() {
       return voltageGoal.getAsDouble();
     }
-
   }
 
   private Goal goal = Goal.IDLE;

@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import frc.team4276.frc2025.Constants;
 import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -41,7 +40,8 @@ public class Elevator {
     }
   }
 
-  private final LoggedTunableNumber homingVolts = new LoggedTunableNumber("Elevator/HomingVolts", 0.0);
+  private final LoggedTunableNumber homingVolts =
+      new LoggedTunableNumber("Elevator/HomingVolts", 0.0);
 
   private Goal goal = Goal.STOW;
 
@@ -56,10 +56,12 @@ public class Elevator {
   private final ElevatorIO io;
   private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
-  private ElevatorFeedforward ff = new ElevatorFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(),
-      kA.getAsDouble());
-  private TrapezoidProfile profile = new TrapezoidProfile(
-      new TrapezoidProfile.Constraints(maxVel.getAsDouble(), maxAccel.getAsDouble()));
+  private ElevatorFeedforward ff =
+      new ElevatorFeedforward(
+          kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), kA.getAsDouble());
+  private TrapezoidProfile profile =
+      new TrapezoidProfile(
+          new TrapezoidProfile.Constraints(maxVel.getAsDouble(), maxAccel.getAsDouble()));
   private TrapezoidProfile.State setpointState = new TrapezoidProfile.State();
 
   private BooleanSupplier coastOverride;
@@ -68,9 +70,7 @@ public class Elevator {
 
   private boolean wantHome = false;
   private boolean isHoming = false;
-  /**
-   * position that reads zero on the elevator
-   */
+  /** position that reads zero on the elevator */
   private double homedPosition = 0.0;
 
   private Timer atGoalTimer = new Timer();
@@ -103,7 +103,6 @@ public class Elevator {
     if (inputs.botLimit) {
       homedPosition = inputs.position;
       isHoming = false;
-
     }
 
     if (DriverStation.isDisabled()) {
@@ -120,9 +119,12 @@ public class Elevator {
       setpointState = new TrapezoidProfile.State(getPositionMetres(), 0.0);
 
       if (Constants.isTuning) {
-        ff = new ElevatorFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), kA.getAsDouble());
-        profile = new TrapezoidProfile(
-            new TrapezoidProfile.Constraints(maxVel.getAsDouble(), maxAccel.getAsDouble()));
+        ff =
+            new ElevatorFeedforward(
+                kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), kA.getAsDouble());
+        profile =
+            new TrapezoidProfile(
+                new TrapezoidProfile.Constraints(maxVel.getAsDouble(), maxAccel.getAsDouble()));
       }
 
     } else {
@@ -151,23 +153,27 @@ public class Elevator {
         io.runVolts(homingVolts.getAsDouble());
 
       } else {
-        setpointState = profile.calculate(0.02, setpointState,
-            new TrapezoidProfile.State(goal.getPositionMetres(), 0.0));
-        double setpointRotations = metresToRotations(MathUtil.clamp(setpointState.position, minInput, maxInput))
-            + homedPosition;
+        setpointState =
+            profile.calculate(
+                0.02, setpointState, new TrapezoidProfile.State(goal.getPositionMetres(), 0.0));
+        double setpointRotations =
+            metresToRotations(MathUtil.clamp(setpointState.position, minInput, maxInput))
+                + homedPosition;
         io.runSetpoint(setpointRotations, ff.calculate(setpointState.velocity));
 
         Logger.recordOutput("Elevator/SetpointRotations", setpointRotations);
         Logger.recordOutput("Elevator/SetpointState/PosMetres", setpointState.position);
         Logger.recordOutput("Elevator/SetpointState/VelMetres", setpointState.velocity);
-        Logger.recordOutput("Elevator/SetpointState/PosRotations", metresToRotations(setpointState.position));
-        Logger.recordOutput("Elevator/SetpointState/VelRotations", metresToRotations(setpointState.velocity));
-
+        Logger.recordOutput(
+            "Elevator/SetpointState/PosRotations", metresToRotations(setpointState.position));
+        Logger.recordOutput(
+            "Elevator/SetpointState/VelRotations", metresToRotations(setpointState.velocity));
       }
     }
 
     goalViz.update(goal.getPositionMetres());
-    measuredViz.update(Constants.getMode() == Mode.SIM ? goal.getPositionMetres() : getPositionMetres());
+    measuredViz.update(
+        Constants.getMode() == Mode.SIM ? goal.getPositionMetres() : getPositionMetres());
     Logger.recordOutput("Elevator/Goal", goal);
     Logger.recordOutput("Elevator/GoalMetres", goal.getPositionMetres());
     Logger.recordOutput("Elevator/GoalRotations", metresToRotations(goal.getPositionMetres()));
@@ -185,7 +191,8 @@ public class Elevator {
   }
 
   public boolean atGoal() {
-    return Constants.getMode() == Mode.SIM ? true
+    return Constants.getMode() == Mode.SIM
+        ? true
         : MathUtil.isNear(goal.getPositionMetres(), getPositionMetres(), tolerance);
   }
 

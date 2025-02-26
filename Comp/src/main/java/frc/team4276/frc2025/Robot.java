@@ -1,16 +1,3 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.team4276.frc2025;
 
 import edu.wpi.first.wpilibj.Alert;
@@ -24,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.team4276.util.dashboard.Elastic;
 import frc.team4276.util.dashboard.ElasticUI;
 import frc.team4276.util.drivers.VirtualSubsystem;
-
 import java.util.HashMap;
 import java.util.function.BiConsumer;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -36,12 +22,9 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
 
 /**
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the
- * name of this class or
- * the package after creating this project, you must also update the
- * build.gradle file in the
+ * The VM is configured to automatically run this class, and to call the functions corresponding to
+ * each mode, as described in the TimedRobot documentation. If you change the name of this class or
+ * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
 public class Robot extends LoggedRobot {
@@ -51,8 +34,8 @@ public class Robot extends LoggedRobot {
   private final Timer canInitialErrorTimer = new Timer();
   private final Timer canErrorTimer = new Timer();
   private static final double canErrorTimeThreshold = 0.5; // Seconds to disable alert
-  private final Alert canErrorAlert = new Alert("CAN errors detected, robot may not be controllable.",
-      AlertType.kError);
+  private final Alert canErrorAlert =
+      new Alert("CAN errors detected, robot may not be controllable.", AlertType.kError);
 
   private boolean autoMessagePrinted = false;
   private double autoStart = 0.0;
@@ -105,14 +88,15 @@ public class Robot extends LoggedRobot {
     Logger.start();
     // Log active commands
     HashMap<String, Integer> commandCounts = new HashMap<>();
-    BiConsumer<Command, Boolean> logCommandFunction = (Command command, Boolean active) -> {
-      String name = command.getName();
-      int count = commandCounts.getOrDefault(name, 0) + (active ? 1 : -1);
-      commandCounts.put(name, count);
-      Logger.recordOutput(
-          "CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()), active);
-      Logger.recordOutput("CommandsAll/" + name, count > 0);
-    };
+    BiConsumer<Command, Boolean> logCommandFunction =
+        (Command command, Boolean active) -> {
+          String name = command.getName();
+          int count = commandCounts.getOrDefault(name, 0) + (active ? 1 : -1);
+          commandCounts.put(name, count);
+          Logger.recordOutput(
+              "CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()), active);
+          Logger.recordOutput("CommandsAll/" + name, count > 0);
+        };
     CommandScheduler.getInstance()
         .onCommandInitialize(
             (Command command) -> {
@@ -185,8 +169,7 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {
-  }
+  public void disabledInit() {}
 
   /** This function is called periodically when disabled. */
   @Override
@@ -202,14 +185,10 @@ public class Robot extends LoggedRobot {
       robotContainer.setToggles(false, false);
     } else {
       robotContainer.setToggles(true, true);
-
     }
   }
 
-  /**
-   * This autonomous runs the autonomous command selected by your
-   * {@link RobotContainer} class.
-   */
+  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
     autoMessagePrinted = false;
@@ -228,8 +207,7 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-  }
+  public void autonomousPeriodic() {}
 
   @Override
   public void autonomousExit() {
@@ -252,12 +230,10 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {
-  }
+  public void teleopPeriodic() {}
 
   @Override
-  public void teleopExit() {
-  }
+  public void teleopExit() {}
 
   /** This function is called once when test mode is enabled. */
   @Override
@@ -268,16 +244,13 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {
-  }
+  public void testPeriodic() {}
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {
-  }
+  public void simulationInit() {}
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {
-  }
+  public void simulationPeriodic() {}
 }

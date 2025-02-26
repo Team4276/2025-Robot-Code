@@ -2,17 +2,15 @@ package frc.team4276.util.path;
 
 import static frc.team4276.frc2025.field.FieldConstants.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.DriveFeedforwards;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PPUtil {
   public static PathPlannerTrajectory mirrorLengthwise(PathPlannerTrajectory trajectory) {
@@ -23,7 +21,7 @@ public class PPUtil {
     return new PathPlannerTrajectory(mirroredStates, trajectory.getEvents());
   }
 
-  private static final double[] dummyList = { 0.0, 0.0, 0.0, 0.0 };
+  private static final double[] dummyList = {0.0, 0.0, 0.0, 0.0};
 
   public static PathPlannerTrajectoryState mirrorLengthwise(PathPlannerTrajectoryState state) {
     var flipped = new PathPlannerTrajectoryState();
@@ -31,7 +29,8 @@ public class PPUtil {
     flipped.timeSeconds = state.timeSeconds;
     flipped.linearVelocity = state.linearVelocity;
     flipped.pose = mirrorLengthwise(state.pose);
-    flipped.feedforwards = new DriveFeedforwards(dummyList, dummyList, dummyList, dummyList, dummyList);
+    flipped.feedforwards =
+        new DriveFeedforwards(dummyList, dummyList, dummyList, dummyList, dummyList);
     flipped.fieldSpeeds = mirrorLengthwise(state.fieldSpeeds);
     flipped.heading = mirrorLengthwise(state.heading);
 
@@ -47,7 +46,8 @@ public class PPUtil {
   }
 
   private static Pose2d mirrorLengthwise(Pose2d pose) {
-    return new Pose2d(mirrorLengthwise(pose.getTranslation()), mirrorLengthwise(pose.getRotation()));
+    return new Pose2d(
+        mirrorLengthwise(pose.getTranslation()), mirrorLengthwise(pose.getRotation()));
   }
 
   private static ChassisSpeeds mirrorLengthwise(ChassisSpeeds speeds) {
@@ -56,5 +56,4 @@ public class PPUtil {
         -1.0 * speeds.vyMetersPerSecond,
         -1.0 * speeds.omegaRadiansPerSecond);
   }
-
 }

@@ -1,16 +1,3 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.team4276.frc2025.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
@@ -19,7 +6,6 @@ import static frc.team4276.frc2025.subsystems.drive.DriveConstants.*;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -60,10 +46,7 @@ public class Drive extends SubsystemBase {
     /** Driving to a location on the field automatically. */
     AUTO_ALIGN,
 
-    /**
-     * Characterizing (modules oriented forwards, motor outputs supplied
-     * externally).
-     */
+    /** Characterizing (modules oriented forwards, motor outputs supplied externally). */
     CHARACTERIZATION,
 
     /** Running wheel radius characterization routine (spinning in circle) */
@@ -75,15 +58,15 @@ public class Drive extends SubsystemBase {
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
-  private final Alert gyroDisconnectedAlert = new Alert("Disconnected gyro, using kinematics as fallback.",
-      AlertType.kError);
+  private final Alert gyroDisconnectedAlert =
+      new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
   private SwerveModulePosition[] lastModulePositions = null;
   private double lastTime = 0.0;
 
   private boolean useSetpointGenerator = true;
-  private final SwerveSetpointGenerator swerveSetpointGenerator = new SwerveSetpointGenerator(driveConfig,
-      maxSteerVelocity);
+  private final SwerveSetpointGenerator swerveSetpointGenerator =
+      new SwerveSetpointGenerator(driveConfig, maxSteerVelocity);
   private SwerveSetpoint prevSetpoint;
   private boolean disableTrajFF = true;
 
@@ -113,19 +96,22 @@ public class Drive extends SubsystemBase {
     // Start odometry thread
     SparkOdometryThread.getInstance().start();
 
-    prevSetpoint = new SwerveSetpoint(getChassisSpeeds(), getModuleStates(), DriveFeedforwards.zeros(4));
+    prevSetpoint =
+        new SwerveSetpoint(getChassisSpeeds(), getModuleStates(), DriveFeedforwards.zeros(4));
 
     // Configure SysId
-    sysId = new SysIdRoutine(
-        new SysIdRoutine.Config(
-            null,
-            null,
-            null,
-            (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
-        new SysIdRoutine.Mechanism(
-            (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+    sysId =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null,
+                null,
+                null,
+                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
 
-    ElasticUI.putSwerveDrive(() -> getModuleStates(), () -> RobotState.getInstance().getEstimatedPose().getRotation());
+    ElasticUI.putSwerveDrive(
+        () -> getModuleStates(), () -> RobotState.getInstance().getEstimatedPose().getRotation());
   }
 
   @Override
@@ -158,7 +144,8 @@ public class Drive extends SubsystemBase {
     }
 
     // Update odometry
-    double[] sampleTimestamps = modules[0].getOdometryTimestamps(); // All signals are sampled together
+    double[] sampleTimestamps =
+        modules[0].getOdometryTimestamps(); // All signals are sampled together
     int sampleCount = sampleTimestamps.length;
     for (int i = 0; i < sampleCount; i++) {
       // Read wheel positions and deltas from each module
@@ -171,8 +158,10 @@ public class Drive extends SubsystemBase {
       if (lastModulePositions != null) {
         double dt = sampleTimestamps[i] - lastTime;
         for (int j = 0; j < modules.length; j++) {
-          double velocity = (modulePositions[j].distanceMeters - lastModulePositions[j].distanceMeters) / dt;
-          double omega = modulePositions[j].angle.minus(lastModulePositions[j].angle).getRadians() / dt;
+          double velocity =
+              (modulePositions[j].distanceMeters - lastModulePositions[j].distanceMeters) / dt;
+          double omega =
+              modulePositions[j].angle.minus(lastModulePositions[j].angle).getRadians() / dt;
           // Check if delta is too large
           if (Math.abs(omega) > DriveConstants.maxSpeed * 5.0
               || Math.abs(velocity) > DriveConstants.maxAngularSpeed * 5.0) {
@@ -203,7 +192,8 @@ public class Drive extends SubsystemBase {
         desiredSpeeds = teleopDriveController.update(currentPose.getRotation());
 
         if (isHeadingControlled) {
-          desiredSpeeds.omegaRadiansPerSecond = headingController.update(currentPose.getRotation().getRadians());
+          desiredSpeeds.omegaRadiansPerSecond =
+              headingController.update(currentPose.getRotation().getRadians());
         }
 
         break;
@@ -215,8 +205,8 @@ public class Drive extends SubsystemBase {
         desiredSpeeds = trajectoryController.update(currentPose);
 
         if (isHeadingControlled) {
-          desiredSpeeds.omegaRadiansPerSecond = headingController.update(
-              currentPose.getRotation().getRadians());
+          desiredSpeeds.omegaRadiansPerSecond =
+              headingController.update(currentPose.getRotation().getRadians());
         }
 
         break;
@@ -247,12 +237,13 @@ public class Drive extends SubsystemBase {
         setpointStates = kinematics.toSwerveModuleStates(setpointSpeeds);
       }
 
-      SwerveModuleState[] setpointTorques = new SwerveModuleState[] {
-          new SwerveModuleState(),
-          new SwerveModuleState(),
-          new SwerveModuleState(),
-          new SwerveModuleState()
-      };
+      SwerveModuleState[] setpointTorques =
+          new SwerveModuleState[] {
+            new SwerveModuleState(),
+            new SwerveModuleState(),
+            new SwerveModuleState(),
+            new SwerveModuleState()
+          };
 
       // Send setpoints to modules
       for (int i = 0; i < 4; i++) {
@@ -381,10 +372,7 @@ public class Drive extends SubsystemBase {
     return run(() -> runCharacterization(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction));
   }
 
-  /**
-   * Returns the module states (turn angles and drive velocities) for all of the
-   * modules.
-   */
+  /** Returns the module states (turn angles and drive velocities) for all of the modules. */
   @AutoLogOutput(key = "Drive/SwerveStates/Measured")
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];

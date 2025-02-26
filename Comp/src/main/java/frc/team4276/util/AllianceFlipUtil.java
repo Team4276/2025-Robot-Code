@@ -45,7 +45,9 @@ public class AllianceFlipUtil {
   }
 
   public static Translation2d apply(Translation2d translation) {
-    return shouldFlip() ? new Translation2d(applyX(translation.getX()), applyY(translation.getY())) : translation;
+    return shouldFlip()
+        ? new Translation2d(applyX(translation.getX()), applyY(translation.getY()))
+        : translation;
   }
 
   public static Rotation2d apply(Rotation2d rotation) {
@@ -59,9 +61,8 @@ public class AllianceFlipUtil {
   }
 
   /**
-   * For SIM
-   * true sets to blue alliance
-   * 
+   * For SIM true sets to blue alliance
+   *
    * @param shouldOverrideFlip
    */
   public static void overrideFlip(boolean shouldOverrideFlip) {

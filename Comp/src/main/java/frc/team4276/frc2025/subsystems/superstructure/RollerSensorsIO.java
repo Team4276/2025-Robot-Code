@@ -14,6 +14,5 @@ public interface RollerSensorsIO {
     boolean backCleared = false;
   }
 
-  default void updateInputs(RollerSensorsIOInputs inputs) {
-  }
+  default void updateInputs(RollerSensorsIOInputs inputs) {}
 }

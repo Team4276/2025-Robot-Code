@@ -1,13 +1,12 @@
 package frc.team4276.frc2025;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import frc.team4276.frc2025.field.FieldConstants.Reef;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
 import frc.team4276.util.drivers.VirtualSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 public class ScoringHelper extends VirtualSubsystem {
   private final CommandGenericHID buttonBoard;
@@ -18,7 +17,8 @@ public class ScoringHelper extends VirtualSubsystem {
   private Goal level = Goal.L1;
   private int side = 0;
 
-  public ScoringHelper(CommandGenericHID buttonBoard, CommandGenericHID keyboard, boolean useKeyboard) {
+  public ScoringHelper(
+      CommandGenericHID buttonBoard, CommandGenericHID keyboard, boolean useKeyboard) {
     this.buttonBoard = buttonBoard;
     this.keyboard = keyboard;
     this.useKeyboard = useKeyboard;
@@ -33,8 +33,8 @@ public class ScoringHelper extends VirtualSubsystem {
     }
 
     for (int i = 0; i < 12; i++) {
-      SmartDashboard.putBoolean("Comp/ReefScoring/" + Reef.values()[i].toString(),
-          getSelectedReef() == Reef.values()[i]);
+      SmartDashboard.putBoolean(
+          "Comp/ReefScoring/" + Reef.values()[i].toString(), getSelectedReef() == Reef.values()[i]);
     }
 
     // SmartDashboard.putBoolean("Comp/ReefScoring/L4", getSuperstructureGoal() ==
@@ -137,7 +137,6 @@ public class ScoringHelper extends VirtualSubsystem {
 
     } else {
       return Reef.values()[(side * 2) + (isRight ? 1 : 0)];
-
     }
   }
 }

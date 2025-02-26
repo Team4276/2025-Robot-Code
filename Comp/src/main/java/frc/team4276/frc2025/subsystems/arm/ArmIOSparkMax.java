@@ -17,7 +17,6 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -46,18 +45,19 @@ public class ArmIOSparkMax implements ArmIO {
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(currentLimit)
         .voltageCompensation(12.0);
-    leaderConfig.absoluteEncoder
+    leaderConfig
+        .absoluteEncoder
         .inverted(invertEncoder)
         .positionConversionFactor(encoderPositionFactor)
         .velocityConversionFactor(encoderVelocityFactor);
-    leaderConfig.closedLoop
+    leaderConfig
+        .closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         .positionWrappingEnabled(true)
         .positionWrappingInputRange(0.0, 2 * Math.PI)
-        .pidf(
-            kp, ki,
-            kd, 0.0);
-    leaderConfig.signals
+        .pidf(kp, ki, kd, 0.0);
+    leaderConfig
+        .signals
         .absoluteEncoderPositionAlwaysOn(true)
         .absoluteEncoderPositionPeriodMs((int) (1000.0 / readFreq))
         .absoluteEncoderVelocityAlwaysOn(true)
@@ -70,8 +70,9 @@ public class ArmIOSparkMax implements ArmIO {
     tryUntilOk(
         leaderSpark,
         5,
-        () -> leaderSpark.configure(
-            leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+        () ->
+            leaderSpark.configure(
+                leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
 
   @Override
@@ -81,15 +82,14 @@ public class ArmIOSparkMax implements ArmIO {
     ifOk(
         leaderSpark,
         absoluteEncoder::getPosition,
-        (value) -> inputs.positionRads = MathUtil.inputModulus(new Rotation2d(value).minus(offset).getRadians(), 0.0,
-            2 * Math.PI));
+        (value) ->
+            inputs.positionRads =
+                MathUtil.inputModulus(
+                    new Rotation2d(value).minus(offset).getRadians(), 0.0, 2 * Math.PI));
+    ifOk(leaderSpark, absoluteEncoder::getVelocity, (value) -> inputs.velocityRadsPerSec = value);
     ifOk(
         leaderSpark,
-        absoluteEncoder::getVelocity,
-        (value) -> inputs.velocityRadsPerSec = value);
-    ifOk(
-        leaderSpark,
-        new DoubleSupplier[] { leaderSpark::getAppliedOutput, leaderSpark::getBusVoltage },
+        new DoubleSupplier[] {leaderSpark::getAppliedOutput, leaderSpark::getBusVoltage},
         (values) -> inputs.appliedVolts[0] = values[0] * values[1]);
     ifOk(leaderSpark, leaderSpark::getOutputCurrent, (value) -> inputs.currentAmps[0] = value);
     ifOk(leaderSpark, leaderSpark::getMotorTemperature, (value) -> inputs.tempCelcius[0] = value);
@@ -99,7 +99,10 @@ public class ArmIOSparkMax implements ArmIO {
   @Override
   public void runSetpoint(double setpointRads, double ff) {
     closedLoopController.setReference(
-        MathUtil.inputModulus(MathUtil.clamp(setpointRads, minInput, maxInput) + offset.getRadians(), 0.0, 2 * Math.PI),
+        MathUtil.inputModulus(
+            MathUtil.clamp(setpointRads, minInput, maxInput) + offset.getRadians(),
+            0.0,
+            2 * Math.PI),
         ControlType.kPosition,
         ClosedLoopSlot.kSlot0,
         ff,
@@ -117,33 +120,31 @@ public class ArmIOSparkMax implements ArmIO {
   }
 
   @Override
-  public void runCurrent(double amps) {
-  }
+  public void runCurrent(double amps) {}
 
   @Override
   public void setBrakeMode(boolean enabled) {
-    if (brakeModeEnabled == enabled)
-      return;
+    if (brakeModeEnabled == enabled) return;
     brakeModeEnabled = enabled;
     new Thread(
-        () -> {
-          tryUntilOk(
-              leaderSpark,
-              5,
-              () -> leaderSpark.configure(
-                  leaderConfig.idleMode(
-                      brakeModeEnabled
-                          ? SparkBaseConfig.IdleMode.kBrake
-                          : SparkBaseConfig.IdleMode.kCoast),
-                  SparkBase.ResetMode.kNoResetSafeParameters,
-                  SparkBase.PersistMode.kNoPersistParameters));
-        })
+            () -> {
+              tryUntilOk(
+                  leaderSpark,
+                  5,
+                  () ->
+                      leaderSpark.configure(
+                          leaderConfig.idleMode(
+                              brakeModeEnabled
+                                  ? SparkBaseConfig.IdleMode.kBrake
+                                  : SparkBaseConfig.IdleMode.kCoast),
+                          SparkBase.ResetMode.kNoResetSafeParameters,
+                          SparkBase.PersistMode.kNoPersistParameters));
+            })
         .start();
   }
 
   @Override
-  public void setPID(double p, double i, double d) {
-  }
+  public void setPID(double p, double i, double d) {}
 
   @Override
   public void stop() {

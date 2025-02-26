@@ -1,16 +1,14 @@
 package frc.team4276.frc2025.subsystems.superstructure;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.frc2025.subsystems.superstructure.displacer.Displacer;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.Elevator;
 import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffector;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class Superstructure extends SubsystemBase {
   private final Elevator elevator;
@@ -18,7 +16,8 @@ public class Superstructure extends SubsystemBase {
   private final Displacer displacer;
 
   private final RollerSensorsIO sensorsIO;
-  private final RollerSensorsIOInputsAutoLogged sensorsInputs = new RollerSensorsIOInputsAutoLogged();
+  private final RollerSensorsIOInputsAutoLogged sensorsInputs =
+      new RollerSensorsIOInputsAutoLogged();
 
   private boolean wantScore = false;
   private boolean leftL1 = false;
@@ -53,7 +52,8 @@ public class Superstructure extends SubsystemBase {
   private boolean hasCoral = false;
   private boolean displace = true;
 
-  public Superstructure(Elevator elevator, EndEffector endeffector, Displacer displacer, RollerSensorsIO sensorsIO) {
+  public Superstructure(
+      Elevator elevator, EndEffector endeffector, Displacer displacer, RollerSensorsIO sensorsIO) {
     this.elevator = elevator;
     this.endeffector = endeffector;
     this.displacer = displacer;
@@ -76,12 +76,13 @@ public class Superstructure extends SubsystemBase {
     }
 
     if (wantScore) {
-      endeffector.setGoal(currentGoal == Goal.L1 ? (leftL1 ? EndEffector.Goal.FAVOR_LEFT : EndEffector.Goal.FAVOR_RIGHT)
-          : EndEffector.Goal.SCORE);
+      endeffector.setGoal(
+          currentGoal == Goal.L1
+              ? (leftL1 ? EndEffector.Goal.FAVOR_LEFT : EndEffector.Goal.FAVOR_RIGHT)
+              : EndEffector.Goal.SCORE);
       hasCoral = false;
     } else {
       endeffector.setGoal(EndEffector.Goal.IDLE);
-
     }
 
     if (displace) {
@@ -119,7 +120,6 @@ public class Superstructure extends SubsystemBase {
           endeffector.setGoal(EndEffector.Goal.REVERSE);
         } else {
           endeffector.setGoal(EndEffector.Goal.SLOINTAKE);
-
         }
 
         break;
@@ -144,7 +144,6 @@ public class Superstructure extends SubsystemBase {
           endeffector.setGoal(EndEffector.Goal.SLOINTAKE);
         } else {
           endeffector.setGoal(EndEffector.Goal.INTAKE);
-
         }
         displacer.setGoal(Displacer.Goal.IDLE);
 
@@ -227,10 +226,11 @@ public class Superstructure extends SubsystemBase {
   }
 
   public Command scoreCommand(boolean isLeftL1) {
-    return Commands.startEnd(() -> {
-      wantScore = true;
-      leftL1 = isLeftL1;
-    },
+    return Commands.startEnd(
+        () -> {
+          wantScore = true;
+          leftL1 = isLeftL1;
+        },
         () -> wantScore = false);
   }
 

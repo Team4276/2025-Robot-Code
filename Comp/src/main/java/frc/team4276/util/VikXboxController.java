@@ -39,7 +39,9 @@ public class VikXboxController extends CommandXboxController {
   }
 
   public JoystickOutput getRightWithDeadband() {
-    return Math.hypot(getRightX(), getRightY()) < JOYSTICK_DEADBAND ? new JoystickOutput() : getRight();
+    return Math.hypot(getRightX(), getRightY()) < JOYSTICK_DEADBAND
+        ? new JoystickOutput()
+        : getRight();
   }
 
   public JoystickOutput getRight() {
@@ -47,7 +49,9 @@ public class VikXboxController extends CommandXboxController {
   }
 
   public JoystickOutput getLeftWithDeadband() {
-    return Math.hypot(getLeftX(), getLeftY()) < JOYSTICK_DEADBAND ? new JoystickOutput() : getLeft();
+    return Math.hypot(getLeftX(), getLeftY()) < JOYSTICK_DEADBAND
+        ? new JoystickOutput()
+        : getLeft();
   }
 
   public JoystickOutput getLeft() {
@@ -86,8 +90,10 @@ public class VikXboxController extends CommandXboxController {
     var command = new SequentialCommandGroup();
 
     for (int i = 0; i < times; i++) {
-      command.addCommands(Commands.startEnd(() -> setRumble(type, value), () -> setRumble(type, 0.0))
-          .withTimeout(duration).andThen(Commands.waitSeconds(0.1)));
+      command.addCommands(
+          Commands.startEnd(() -> setRumble(type, value), () -> setRumble(type, 0.0))
+              .withTimeout(duration)
+              .andThen(Commands.waitSeconds(0.1)));
     }
 
     return command;

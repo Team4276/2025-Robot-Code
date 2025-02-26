@@ -1,17 +1,15 @@
 package frc.team4276.frc2025.commands;
 
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.Logger;
-
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public class FeedForwardCharacterization extends Command {
   private final double FF_START_DELAY = 2.0; // Secs
@@ -31,7 +29,10 @@ public class FeedForwardCharacterization extends Command {
   }
 
   public FeedForwardCharacterization(
-      Subsystem subsystem, Consumer<Double> voltageConsumer, Supplier<Double> velocitySupplier, boolean reverse) {
+      Subsystem subsystem,
+      Consumer<Double> voltageConsumer,
+      Supplier<Double> velocitySupplier,
+      boolean reverse) {
     addRequirements(subsystem);
     this.voltageConsumer = voltageConsumer;
     this.velocitySupplier = velocitySupplier;

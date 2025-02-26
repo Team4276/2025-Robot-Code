@@ -14,43 +14,34 @@ public interface ElevatorIO {
     public boolean topLimit = false;
     public boolean botLimit = false;
 
-    public double[] appliedVolts = new double[] { 0.0, 0.0 };
-    public double[] currentAmps = new double[] { 0.0, 0.0 };
-    public double[] tempCelcius = new double[] { 0.0, 0.0 };
+    public double[] appliedVolts = new double[] {0.0, 0.0};
+    public double[] currentAmps = new double[] {0.0, 0.0};
+    public double[] tempCelcius = new double[] {0.0, 0.0};
     public boolean absoluteEncoderConnected = true;
   }
 
-  public default void updateInputs(ElevatorIOInputs inputs) {
-  }
+  public default void updateInputs(ElevatorIOInputs inputs) {}
 
   /** Run to setpoint */
-  public default void runSetpoint(double setpoint, double ff) {
-  }
+  public default void runSetpoint(double setpoint, double ff) {}
 
   /** Run to setpoint */
-  public default void runSetpoint(double setpoint) {
-  }
+  public default void runSetpoint(double setpoint) {}
 
   /** Run motors at volts */
-  public default void runVolts(double volts) {
-  }
+  public default void runVolts(double volts) {}
 
   /** Run motors at current */
-  public default void runCurrent(double amps) {
-  }
+  public default void runCurrent(double amps) {}
 
   /** Set brake mode enabled */
-  public default void setBrakeMode(boolean enabled) {
-  }
+  public default void setBrakeMode(boolean enabled) {}
 
   /** Set PID values */
-  public default void setPID(double p, double i, double d) {
-  }
+  public default void setPID(double p, double i, double d) {}
 
-  public default void setPosition(double position) {
-  }
+  public default void setPosition(double position) {}
 
   /** Stops motors */
-  public default void stop() {
-  }
+  public default void stop() {}
 }

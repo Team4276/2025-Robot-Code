@@ -10,12 +10,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.team4276.frc2025.subsystems.drive.DriveConstants;
 import frc.team4276.util.AllianceFlipUtil;
-
 import java.util.List;
 
 public class ChoreoUtil {
-  private ChoreoUtil() {
-  }
+  private ChoreoUtil() {}
 
   // Assume swerve sample and if not then we screwed ig
   /** Loads and flips trajectory accordingly */
@@ -39,7 +37,8 @@ public class ChoreoUtil {
   public static Trajectory<SwerveSample> getChoreoSwerveTrajectory(String name, int split) {
     var uncheckedTraj = Choreo.loadTrajectory(name);
     try {
-      var traj = (Trajectory<SwerveSample>) uncheckedTraj.orElseThrow().getSplit(split).orElseThrow();
+      var traj =
+          (Trajectory<SwerveSample>) uncheckedTraj.orElseThrow().getSplit(split).orElseThrow();
 
       return AllianceFlipUtil.shouldFlip() ? traj.flipped() : traj;
     } catch (Exception e) {
@@ -52,11 +51,13 @@ public class ChoreoUtil {
     return getPathPlannerTrajectoryFromChoreo(name, false);
   }
 
-  public static PathPlannerTrajectory getPathPlannerTrajectoryFromChoreo(String name, boolean mirrorLengthwise) {
+  public static PathPlannerTrajectory getPathPlannerTrajectoryFromChoreo(
+      String name, boolean mirrorLengthwise) {
     try {
-      var traj = PathPlannerPath.fromChoreoTrajectory(name)
-          .generateTrajectory(
-              new ChassisSpeeds(), Rotation2d.kZero, DriveConstants.driveConfig);
+      var traj =
+          PathPlannerPath.fromChoreoTrajectory(name)
+              .generateTrajectory(
+                  new ChassisSpeeds(), Rotation2d.kZero, DriveConstants.driveConfig);
 
       if (mirrorLengthwise) {
         traj = PPUtil.mirrorLengthwise(traj);
@@ -74,12 +75,13 @@ public class ChoreoUtil {
     return getPathPlannerTrajectoryFromChoreo(name, false, split);
   }
 
-  public static PathPlannerTrajectory getPathPlannerTrajectoryFromChoreo(String name, boolean mirrorLengthwise,
-      int split) {
+  public static PathPlannerTrajectory getPathPlannerTrajectoryFromChoreo(
+      String name, boolean mirrorLengthwise, int split) {
     try {
-      var traj = PathPlannerPath.fromChoreoTrajectory(name, split)
-          .generateTrajectory(
-              new ChassisSpeeds(), Rotation2d.kZero, DriveConstants.driveConfig);
+      var traj =
+          PathPlannerPath.fromChoreoTrajectory(name, split)
+              .generateTrajectory(
+                  new ChassisSpeeds(), Rotation2d.kZero, DriveConstants.driveConfig);
 
       if (mirrorLengthwise) {
         traj = PPUtil.mirrorLengthwise(traj);

@@ -1,12 +1,10 @@
 package frc.team4276.util.drivers;
 
+import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.commons.math3.stat.StatUtils;
 import org.littletonrobotics.junction.Logger;
-
-import frc.team4276.util.dashboard.LoggedTunableNumber;
 
 public class CurrentSensor {
   private final String key;
@@ -35,9 +33,9 @@ public class CurrentSensor {
 
     if (currentSamples.size() > 100) {
       currentSamples.remove(0);
-      currentAverage = StatUtils.mean(currentSamples.stream().mapToDouble(Double::doubleValue).toArray());
-      spikeDetected = current > currentAverage
-          + spikeThreshold.getAsDouble();
+      currentAverage =
+          StatUtils.mean(currentSamples.stream().mapToDouble(Double::doubleValue).toArray());
+      spikeDetected = current > currentAverage + spikeThreshold.getAsDouble();
     } else {
       spikeDetected = false;
     }

@@ -1,16 +1,3 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.team4276.frc2025.subsystems.drive;
 
 import com.pathplanner.lib.config.ModuleConfig;
@@ -26,14 +13,16 @@ public class DriveConstants {
   public static final double odometryFrequency = 100.0; // Hz
   public static final double trackWidth = Units.inchesToMeters(26.0);
   public static final double wheelBase = Units.inchesToMeters(26.0);
-  public static final Translation2d[] moduleTranslations = new Translation2d[] {
-      new Translation2d(trackWidth / 2.0, wheelBase / 2.0),
-      new Translation2d(trackWidth / 2.0, -wheelBase / 2.0),
-      new Translation2d(-trackWidth / 2.0, wheelBase / 2.0),
-      new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0)
-  };
+  public static final Translation2d[] moduleTranslations =
+      new Translation2d[] {
+        new Translation2d(trackWidth / 2.0, wheelBase / 2.0),
+        new Translation2d(trackWidth / 2.0, -wheelBase / 2.0),
+        new Translation2d(-trackWidth / 2.0, wheelBase / 2.0),
+        new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0)
+      };
   public static final double driveBaseRadius = Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
-  public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
+  public static final SwerveDriveKinematics kinematics =
+      new SwerveDriveKinematics(moduleTranslations);
 
   public static final double maxSpeed = 5.3;
   public static final double maxAccel = 6.4;
@@ -66,25 +55,30 @@ public class DriveConstants {
   public static final int driveMotorCurrentLimit = 50;
   public static final double wheelRadiusMeters = Units.inchesToMeters(1.5);
   public static final double drivingMotorPinionTeeth = 13.0;
-  public static final double driveMotorReduction = (45.0 * 22.0) / (drivingMotorPinionTeeth * 15.0); // MAXSwerve
-                                                                                                     // with
+  public static final double driveMotorReduction =
+      (45.0 * 22.0) / (drivingMotorPinionTeeth * 15.0); // MAXSwerve
+  // with
   // x pinion teeth
   // and 22 spur teeth
   public static final DCMotor driveGearbox = DCMotor.getNeoVortex(1);
-  public static final double maxSteerVelocity = driveGearbox.freeSpeedRadPerSec / driveMotorReduction;
+  public static final double maxSteerVelocity =
+      driveGearbox.freeSpeedRadPerSec / driveMotorReduction;
 
   // Drive encoder configuration
-  public static final double driveEncoderPositionFactor = 2 * Math.PI / driveMotorReduction; // Rotor Rotations ->
+  public static final double driveEncoderPositionFactor =
+      2 * Math.PI / driveMotorReduction; // Rotor Rotations ->
   // Wheel Radians
-  public static final double driveEncoderVelocityFactor = (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM
-                                                                                                      // ->
+  public static final double driveEncoderVelocityFactor =
+      (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM
+  // ->
   // Wheel Rad/Sec
 
   // Drive PID configuration
   public static final double driveKp = 0.005;
   public static final double driveKd = 0.0;
   public static final double driveKs = 0.177;
-  public static final double driveKv = 12.0 / (driveGearbox.freeSpeedRadPerSec / driveMotorReduction);
+  public static final double driveKv =
+      12.0 / (driveGearbox.freeSpeedRadPerSec / driveMotorReduction);
   public static final double driveSimP = 1.0;
   public static final double driveSimD = 0.0;
   public static final double driveSimKs = 0.028;
@@ -113,20 +107,22 @@ public class DriveConstants {
   public static final double robotMassKg = 56.699;
   public static final double robotMOI = 5.267513460399;
   public static final double wheelCOF = 1.2;
-  public static final RobotConfig driveConfig = new RobotConfig(
-      robotMassKg,
-      robotMOI,
-      new ModuleConfig(
-          wheelRadiusMeters,
-          maxSpeed,
-          wheelCOF,
-          driveGearbox.withReduction(driveMotorReduction),
-          driveMotorCurrentLimit,
-          1),
-      moduleTranslations);
+  public static final RobotConfig driveConfig =
+      new RobotConfig(
+          robotMassKg,
+          robotMOI,
+          new ModuleConfig(
+              wheelRadiusMeters,
+              maxSpeed,
+              wheelCOF,
+              driveGearbox.withReduction(driveMotorReduction),
+              driveMotorCurrentLimit,
+              1),
+          moduleTranslations);
 
   public static final double ffkT = 1.0 / DCMotor.getNeoVortex(1).KtNMPerAmp;
 
-  public static final double disableBackVisionDistance = 0.5; // Cancel secondary camera for more precise
-                                                              // alignment
+  public static final double disableBackVisionDistance =
+      0.5; // Cancel secondary camera for more precise
+  // alignment
 }

@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.frc2025.Constants;
 import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -53,12 +52,15 @@ public class Arm extends SubsystemBase {
   private final ArmIO io;
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
 
-  private ArmFeedforward ff = new ArmFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), 0.0);
-  private ArmFeedforward ffLoaded = new ArmFeedforward(kS.getAsDouble(), kGLoaded.getAsDouble(), kV.getAsDouble(), 0.0);
-  private TrapezoidProfile profile = new TrapezoidProfile(
-      new TrapezoidProfile.Constraints(
-          Units.degreesToRadians(maxVel.getAsDouble()),
-          Units.degreesToRadians(maxAccel.getAsDouble())));
+  private ArmFeedforward ff =
+      new ArmFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), 0.0);
+  private ArmFeedforward ffLoaded =
+      new ArmFeedforward(kS.getAsDouble(), kGLoaded.getAsDouble(), kV.getAsDouble(), 0.0);
+  private TrapezoidProfile profile =
+      new TrapezoidProfile(
+          new TrapezoidProfile.Constraints(
+              Units.degreesToRadians(maxVel.getAsDouble()),
+              Units.degreesToRadians(maxAccel.getAsDouble())));
   private TrapezoidProfile.State setpointState = new TrapezoidProfile.State();
 
   private BooleanSupplier coastOverride;
@@ -105,11 +107,13 @@ public class Arm extends SubsystemBase {
 
       if (Constants.isTuning) {
         ff = new ArmFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), 0.0);
-        ffLoaded = new ArmFeedforward(kS.getAsDouble(), kGLoaded.getAsDouble(), kV.getAsDouble(), 0.0);
-        profile = new TrapezoidProfile(
-            new TrapezoidProfile.Constraints(
-                Units.degreesToRadians(maxVel.getAsDouble()),
-                Units.degreesToRadians(maxAccel.getAsDouble())));
+        ffLoaded =
+            new ArmFeedforward(kS.getAsDouble(), kGLoaded.getAsDouble(), kV.getAsDouble(), 0.0);
+        profile =
+            new TrapezoidProfile(
+                new TrapezoidProfile.Constraints(
+                    Units.degreesToRadians(maxVel.getAsDouble()),
+                    Units.degreesToRadians(maxAccel.getAsDouble())));
       }
 
     } else {
@@ -122,15 +126,17 @@ public class Arm extends SubsystemBase {
       if (goal == Goal.CHARACTERIZING) {
         io.runVolts(characterizationInput + (kG.getAsDouble() * Math.cos(inputs.positionRads)));
       } else {
-        setpointState = profile.calculate(0.02, setpointState, new TrapezoidProfile.State(goal.getRads(), 0.0));
-        io.runSetpoint(setpointState.position,
-            goal == Goal.HOLD ? ffLoaded.calculate(setpointState.position, setpointState.velocity)
+        setpointState =
+            profile.calculate(0.02, setpointState, new TrapezoidProfile.State(goal.getRads(), 0.0));
+        io.runSetpoint(
+            setpointState.position,
+            goal == Goal.HOLD
+                ? ffLoaded.calculate(setpointState.position, setpointState.velocity)
                 : ff.calculate(setpointState.position, setpointState.velocity));
 
         Logger.recordOutput("Arm/SetpointState/Pos", setpointState.position);
         Logger.recordOutput("Arm/SetpointState/Vel", setpointState.velocity);
         Logger.recordOutput("Arm/GoalAngle", goal.getDegs());
-
       }
     }
 

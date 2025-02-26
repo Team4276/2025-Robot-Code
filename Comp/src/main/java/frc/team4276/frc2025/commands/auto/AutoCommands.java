@@ -12,13 +12,11 @@ import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.dashboard.Elastic;
 import frc.team4276.util.dashboard.Elastic.Notification;
 import frc.team4276.util.dashboard.Elastic.Notification.NotificationLevel;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 public class AutoCommands {
-  private AutoCommands() {
-  }
+  private AutoCommands() {}
 
   public static final double scoreWaitTime = 0.5;
   public static final double intakeWaitTime = 1.0;
@@ -27,49 +25,39 @@ public class AutoCommands {
     return Commands.runOnce(() -> RobotState.getInstance().resetPose(pose));
   }
 
-  /**
-   * Creates a command that follows a trajectory, command ends when the trajectory
-   * is finished
-   */
+  /** Creates a command that follows a trajectory, command ends when the trajectory is finished */
   public static Command followTrajectory(Drive drive, PathPlannerTrajectory trajectory) {
     return followTrajectory(drive, () -> trajectory);
   }
 
-  /**
-   * Creates a command that follows a trajectory, command ends when the trajectory
-   * is finished
-   */
-  public static Command followTrajectory(Drive drive, PathPlannerTrajectory trajectory, BooleanSupplier endCondition) {
+  /** Creates a command that follows a trajectory, command ends when the trajectory is finished */
+  public static Command followTrajectory(
+      Drive drive, PathPlannerTrajectory trajectory, BooleanSupplier endCondition) {
     return followTrajectory(drive, () -> trajectory, endCondition);
   }
 
-  /**
-   * Creates a command that follows a trajectory, command ends when the trajectory
-   * is finished
-   */
+  /** Creates a command that follows a trajectory, command ends when the trajectory is finished */
   public static Command followTrajectory(
       Drive drive, Supplier<PathPlannerTrajectory> trajectorySupplier) {
     return followTrajectory(drive, trajectorySupplier, drive::isTrajectoryCompleted);
   }
 
-  /**
-   * Creates a command that follows a trajectory, command ends when the trajectory
-   * is finished
-   */
+  /** Creates a command that follows a trajectory, command ends when the trajectory is finished */
   public static Command followTrajectory(
-      Drive drive, Supplier<PathPlannerTrajectory> trajectorySupplier, BooleanSupplier endCondition) {
+      Drive drive,
+      Supplier<PathPlannerTrajectory> trajectorySupplier,
+      BooleanSupplier endCondition) {
     return Commands.startEnd(
-        () -> drive.setTrajectory(trajectorySupplier.get()), drive::clearTrajectory)
+            () -> drive.setTrajectory(trajectorySupplier.get()), drive::clearTrajectory)
         .until(endCondition);
   }
 
   /**
    * Returns whether robot has crossed x boundary, accounting for alliance flip
    *
-   * @param xPosition         X position coordinate on blue side of field.
-   * @param towardsCenterline Whether to wait until passed x coordinate towards
-   *                          center line or away
-   *                          from center line
+   * @param xPosition X position coordinate on blue side of field.
+   * @param towardsCenterline Whether to wait until passed x coordinate towards center line or away
+   *     from center line
    */
   public static boolean xCrossed(double xPosition, boolean towardsCenterline) {
     Pose2d robotPose = RobotState.getInstance().getTrajectorySetpoint();
@@ -88,10 +76,7 @@ public class AutoCommands {
     }
   }
 
-  /**
-   * Command that waits for x boundary to be crossed. See
-   * {@link #xCrossed(double, boolean)}
-   */
+  /** Command that waits for x boundary to be crossed. See {@link #xCrossed(double, boolean)} */
   public static Command waitUntilXCrossed(double xPosition, boolean towardsCenterline) {
     return Commands.waitUntil(() -> xCrossed(xPosition, towardsCenterline));
   }
@@ -99,10 +84,9 @@ public class AutoCommands {
   /**
    * Returns whether robot has crossed y boundary, accounting for alliance flip
    *
-   * @param yPosition         Y position coordinate on blue side of field.
-   * @param towardsCenterline Whether to wait until passed y coordinate towards
-   *                          center line or away
-   *                          from center line
+   * @param yPosition Y position coordinate on blue side of field.
+   * @param towardsCenterline Whether to wait until passed y coordinate towards center line or away
+   *     from center line
    */
   public static boolean yCrossed(double yPosition, boolean towardsCenterline) {
     Pose2d robotPose = RobotState.getInstance().getTrajectorySetpoint();
@@ -121,10 +105,7 @@ public class AutoCommands {
     }
   }
 
-  /**
-   * Command that waits for y boundary to be crossed. See
-   * {@link #yCrossed(double, boolean)}
-   */
+  /** Command that waits for y boundary to be crossed. See {@link #yCrossed(double, boolean)} */
   public static Command waitUntilYCrossed(double yPosition, boolean towardsCenterline) {
     return Commands.waitUntil(() -> yCrossed(yPosition, towardsCenterline));
   }
@@ -134,10 +115,12 @@ public class AutoCommands {
   }
 
   public static Command notificationCommand(String notification) {
-    return notificationCommand(new Notification(NotificationLevel.INFO, "Auto Action", notification, 3000));
+    return notificationCommand(
+        new Notification(NotificationLevel.INFO, "Auto Action", notification, 3000));
   }
 
-  public static Command notificationCommand(Notification notification) { // Jank but gud enough for now
+  public static Command notificationCommand(
+      Notification notification) { // Jank but gud enough for now
     return Commands.runOnce(() -> Elastic.sendNotification(notification));
   }
 
@@ -146,7 +129,8 @@ public class AutoCommands {
   }
 
   public static Command scoreCommand(Superstructure superstructure, boolean isLeftL1) {
-    return superstructure.scoreCommand(isLeftL1)
+    return superstructure
+        .scoreCommand(isLeftL1)
         .alongWith(notificationCommand("Scoring"))
         .withTimeout(scoreWaitTime)
         .withName("Score");

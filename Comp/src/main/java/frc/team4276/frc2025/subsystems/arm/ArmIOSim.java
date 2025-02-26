@@ -9,15 +9,16 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class ArmIOSim implements ArmIO {
-  private final SingleJointedArmSim sim = new SingleJointedArmSim(
-      DCMotor.getNEO(1),
-      gearRatio,
-      0.1,
-      length,
-      Math.toRadians(50.0),
-      maxInput,
-      false,
-      minInput);
+  private final SingleJointedArmSim sim =
+      new SingleJointedArmSim(
+          DCMotor.getNEO(1),
+          gearRatio,
+          0.1,
+          length,
+          Math.toRadians(50.0),
+          maxInput,
+          false,
+          minInput);
 
   private final PIDController controller;
   private double appliedVoltage = 0.0;
@@ -36,9 +37,9 @@ public class ArmIOSim implements ArmIO {
 
     inputs.positionRads = sim.getAngleRads();
     inputs.velocityRadsPerSec = sim.getVelocityRadPerSec();
-    inputs.appliedVolts = new double[] { appliedVoltage };
-    inputs.currentAmps = new double[] { sim.getCurrentDrawAmps() };
-    inputs.tempCelcius = new double[] { 0.0 };
+    inputs.appliedVolts = new double[] {appliedVoltage};
+    inputs.currentAmps = new double[] {sim.getCurrentDrawAmps()};
+    inputs.tempCelcius = new double[] {0.0};
   }
 
   /** Run to setpoint angle in radians */
@@ -46,9 +47,7 @@ public class ArmIOSim implements ArmIO {
   public void runSetpoint(double setpointRads, double ff) {
     setpointViz.update(setpointRads);
 
-    runVolts(
-        controller.calculate(sim.getAngleRads(), setpointRads)
-            + ff);
+    runVolts(controller.calculate(sim.getAngleRads(), setpointRads) + ff);
   }
 
   /** Run to setpoint angle in radians */
@@ -66,18 +65,15 @@ public class ArmIOSim implements ArmIO {
 
   /** Run motors at current */
   @Override
-  public void runCurrent(double amps) {
-  }
+  public void runCurrent(double amps) {}
 
   /** Set brake mode enabled */
   @Override
-  public void setBrakeMode(boolean enabled) {
-  }
+  public void setBrakeMode(boolean enabled) {}
 
   /** Set PID values */
   @Override
-  public void setPID(double p, double i, double d) {
-  }
+  public void setPID(double p, double i, double d) {}
 
   /** Stops motors */
   @Override

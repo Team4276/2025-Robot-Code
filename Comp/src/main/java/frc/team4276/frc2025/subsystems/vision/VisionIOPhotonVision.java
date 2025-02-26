@@ -1,23 +1,9 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.team4276.frc2025.subsystems.vision;
 
 import static frc.team4276.frc2025.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +18,7 @@ public class VisionIOPhotonVision implements VisionIO {
   /**
    * Creates a new VisionIOPhotonVision.
    *
-   * @param name             The configured name of the camera.
+   * @param name The configured name of the camera.
    * @param rotationSupplier The 3D position of the camera relative to the robot.
    */
   public VisionIOPhotonVision(String name, Transform3d robotToCamera) {
@@ -71,8 +57,8 @@ public class VisionIOPhotonVision implements VisionIO {
             new PoseObservation(
                 result.getTimestampSeconds(), // Timestamp
                 multitagResult.fiducialIDsUsed.size(), // Tag count
-                robotPose , // 3D pose estimate
-                robotPose , // 3D pose estimate
+                robotPose, // 3D pose estimate
+                robotPose, // 3D pose estimate
                 multitagResult.estimatedPose.ambiguity, // Ambiguity
                 totalTagDistance / result.targets.size(), // Average tag distance
                 totalTagDistance / result.targets.size(), // Average tag distance
@@ -83,17 +69,21 @@ public class VisionIOPhotonVision implements VisionIO {
         // Calculate robot pose
         var tagPose = aprilTagLayout.getTagPose(target.fiducialId);
         if (tagPose.isPresent()) {
-          Transform3d fieldToTarget1 = new Transform3d(tagPose.get().getTranslation(), tagPose.get().getRotation());
+          Transform3d fieldToTarget1 =
+              new Transform3d(tagPose.get().getTranslation(), tagPose.get().getRotation());
           Transform3d cameraToTarget1 = target.bestCameraToTarget;
           Transform3d fieldToCamera1 = fieldToTarget1.plus(cameraToTarget1.inverse());
           Transform3d fieldToRobot1 = fieldToCamera1.plus(robotToCamera.inverse());
-          Pose3d robotPose1 = new Pose3d(fieldToRobot1.getTranslation(), fieldToRobot1.getRotation());
+          Pose3d robotPose1 =
+              new Pose3d(fieldToRobot1.getTranslation(), fieldToRobot1.getRotation());
 
-          Transform3d fieldToTarget2 = new Transform3d(tagPose.get().getTranslation(), tagPose.get().getRotation());
+          Transform3d fieldToTarget2 =
+              new Transform3d(tagPose.get().getTranslation(), tagPose.get().getRotation());
           Transform3d cameraToTarget2 = target.altCameraToTarget;
           Transform3d fieldToCamera2 = fieldToTarget2.plus(cameraToTarget2.inverse());
           Transform3d fieldToRobot2 = fieldToCamera2.plus(robotToCamera.inverse());
-          Pose3d robotPose2 = new Pose3d(fieldToRobot2.getTranslation(), fieldToRobot2.getRotation());
+          Pose3d robotPose2 =
+              new Pose3d(fieldToRobot2.getTranslation(), fieldToRobot2.getRotation());
 
           // Add tag ID
           tagIds.add((short) target.fiducialId);
@@ -105,7 +95,7 @@ public class VisionIOPhotonVision implements VisionIO {
                   1, // Tag count
                   robotPose1, // 3D pose estimate
                   robotPose2, // 3D pose estimate
-                  target.poseAmbiguity , // Ambiguity
+                  target.poseAmbiguity, // Ambiguity
                   cameraToTarget1.getTranslation().getNorm(), // Tag distances
                   cameraToTarget2.getTranslation().getNorm(), // Tag distances
                   PoseObservationType.PHOTONVISION)); // Observation type

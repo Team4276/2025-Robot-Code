@@ -11,7 +11,7 @@ public class LoggedTunablePID extends PIDController {
 
   private final String key;
 
-  public LoggedTunablePID(double kp, double ki, double kd, String key){
+  public LoggedTunablePID(double kp, double ki, double kd, String key) {
     super(kp, ki, kd);
     this.key = key;
     Kp = new LoggedTunableNumber(this.key + "/kP", kp);

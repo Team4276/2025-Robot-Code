@@ -4,7 +4,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.team4276.frc2025.Constants;
 
-public class LoggedTunableProfiledPID extends ProfiledPIDController{
+public class LoggedTunableProfiledPID extends ProfiledPIDController {
   public final LoggedTunableNumber Kp;
   public final LoggedTunableNumber Ki;
   public final LoggedTunableNumber Kd;
@@ -14,7 +14,8 @@ public class LoggedTunableProfiledPID extends ProfiledPIDController{
 
   private final String key;
 
-  public LoggedTunableProfiledPID(String key, double kp, double ki, double kd, double maxVel, double maxAccel){
+  public LoggedTunableProfiledPID(
+      String key, double kp, double ki, double kd, double maxVel, double maxAccel) {
     super(kp, ki, kd, new TrapezoidProfile.Constraints(maxVel, maxAccel));
     this.key = key;
     Kp = new LoggedTunableNumber(this.key + "/kP", kp);
@@ -25,7 +26,8 @@ public class LoggedTunableProfiledPID extends ProfiledPIDController{
     this.maxAccel = new LoggedTunableNumber(this.key + "/MaxAccel", maxAccel);
   }
 
-  public LoggedTunableProfiledPID(String key, double kp, double ki, double kd, double tol, double maxVel, double maxAccel) {
+  public LoggedTunableProfiledPID(
+      String key, double kp, double ki, double kd, double tol, double maxVel, double maxAccel) {
     super(kp, ki, kd, new TrapezoidProfile.Constraints(maxVel, maxAccel));
     this.key = key;
     Kp = new LoggedTunableNumber(this.key + "/kP", kp);
@@ -41,7 +43,8 @@ public class LoggedTunableProfiledPID extends ProfiledPIDController{
     if (Constants.isTuning) {
       setPID(Kp.getAsDouble(), Ki.getAsDouble(), Kd.getAsDouble());
       setTolerance(KTol.getAsDouble());
-      setConstraints(new TrapezoidProfile.Constraints(maxVel.getAsDouble(), maxAccel.getAsDouble()));
+      setConstraints(
+          new TrapezoidProfile.Constraints(maxVel.getAsDouble(), maxAccel.getAsDouble()));
     }
 
     return super.calculate(measurement, setpoint);

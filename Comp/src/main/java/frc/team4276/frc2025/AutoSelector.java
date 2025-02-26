@@ -8,11 +8,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.drivers.VirtualSubsystem;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -47,7 +45,8 @@ public class AutoSelector extends VirtualSubsystem {
 
   private static final int maxQuestions = 4;
 
-  private static final AutoRoutine defaultRoutine = new AutoRoutine("Do Nothing", List.of(), () -> Commands.none());
+  private static final AutoRoutine defaultRoutine =
+      new AutoRoutine("Do Nothing", List.of(), () -> Commands.none());
 
   private final LoggedDashboardChooser<AutoRoutine> routineChooser;
   private final List<StringPublisher> questionPublishers;
@@ -61,11 +60,12 @@ public class AutoSelector extends VirtualSubsystem {
   private double prevDelayInput = 0.0;
 
   private AutoRoutine lastRoutine;
-  private List<AutoQuestionResponse> lastResponses = List.of(
-      AutoQuestionResponse.EMPTY,
-      AutoQuestionResponse.EMPTY,
-      AutoQuestionResponse.EMPTY,
-      AutoQuestionResponse.EMPTY);
+  private List<AutoQuestionResponse> lastResponses =
+      List.of(
+          AutoQuestionResponse.EMPTY,
+          AutoQuestionResponse.EMPTY,
+          AutoQuestionResponse.EMPTY,
+          AutoQuestionResponse.EMPTY);
 
   public AutoSelector() {
     routineChooser = new LoggedDashboardChooser<>("Comp/Auto/RoutineChooser");
@@ -75,18 +75,19 @@ public class AutoSelector extends VirtualSubsystem {
     questionPublishers = new ArrayList<>();
     questionChoosers = new ArrayList<>();
     for (int i = 0; i < maxQuestions; i++) {
-      var publisher = NetworkTableInstance.getDefault()
-          .getStringTopic("Comp/Auto/Question #" + Integer.toString(i + 1))
-          .publish();
+      var publisher =
+          NetworkTableInstance.getDefault()
+              .getStringTopic("Comp/Auto/Question #" + Integer.toString(i + 1))
+              .publish();
       publisher.set("NA");
       questionPublishers.add(publisher);
       questionChoosers.add(
-          new LoggedDashboardChooser<>("Comp/Auto/Question #" + Integer.toString(i + 1) + " Chooser"));
+          new LoggedDashboardChooser<>(
+              "Comp/Auto/Question #" + Integer.toString(i + 1) + " Chooser"));
     }
 
     coralInput = new LoggedNetworkNumber("Comp/Auto/Coral Input", 1);
     delayInput = new LoggedNetworkNumber("Comp/Auto/Delay", 0.0);
-
   }
 
   /** Registers a new auto routine that can be selected. */
@@ -155,7 +156,8 @@ public class AutoSelector extends VirtualSubsystem {
       questionChoosers.clear();
       for (int i = 0; i < maxQuestions; i++) {
         questionChoosers.add(
-            new LoggedDashboardChooser<>("Comp/Auto/Question #" + Integer.toString(i + 1) + " Chooser"));
+            new LoggedDashboardChooser<>(
+                "Comp/Auto/Question #" + Integer.toString(i + 1) + " Chooser"));
         if (i < questions.size()) {
           questionPublishers.get(i).set(questions.get(i).question());
           for (int j = 0; j < questions.get(i).responses().size(); j++) {
@@ -170,11 +172,14 @@ public class AutoSelector extends VirtualSubsystem {
 
     // Update the routine and responses
     lastRoutine = selectedRoutine;
-    var cachedResponses = lastResponses.isEmpty() ? List.of(
-        AutoQuestionResponse.EMPTY,
-        AutoQuestionResponse.EMPTY,
-        AutoQuestionResponse.EMPTY,
-        AutoQuestionResponse.EMPTY) : lastResponses;
+    var cachedResponses =
+        lastResponses.isEmpty()
+            ? List.of(
+                AutoQuestionResponse.EMPTY,
+                AutoQuestionResponse.EMPTY,
+                AutoQuestionResponse.EMPTY,
+                AutoQuestionResponse.EMPTY)
+            : lastResponses;
     lastResponses = new ArrayList<>();
     for (int i = 0; i < lastRoutine.questions().size(); i++) {
       questionChoosers.get(i).periodic();
@@ -199,10 +204,9 @@ public class AutoSelector extends VirtualSubsystem {
   }
 
   /** A customizable auto routine associated with a single command. */
-  private static final record AutoRoutine(String name, List<AutoQuestion> questions, Supplier<Command> command) {
-  }
+  private static final record AutoRoutine(
+      String name, List<AutoQuestion> questions, Supplier<Command> command) {}
 
   /** A question to ask for customizing an auto routine. */
-  public static record AutoQuestion(String question, List<AutoQuestionResponse> responses) {
-  }
+  public static record AutoQuestion(String question, List<AutoQuestionResponse> responses) {}
 }

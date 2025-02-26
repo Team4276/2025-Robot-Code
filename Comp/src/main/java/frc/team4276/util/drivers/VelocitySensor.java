@@ -1,13 +1,11 @@
 package frc.team4276.util.drivers;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.math3.stat.StatUtils;
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj.Timer;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.math3.stat.StatUtils;
+import org.littletonrobotics.junction.Logger;
 
 public class VelocitySensor { // add a debounce?
   private final String key;
@@ -29,7 +27,8 @@ public class VelocitySensor { // add a debounce?
     timeOld = Timer.getTimestamp();
 
     velDipThreshold = new LoggedTunableNumber(key + "/VelocitySensor/VelocityDipThreshold", 10);
-    deccelThreshold = new LoggedTunableNumber(key + "/VelocitySensor/DecellerationThreshold", -11.0);
+    deccelThreshold =
+        new LoggedTunableNumber(key + "/VelocitySensor/DecellerationThreshold", -11.0);
     upperBoundAccel = new LoggedTunableNumber(key + "/VelocitySensor/UpperBoundAccelRange", 10);
     lowerBoundAccel = new LoggedTunableNumber(key + "/VelocitySensor/LowerBoundAccelRange", -10);
   }
@@ -46,15 +45,19 @@ public class VelocitySensor { // add a debounce?
     }
 
     // no longer accelarting but not at rest
-    if ((withinRange(acceleration, lowerBoundAccel.getAsDouble(), upperBoundAccel.getAsDouble()) && velocity >= 6000) || (peakVelocitySamples.isEmpty() && velocity >= 6000)) {
+    if ((withinRange(acceleration, lowerBoundAccel.getAsDouble(), upperBoundAccel.getAsDouble())
+            && velocity >= 6000)
+        || (peakVelocitySamples.isEmpty() && velocity >= 6000)) {
       peakVelocitySamples.add(velocity);
     }
 
     if (peakVelocitySamples.size() > 100) {
       peakVelocitySamples.remove(0);
-      averageVelocity = StatUtils.mean(peakVelocitySamples.stream().mapToDouble(Double::doubleValue).toArray());
-      dipDetected = (velocity < averageVelocity - velDipThreshold.getAsDouble())
-          && acceleration < deccelThreshold.getAsDouble();
+      averageVelocity =
+          StatUtils.mean(peakVelocitySamples.stream().mapToDouble(Double::doubleValue).toArray());
+      dipDetected =
+          (velocity < averageVelocity - velDipThreshold.getAsDouble())
+              && acceleration < deccelThreshold.getAsDouble();
     }
     Logger.recordOutput(key + "/VelocitySensor/Acceleration", acceleration);
     Logger.recordOutput(key + "/VelocitySensor/Velocity", velocity);
@@ -69,5 +72,4 @@ public class VelocitySensor { // add a debounce?
   private static boolean withinRange(double value, double min, double max) {
     return value >= min && value <= max;
   }
-
 }

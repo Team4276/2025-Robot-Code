@@ -20,5 +20,4 @@ public class ObjectSensor {
   public boolean getDetection() {
     return objectDetected;
   }
-
 }
