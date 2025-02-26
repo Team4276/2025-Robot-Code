@@ -5,12 +5,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import frc.team4276.frc2025.field.FieldConstants.Reef;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
+import frc.team4276.util.VikXboxController;
 import frc.team4276.util.drivers.VirtualSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class ScoringHelper extends VirtualSubsystem {
   private final CommandGenericHID buttonBoard;
   private final CommandGenericHID keyboard;
+  private final VikXboxController xbox;
   private final boolean useKeyboard;
 
   private boolean isRight = false;
@@ -18,9 +20,13 @@ public class ScoringHelper extends VirtualSubsystem {
   private int side = 0;
 
   public ScoringHelper(
-      CommandGenericHID buttonBoard, CommandGenericHID keyboard, boolean useKeyboard) {
+      CommandGenericHID buttonBoard,
+      CommandGenericHID keyboard,
+      VikXboxController xbox,
+      boolean useKeyboard) {
     this.buttonBoard = buttonBoard;
     this.keyboard = keyboard;
+    this.xbox = xbox;
     this.useKeyboard = useKeyboard;
   }
 
@@ -29,6 +35,7 @@ public class ScoringHelper extends VirtualSubsystem {
     if (useKeyboard && Constants.getMode() == Constants.Mode.SIM) {
       updateKeyboard();
     } else {
+      updateXbox(); // redundancy
       updateButtonBoard();
     }
 
@@ -83,6 +90,41 @@ public class ScoringHelper extends VirtualSubsystem {
     } else if (buttonBoard.getHID().getPOV() == 0) {
       level = Goal.L3;
     }
+  }
+
+  private void updateXbox() {
+    // Update Positions
+    if (xbox.getHID().getLeftBumperButton()) {
+      isRight = false;
+    } else if (xbox.getHID().getRightBumperButton()) {
+      isRight = true;
+    }
+
+    if (xbox.getHID().getPOV() == 180) {
+      side = 0;
+    } else if (xbox.getHID().getPOV() == 135) {
+      side = 1;
+    } else if (xbox.getHID().getPOV() == 45) {
+      side = 2;
+    } else if (xbox.getHID().getPOV() == 0) {
+      side = 3;
+    } else if (xbox.getHID().getPOV() == 315) {
+      side = 4;
+    } else if (xbox.getHID().getPOV() == 225) {
+      side = 5;
+    }
+
+    // Update Level
+    if (xbox.getHID().getAButton()) {
+      level = Goal.L1;
+    } else if (xbox.getHID().getBButton()) {
+      level = Goal.L2;
+    } else if (xbox.getHID().getYButton()) {
+      level = Goal.L3;
+    }
+    // else if (xbox.getHID().getPOV() == 0) {
+    //   level = Goal.L3;
+    // }
   }
 
   private void updateKeyboard() {

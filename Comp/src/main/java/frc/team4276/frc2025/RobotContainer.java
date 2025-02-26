@@ -77,8 +77,10 @@ public class RobotContainer {
   private final VikXboxController driver = new VikXboxController(0);
   private final CommandGenericHID buttonBoard = new CommandGenericHID(1);
   private final CommandGenericHID keyboard = new CommandGenericHID(2);
+  private final VikXboxController operator = new VikXboxController(3);
 
-  private final ScoringHelper scoringHelper = new ScoringHelper(buttonBoard, keyboard, useKeyboard);
+  private final ScoringHelper scoringHelper =
+      new ScoringHelper(buttonBoard, keyboard, operator, useKeyboard);
 
   private final Alert driverDisconnected =
       new Alert("Driver controller disconnected (port 0).", AlertType.kWarning);

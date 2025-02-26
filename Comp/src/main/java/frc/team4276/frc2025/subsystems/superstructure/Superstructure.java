@@ -109,9 +109,6 @@ public class Superstructure extends SubsystemBase {
         break;
 
       case SHUFFLE:
-        elevator.setGoal(Elevator.Goal.STOW);
-        displacer.setGoal(Displacer.Goal.IDLE);
-
         if (sensorsInputs.backTripped || cleared5) {
           cleared5 = true;
           endeffector.setGoal(EndEffector.Goal.IDLE);
@@ -134,7 +131,7 @@ public class Superstructure extends SubsystemBase {
         elevator.setGoal(Elevator.Goal.INTAKE);
         if ((sensorsInputs.backTripped && cleared2) || cleared3) {
           cleared3 = true;
-          hasCoral = true;
+          hasCoral = sensorsInputs.frontRead;
           endeffector.setGoal(EndEffector.Goal.IDLE);
         } else if (sensorsInputs.backCleared || cleared2) {
           cleared2 = true;

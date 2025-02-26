@@ -223,7 +223,7 @@ public class AutoBuilder { // TODO: fix auto not intaking
                       .andThen(
                           superstructure
                               .setGoalCommand(toGoal(levels.get(i)))
-                              .raceWith(
+                              .withDeadline(
                                   Commands.waitUntil(superstructure::atGoal)
                                       .andThen(scoreCommand(superstructure))))));
 
