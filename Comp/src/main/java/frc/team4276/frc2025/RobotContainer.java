@@ -543,10 +543,6 @@ public class RobotContainer {
                         .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 1.0))));
 
     // Scoring
-    var headingAlignReefCommand =
-        DriveCommands.headingAlignCommand(
-                drive, () -> scoringHelper.getSelectedScorePose().getRotation())
-            .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal));
 
     driver
         .rightTrigger()
@@ -555,7 +551,7 @@ public class RobotContainer {
             Commands.either(
                 superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal),
                 Commands.either(
-                    headingAlignReefCommand,
+                    AutoScore.getAutoHeadingAlignScoreCommand(drive, superstructure, scoringHelper),
                     AutoScore.getAutoScoreCommand(drive, superstructure, vision, scoringHelper)
                         .alongWith(
                             Commands.waitUntil(

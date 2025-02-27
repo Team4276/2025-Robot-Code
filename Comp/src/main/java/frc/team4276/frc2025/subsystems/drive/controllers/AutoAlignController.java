@@ -14,7 +14,7 @@ public class AutoAlignController {
   private final LoggedTunableProfiledPID driveController;
   private final LoggedTunableProfiledPID thetaController;
 
-  @AutoLogOutput(key = "AutoAlign/SetpointPose")
+  @AutoLogOutput(key = "AutoAlignController/SetpointPose")
   private Pose2d setpoint = Pose2d.kZero;
 
   private Pose2d distanceToGoal = Pose2d.kZero;
@@ -29,10 +29,10 @@ public class AutoAlignController {
   public AutoAlignController() {
     driveController =
         new LoggedTunableProfiledPID(
-            "AutoAlignController/Translation", 3.0, 0.0, 0.0, 0.05, 3.0, 3.0);
+            "AutoAlignController/Translation", 3.0, 0.0, 0.0, 0.01, 3.0, 3.0);
     thetaController =
         new LoggedTunableProfiledPID(
-            "AutoAlignController/Rotation", 1.0, 0.0, 0.0, Units.degreesToRadians(3.0), 6.0, 6.0);
+            "AutoAlignController/Rotation", 4.0, 0.0, 0.0, Units.degreesToRadians(3.0), 6.0, 3.0);
 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
@@ -43,8 +43,7 @@ public class AutoAlignController {
     ChassisSpeeds fieldVelocity = RobotState.getInstance().getFieldVelocity();
     Translation2d linearFieldVelocity =
         new Translation2d(fieldVelocity.vxMetersPerSecond, fieldVelocity.vyMetersPerSecond);
-    thetaController.reset(
-        currentPose.getRotation().getRadians(), fieldVelocity.omegaRadiansPerSecond);
+    thetaController.reset(0.0, 0.0);
     driveController.reset(
         currentPose.getTranslation().getDistance(pose.getTranslation()),
         Math.min(
@@ -103,10 +102,10 @@ public class AutoAlignController {
 
     var teleopSpeeds = teleopDriveController.updateRaw(currentPose.getRotation());
 
-    cancelX = (useCancel ? cancelX : false) || Math.abs(teleopSpeeds.vxMetersPerSecond) > 1e-6;
-    cancelY = (useCancel ? cancelY : false) || Math.abs(teleopSpeeds.vyMetersPerSecond) > 1e-6;
-    cancelTheta =
-        (useCancel ? cancelTheta : false) || Math.abs(teleopSpeeds.omegaRadiansPerSecond) > 1e-6;
+    // cancelX = (useCancel ? cancelX : false) || Math.abs(teleopSpeeds.vxMetersPerSecond) > 1e-6;
+    // cancelY = (useCancel ? cancelY : false) || Math.abs(teleopSpeeds.vyMetersPerSecond) > 1e-6;
+    // cancelTheta =
+    //     (useCancel ? cancelTheta : false) || Math.abs(teleopSpeeds.omegaRadiansPerSecond) > 1e-6;
 
     Logger.recordOutput("AutoAlignController/CancelX", cancelX);
     Logger.recordOutput("AutoAlignController/CancelY", cancelY);

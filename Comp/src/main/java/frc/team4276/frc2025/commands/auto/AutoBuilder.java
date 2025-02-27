@@ -304,8 +304,8 @@ public class AutoBuilder { // TODO: fix auto not intaking
             AutoQuestionResponse.L2,
             AutoQuestionResponse.L1_LEFT),
         List.of(
-            AutoQuestionResponse.CLOSE,
-            AutoQuestionResponse.CLOSE,
+            AutoQuestionResponse.FAR,
+            AutoQuestionResponse.FAR,
             AutoQuestionResponse.FAR,
             AutoQuestionResponse.FAR,
             AutoQuestionResponse.FAR),
@@ -316,22 +316,22 @@ public class AutoBuilder { // TODO: fix auto not intaking
     return coralScoreAuto(
         List.of(
             AutoQuestionResponse.E,
-            AutoQuestionResponse.D,
-            AutoQuestionResponse.C,
             AutoQuestionResponse.B,
-            AutoQuestionResponse.A),
+            AutoQuestionResponse.A,
+            AutoQuestionResponse.C,
+            AutoQuestionResponse.D),
         List.of(
+            AutoQuestionResponse.L2,
+            AutoQuestionResponse.L2,
             AutoQuestionResponse.L2,
             AutoQuestionResponse.L1_RIGHT,
-            AutoQuestionResponse.L1_LEFT,
-            AutoQuestionResponse.L2,
-            AutoQuestionResponse.L2),
+            AutoQuestionResponse.L1_LEFT),
         List.of(
             AutoQuestionResponse.FAR,
             AutoQuestionResponse.FAR,
-            AutoQuestionResponse.CLOSE,
-            AutoQuestionResponse.CLOSE,
-            AutoQuestionResponse.CLOSE),
+            AutoQuestionResponse.FAR,
+            AutoQuestionResponse.FAR,
+            AutoQuestionResponse.FAR),
         false);
   }
 
