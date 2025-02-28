@@ -83,11 +83,6 @@ public class Vision extends SubsystemBase {
 
       // Loop over pose observations
       for (var observation : inputs[cameraIndex].poseObservations) {
-        if (observation.tagCount() == 0) {
-          robotPosesRejected.add(observation.pose1());
-          continue;
-        }
-
         Pose3d robotPose3d = null;
         double avgTagDist = 0.0;
         if (observation.tagCount() > 1) {
@@ -119,10 +114,10 @@ public class Vision extends SubsystemBase {
             continue;
           }
 
-          // if (avgTagDist > maxDist && observation.tagCount() == 1) {
-          // robotPosesRejected.add(robotPose3d);
-          // continue;
-          // }
+          if (avgTagDist > maxDist) {
+            robotPosesRejected.add(robotPose3d);
+            continue;
+          }
 
           // Exit if robot pose is off the field
           if (robotPose3d.getX() < -fieldBorderMargin
