@@ -643,7 +643,7 @@ public class RobotContainer {
         .and(() -> !driver.getRT())
         .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE));
 
-    driver.povUp().onTrue(superstructure.toggleUnjamCommand());
+    // driver.povUp().onTrue(superstructure.toggleUnjamCommand());
 
     /***************** Algae Triggers *****************/
 
