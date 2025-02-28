@@ -40,8 +40,7 @@ public class VisionIOPhotonVision implements VisionIO {
 
         // Calculate robot pose
         Transform3d fieldToCamera = multitagResult.estimatedPose.best;
-        Transform3d fieldToRobot = fieldToCamera.plus(robotToCamera.inverse());
-        Pose3d robotPose = new Pose3d(fieldToRobot.getTranslation(), fieldToRobot.getRotation());
+        Pose3d camPose = new Pose3d(fieldToCamera.getTranslation(), fieldToCamera.getRotation());
 
         // Calculate average tag distance
         double totalTagDistance = 0.0;
@@ -57,8 +56,8 @@ public class VisionIOPhotonVision implements VisionIO {
             new PoseObservation(
                 result.getTimestampSeconds(), // Timestamp
                 multitagResult.fiducialIDsUsed.size(), // Tag count
-                robotPose, // 3D pose estimate
-                robotPose, // 3D pose estimate
+                camPose, // 3D pose estimate
+                camPose, // 3D pose estimate
                 multitagResult.estimatedPose.ambiguity, // Ambiguity
                 totalTagDistance / result.targets.size(), // Average tag distance
                 totalTagDistance / result.targets.size(), // Average tag distance
@@ -73,17 +72,15 @@ public class VisionIOPhotonVision implements VisionIO {
               new Transform3d(tagPose.get().getTranslation(), tagPose.get().getRotation());
           Transform3d cameraToTarget1 = target.bestCameraToTarget;
           Transform3d fieldToCamera1 = fieldToTarget1.plus(cameraToTarget1.inverse());
-          Transform3d fieldToRobot1 = fieldToCamera1.plus(robotToCamera.inverse());
-          Pose3d robotPose1 =
-              new Pose3d(fieldToRobot1.getTranslation(), fieldToRobot1.getRotation());
+          Pose3d camPose1 =
+              new Pose3d(fieldToCamera1.getTranslation(), fieldToCamera1.getRotation());
 
           Transform3d fieldToTarget2 =
               new Transform3d(tagPose.get().getTranslation(), tagPose.get().getRotation());
           Transform3d cameraToTarget2 = target.altCameraToTarget;
           Transform3d fieldToCamera2 = fieldToTarget2.plus(cameraToTarget2.inverse());
-          Transform3d fieldToRobot2 = fieldToCamera2.plus(robotToCamera.inverse());
-          Pose3d robotPose2 =
-              new Pose3d(fieldToRobot2.getTranslation(), fieldToRobot2.getRotation());
+          Pose3d camPose2 =
+              new Pose3d(fieldToCamera2.getTranslation(), fieldToCamera2.getRotation());
 
           // Add tag ID
           tagIds.add((short) target.fiducialId);
@@ -93,8 +90,8 @@ public class VisionIOPhotonVision implements VisionIO {
               new PoseObservation(
                   result.getTimestampSeconds(), // Timestamp
                   1, // Tag count
-                  robotPose1, // 3D pose estimate
-                  robotPose2, // 3D pose estimate
+                  camPose1, // 3D pose estimate
+                  camPose2, // 3D pose estimate
                   target.poseAmbiguity, // Ambiguity
                   cameraToTarget1.getTranslation().getNorm(), // Tag distances
                   cameraToTarget2.getTranslation().getNorm(), // Tag distances

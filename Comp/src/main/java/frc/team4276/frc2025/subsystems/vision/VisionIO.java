@@ -15,8 +15,8 @@ public interface VisionIO {
   public static record PoseObservation(
       double timestamp,
       int tagCount,
-      Pose3d pose1,
-      Pose3d pose2,
+      Pose3d fieldToCam1,
+      Pose3d fieldToCam2,
       double ambiguity,
       double avgTagDistance1,
       double avgTagDistance2,

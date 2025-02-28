@@ -7,6 +7,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
@@ -24,6 +25,7 @@ public class Vision extends SubsystemBase {
   private final VisionConsumer consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
+  private final Transform3d[] robotToCam = {robotToCamera0, robotToCamera1};
   private final Alert[] disconnectedAlerts;
 
   private boolean[] camerasEnabled = {true, false};
@@ -86,26 +88,30 @@ public class Vision extends SubsystemBase {
         Pose3d robotPose3d = null;
         double avgTagDist = 0.0;
         if (observation.tagCount() > 1) {
+          var fieldToRobot = observation.fieldToCam1().plus(robotToCam[cameraIndex].inverse());
           // Add pose to log
-          robotPoses.add(observation.pose1());
-          robotPose3d = observation.pose1();
+          robotPoses.add(fieldToRobot);
+          robotPose3d = fieldToRobot;
 
           avgTagDist = observation.avgTagDistance1();
         } else if (observation.tagCount() == 1) {
+          var fieldToRobot0 = observation.fieldToCam1().plus(robotToCam[cameraIndex].inverse());
+          var fieldToRobot1 = observation.fieldToCam2().plus(robotToCam[cameraIndex].inverse());
+
           // Add pose to log
-          robotPoses.add(observation.pose1());
-          robotPoses.add(observation.pose2());
+          robotPoses.add(fieldToRobot0);
+          robotPoses.add(fieldToRobot1);
 
           if (observation.ambiguity() < maxAmbiguity) {
             Rotation2d currentRotation = RobotState.getInstance().getEstimatedPose().getRotation();
-            Rotation2d visionRotation0 = observation.pose1().toPose2d().getRotation();
-            Rotation2d visionRotation1 = observation.pose2().toPose2d().getRotation();
+            Rotation2d visionRotation0 = fieldToRobot0.toPose2d().getRotation();
+            Rotation2d visionRotation1 = fieldToRobot1.toPose2d().getRotation();
             if (Math.abs(currentRotation.minus(visionRotation0).getRadians())
                 < Math.abs(currentRotation.minus(visionRotation1).getRadians())) {
-              robotPose3d = observation.pose1();
+              robotPose3d = observation.fieldToCam1();
               avgTagDist = observation.avgTagDistance1();
             } else {
-              robotPose3d = observation.pose2();
+              robotPose3d = observation.fieldToCam2();
               avgTagDist = observation.avgTagDistance2();
             }
           }
@@ -147,7 +153,7 @@ public class Vision extends SubsystemBase {
                 robotPose3d.toPose2d(),
                 observation.timestamp(),
                 VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
-          } else {
+          } else { // TODO: disable vision heading zero
             robotPosesCanceled.add(robotPose3d);
           }
         }
