@@ -34,13 +34,14 @@ public class VisionConstants {
           Units.inchesToMeters(1.573079),
           Units.inchesToMeters(9.498816) * -1.0,
           Units.inchesToMeters(39.580820),
-          new Rotation3d(0.0, Math.toRadians(25.0) * 1.0, Math.PI));
+          new Rotation3d(0.0, Math.toRadians(25.0) * -1.0, Math.PI));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
   public static final double fieldBorderMargin = 0.5;
   public static double maxZError = 0.75;
-  public static double maxDist = 3.5;
+  public static double maxDist = 2.0;
+  public static double maxTip = Units.degreesToRadians(20.0);
 
   // Standard deviation baselines, for 1 meter distance and 1 tag
   // (Adjusted automatically based on distance and # of tags)

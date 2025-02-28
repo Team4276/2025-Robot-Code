@@ -8,9 +8,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class EndEffector {
   private static final LoggedTunableNumber favorVolts =
-      new LoggedTunableNumber("EndEffector/FavorVolts", 4.0);
+      new LoggedTunableNumber("EndEffector/FavorVolts", 5.0);
   private static final LoggedTunableNumber lagVolts =
-      new LoggedTunableNumber("EndEffector/LagVolts", 2.0);
+      new LoggedTunableNumber("EndEffector/LagVolts", 3.0);
 
   public enum Goal {
     IDLE(() -> 0.0, () -> 0.0),

@@ -132,8 +132,6 @@ public class AutoSelector extends VirtualSubsystem {
       return;
     }
 
-    wasRed = AllianceFlipUtil.shouldFlip();
-
     SmartDashboard.putNumber("Comp/Auto/Num Coral Submitted ", getCoralInput());
     SmartDashboard.putNumber("Comp/Auto/Delay Input Submitted ", getDelayInput());
 
@@ -191,9 +189,14 @@ public class AutoSelector extends VirtualSubsystem {
       autoChanged = true;
     }
 
+    prevCoralInput = getCoralInput();
+    prevDelayInput = getDelayInput();
+
     if (AllianceFlipUtil.shouldFlip() != wasRed) {
       autoChanged = true;
     }
+
+    wasRed = AllianceFlipUtil.shouldFlip();
   }
 
   public boolean hasAutoChanged() {

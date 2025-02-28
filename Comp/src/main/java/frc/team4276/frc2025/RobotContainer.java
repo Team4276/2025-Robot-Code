@@ -285,54 +285,54 @@ public class RobotContainer {
                 "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO))),
         () -> autoBuilder.taxiAuto("t_WALL"));
     // autoSelector.addRoutine(
-    //     "(ECD) Shrimple Coral Auto",
-    //     List.of(
-    //         new AutoQuestion(
-    //             "Is Processor Side?", List.of(AutoQuestionResponse.YES,
+    // "(ECD) Shrimple Coral Auto",
+    // List.of(
+    // new AutoQuestion(
+    // "Is Processor Side?", List.of(AutoQuestionResponse.YES,
     // AutoQuestionResponse.NO))),
-    //     () -> autoBuilder.ECDshrimpleCoralAuto());
+    // () -> autoBuilder.ECDshrimpleCoralAuto());
     // autoSelector.addRoutine(
-    //     "(FEBA) Shrimple Coral Auto",
-    //     List.of(
-    //         new AutoQuestion(
-    //             "Is Processor Side?", List.of(AutoQuestionResponse.YES,
+    // "(FEBA) Shrimple Coral Auto",
+    // List.of(
+    // new AutoQuestion(
+    // "Is Processor Side?", List.of(AutoQuestionResponse.YES,
     // AutoQuestionResponse.NO))),
-    //     () -> autoBuilder.FEBAshrimpleCoralAuto());
+    // () -> autoBuilder.FEBAshrimpleCoralAuto());
     // autoSelector.addRoutine(
-    //     "RP Auto",
-    //     List.of(
-    //         new AutoQuestion(
-    //             "Is Processor Side?", List.of(AutoQuestionResponse.YES,
+    // "RP Auto",
+    // List.of(
+    // new AutoQuestion(
+    // "Is Processor Side?", List.of(AutoQuestionResponse.YES,
     // AutoQuestionResponse.NO))),
-    //     () -> autoBuilder.rpAuto());
+    // () -> autoBuilder.rpAuto());
     // autoSelector.addRoutine(
-    //     "Max 5 Coral",
-    //     List.of(
-    //         new AutoQuestion(
-    //             "Is Processor Side?", List.of(AutoQuestionResponse.YES,
+    // "Max 5 Coral",
+    // List.of(
+    // new AutoQuestion(
+    // "Is Processor Side?", List.of(AutoQuestionResponse.YES,
     // AutoQuestionResponse.NO))),
-    //     () -> autoBuilder.max5Coral());
+    // () -> autoBuilder.max5Coral());
     // autoSelector.addRoutine(
-    //     "Safe 5 Coral",
-    //     List.of(
-    //         new AutoQuestion(
-    //             "Is Processor Side?", List.of(AutoQuestionResponse.YES,
+    // "Safe 5 Coral",
+    // List.of(
+    // new AutoQuestion(
+    // "Is Processor Side?", List.of(AutoQuestionResponse.YES,
     // AutoQuestionResponse.NO))),
-    //     () -> autoBuilder.safe5Coal());
+    // () -> autoBuilder.safe5Coal());
     // autoSelector.addRoutine(
-    //     "Vanilla Hybrid",
-    //     List.of(
-    //         new AutoQuestion(
-    //             "Is Processor Side?", List.of(AutoQuestionResponse.YES,
+    // "Vanilla Hybrid",
+    // List.of(
+    // new AutoQuestion(
+    // "Is Processor Side?", List.of(AutoQuestionResponse.YES,
     // AutoQuestionResponse.NO))),
-    //     () -> autoBuilder.vanHybridAuto());
+    // () -> autoBuilder.vanHybridAuto());
     // autoSelector.addRoutine(
-    //     "Test 3 Coral",
-    //     List.of(
-    //         new AutoQuestion(
-    //             "Is Processor Side?", List.of(AutoQuestionResponse.YES,
+    // "Test 3 Coral",
+    // List.of(
+    // new AutoQuestion(
+    // "Is Processor Side?", List.of(AutoQuestionResponse.YES,
     // AutoQuestionResponse.NO))),
-    //     () -> autoBuilder.test3Coral());
+    // () -> autoBuilder.test3Coral());
   }
 
   private void configureTuningRoutines() {
@@ -605,7 +605,6 @@ public class RobotContainer {
                         .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 1.0))));
 
     // Scoring
-
     driver
         .rightTrigger()
         .and(() -> !(driver.getHID().getXButton() || driver.getHID().getBButton()))
@@ -620,7 +619,9 @@ public class RobotContainer {
                                     () -> (superstructure.atGoal() && drive.isAutoAligned()))
                                 .andThen(
                                     driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 0.2, 3))),
-                    () -> disableTranslationAutoAlign),
+                    () ->
+                        disableTranslationAutoAlign
+                            || scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L1),
                 () -> disableHeadingAutoAlign));
 
     driver.rightBumper().and(driver.rightTrigger()).whileTrue(superstructure.scoreCommand(false));

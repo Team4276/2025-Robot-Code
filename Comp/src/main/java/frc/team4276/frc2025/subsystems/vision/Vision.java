@@ -123,7 +123,7 @@ public class Vision extends SubsystemBase {
             continue;
           }
 
-          if (avgTagDist > maxDist) {
+          if (avgTagDist > maxDist || (avgTagDist <= 0.01 && avgTagDist >= -0.01)) {
             robotPosesRejected.add(robotPose3d);
             continue;
           }
@@ -139,6 +139,7 @@ public class Vision extends SubsystemBase {
             continue;
           }
 
+          useVisionRotation = false;
           // Calculate standard deviations
           double stdDevFactor = Math.pow(avgTagDist, 2.0) / observation.tagCount();
           double linearStdDev =

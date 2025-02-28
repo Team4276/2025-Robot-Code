@@ -130,7 +130,7 @@ public class AutoBuilder { // TODO: fix auto not intaking
   public Command shrimpleOcrAuto() {
     List<AutoQuestionResponse> reefs = new ArrayList<>();
 
-    for (int i = 1; i < 5; i++) {
+    for (int i = 1; i < autoSelector.getResponses().size(); i++) {
       int ordinal = autoSelector.getResponses().get(i).ordinal() - AutoQuestionResponse.A.ordinal();
       if (ordinal >= 0 && ordinal < 12) {
         reefs.add(autoSelector.getResponses().get(i));
