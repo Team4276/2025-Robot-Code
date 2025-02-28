@@ -389,4 +389,8 @@ public class Drive extends SubsystemBase {
   private ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
+
+  public DriveMode getMode() {
+    return mode;
+  }
 }

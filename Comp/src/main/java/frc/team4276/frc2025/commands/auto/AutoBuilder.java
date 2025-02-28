@@ -60,6 +60,86 @@ public class AutoBuilder { // TODO: fix auto not intaking
         followTrajectory(drive, traj));
   }
 
+  public Command shrimpleOcrAuto(
+      List<AutoQuestionResponse> reefs, List<AutoQuestionResponse> levels) {
+
+    if (reefs.isEmpty() || levels.isEmpty()) {
+      CommandScheduler.getInstance()
+          .schedule(notificationCommand("Error invalid Coral Auto List is Empty"));
+
+      return Commands.none();
+    }
+
+    // Check if need to flip paths to barge side
+    boolean mirrorLengthwise = autoSelector.getResponses().get(0) == AutoQuestionResponse.NO;
+
+    var scoringCommand = new SequentialCommandGroup();
+
+    var traj1 =
+        getPathPlannerTrajectoryFromChoreo("c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise);
+
+    for (int i = 0; i < reefs.size(); i++) {
+      scoringCommand.addCommands(
+          vision.setCamerasEnabledCommand(true, false),
+          followTrajectory(
+              drive,
+              i == 0
+                  ? traj1
+                  : getPathPlannerTrajectoryFromChoreo(
+                      "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 0)),
+          superstructure
+              .setGoalCommand(toGoal(levels.get(i)))
+              .withDeadline(
+                  Commands.waitUntil(() -> superstructure.atGoal())
+                      .andThen(scoreCommand(superstructure))),
+          vision.setCamerasEnabledCommand(false, false),
+          followTrajectory(
+              drive,
+              getPathPlannerTrajectoryFromChoreo(
+                  "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 1)),
+          superstructure.setGoalCommand(Goal.INTAKE).withTimeout(intakeWaitTime));
+    }
+
+    return Commands.sequence(
+        resetPose(traj1.getInitialPose()),
+        Commands.waitSeconds(autoSelector.getDelayInput()),
+        scoringCommand);
+  }
+
+  public Command shrimpleOcrAuto(List<AutoQuestionResponse> reefs) {
+    return shrimpleOcrAuto(reefs, reefsToLevels(reefs));
+  }
+
+  public Command rpShrimpleOcrAuto() {
+    return shrimpleOcrAuto(List.of(AutoQuestionResponse.G))
+        .withDeadline(
+            Commands.waitUntil(() -> drive.getMode() == Drive.DriveMode.TRAJECTORY)
+                .andThen(Commands.waitUntil(() -> drive.isTrajectoryCompleted()))
+                .andThen(Commands.waitUntil(() -> drive.getMode() == Drive.DriveMode.TRAJECTORY)));
+  }
+
+  public Command FEBAshrimpleOcrAuto() {
+    return shrimpleOcrAuto(
+        List.of(
+            AutoQuestionResponse.F,
+            AutoQuestionResponse.E,
+            AutoQuestionResponse.B,
+            AutoQuestionResponse.A));
+  }
+
+  public Command shrimpleOcrAuto() {
+    List<AutoQuestionResponse> reefs = new ArrayList<>();
+
+    for (int i = 1; i < 5; i++) {
+      int ordinal = autoSelector.getResponses().get(i).ordinal() - AutoQuestionResponse.A.ordinal();
+      if (ordinal >= 0 && ordinal < 12) {
+        reefs.add(autoSelector.getResponses().get(i));
+      }
+    }
+
+    return shrimpleOcrAuto(reefs, reefsToLevels(reefs));
+  }
+
   public Command ECDshrimpleCoralAuto() {
     // Check if need to flip paths to barge side
     boolean mirrorLengthwise = autoSelector.getResponses().get(0) == AutoQuestionResponse.NO;
@@ -397,5 +477,34 @@ public class AutoBuilder { // TODO: fix auto not intaking
     // TODO: impl
 
     return false;
+  }
+
+  /** fms convention (A-L) */
+  private int[] scoringAvailable = {2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1};
+
+  public List<AutoQuestionResponse> reefsToLevels(List<AutoQuestionResponse> reefs) {
+    if (reefs.isEmpty()) {
+      return List.of();
+    }
+
+    List<AutoQuestionResponse> levels = new ArrayList<>();
+
+    int[] totalAvailable = scoringAvailable;
+
+    for (var reef : reefs) {
+      int available = totalAvailable[reef.ordinal() - AutoQuestionResponse.A.ordinal()];
+
+      if (available > 1) {
+        levels.add(AutoQuestionResponse.L2);
+        totalAvailable[reef.ordinal() - AutoQuestionResponse.A.ordinal()]--;
+
+      } else {
+        levels.add(
+            available % 2 == 0 ? AutoQuestionResponse.L1_LEFT : AutoQuestionResponse.L1_RIGHT);
+        totalAvailable[reef.ordinal() - AutoQuestionResponse.A.ordinal()]--;
+      }
+    }
+
+    return levels;
   }
 }

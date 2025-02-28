@@ -43,7 +43,7 @@ public class AutoSelector extends VirtualSubsystem {
     PROCESSOR
   }
 
-  private static final int maxQuestions = 4;
+  private static final int maxQuestions = 5;
 
   private static final AutoRoutine defaultRoutine =
       new AutoRoutine("Do Nothing", List.of(), () -> Commands.none());
@@ -62,6 +62,7 @@ public class AutoSelector extends VirtualSubsystem {
   private AutoRoutine lastRoutine;
   private List<AutoQuestionResponse> lastResponses =
       List.of(
+          AutoQuestionResponse.EMPTY,
           AutoQuestionResponse.EMPTY,
           AutoQuestionResponse.EMPTY,
           AutoQuestionResponse.EMPTY,
@@ -175,6 +176,7 @@ public class AutoSelector extends VirtualSubsystem {
     var cachedResponses =
         lastResponses.isEmpty()
             ? List.of(
+                AutoQuestionResponse.EMPTY,
                 AutoQuestionResponse.EMPTY,
                 AutoQuestionResponse.EMPTY,
                 AutoQuestionResponse.EMPTY,

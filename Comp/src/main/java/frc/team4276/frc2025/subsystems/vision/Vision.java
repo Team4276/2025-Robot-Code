@@ -25,10 +25,10 @@ public class Vision extends SubsystemBase {
   private final VisionConsumer consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
-  private final Transform3d[] robotToCam = { robotToCamera0, robotToCamera1 };
+  private final Transform3d[] robotToCam = {robotToCamera0, robotToCamera1};
   private final Alert[] disconnectedAlerts;
 
-  private boolean[] camerasEnabled = { true, false };
+  private boolean[] camerasEnabled = {true, false};
 
   public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -43,8 +43,9 @@ public class Vision extends SubsystemBase {
     // Initialize disconnected alerts
     this.disconnectedAlerts = new Alert[io.length];
     for (int i = 0; i < inputs.length; i++) {
-      disconnectedAlerts[i] = new Alert(
-          "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
+      disconnectedAlerts[i] =
+          new Alert(
+              "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
     }
   }
 
@@ -108,12 +109,12 @@ public class Vision extends SubsystemBase {
             Rotation2d currentRotation = RobotState.getInstance().getEstimatedPose().getRotation();
             Rotation2d visionRotation0 = fieldToRobot0.toPose2d().getRotation();
             Rotation2d visionRotation1 = fieldToRobot1.toPose2d().getRotation();
-            if (Math.abs(currentRotation.minus(visionRotation0).getRadians()) < Math
-                .abs(currentRotation.minus(visionRotation1).getRadians())) {
-              robotPose3d = observation.fieldToCam1();
+            if (Math.abs(currentRotation.minus(visionRotation0).getRadians())
+                < Math.abs(currentRotation.minus(visionRotation1).getRadians())) {
+              robotPose3d = fieldToRobot0;
               avgTagDist = observation.avgTagDistance1();
             } else {
-              robotPose3d = observation.fieldToCam2();
+              robotPose3d = fieldToRobot1;
               avgTagDist = observation.avgTagDistance2();
             }
           }
@@ -140,10 +141,12 @@ public class Vision extends SubsystemBase {
 
           // Calculate standard deviations
           double stdDevFactor = Math.pow(avgTagDist, 2.0) / observation.tagCount();
-          double linearStdDev = linearStdDevBaseline * stdDevFactor * cameraStdDevFactors[cameraIndex];
-          double angularStdDev = useVisionRotation
-              ? angularStdDevBaseline * stdDevFactor * cameraStdDevFactors[cameraIndex]
-              : Double.POSITIVE_INFINITY;
+          double linearStdDev =
+              linearStdDevBaseline * stdDevFactor * cameraStdDevFactors[cameraIndex];
+          double angularStdDev =
+              useVisionRotation
+                  ? angularStdDevBaseline * stdDevFactor * cameraStdDevFactors[cameraIndex]
+                  : Double.POSITIVE_INFINITY;
 
           // Send vision observation
           if (camerasEnabled[cameraIndex]) {
@@ -158,8 +161,8 @@ public class Vision extends SubsystemBase {
           }
         }
       }
-      
-      if(enableInstanceLogging){
+
+      if (enableInstanceLogging) {
         // Log camera datadata
         Logger.recordOutput(
             "Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",

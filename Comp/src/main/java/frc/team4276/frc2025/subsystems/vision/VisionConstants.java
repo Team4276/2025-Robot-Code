@@ -9,9 +9,9 @@ import frc.team4276.frc2025.Constants;
 import frc.team4276.frc2025.Constants.Mode;
 
 public class VisionConstants {
-    private static final boolean forceEnableInstanceLogging = false;
-    public static final boolean enableInstanceLogging =
-        forceEnableInstanceLogging || Constants.getMode() == Mode.REPLAY;
+  private static final boolean forceEnableInstanceLogging = false;
+  public static final boolean enableInstanceLogging =
+      forceEnableInstanceLogging || Constants.getMode() == Mode.REPLAY;
 
   // AprilTag layout
   public static AprilTagFieldLayout aprilTagLayout =

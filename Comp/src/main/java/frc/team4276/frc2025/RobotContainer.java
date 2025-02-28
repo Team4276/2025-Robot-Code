@@ -224,53 +224,115 @@ public class RobotContainer {
 
     // Set up auto routines
     autoSelector.addRoutine(
-        "(ECD) Shrimple Coral Auto",
+        "RP Shrimple OCR Auto",
         List.of(
             new AutoQuestion(
                 "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO))),
-        () -> autoBuilder.ECDshrimpleCoralAuto());
+        () -> autoBuilder.rpShrimpleOcrAuto());
     autoSelector.addRoutine(
-        "(FEBA) Shrimple Coral Auto",
+        "(FEBA) Shrimple OCR Auto",
         List.of(
             new AutoQuestion(
                 "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO))),
-        () -> autoBuilder.FEBAshrimpleCoralAuto());
+        () -> autoBuilder.FEBAshrimpleOcrAuto());
     autoSelector.addRoutine(
-        "RP Auto",
+        "Shrimple OCR Auto",
         List.of(
             new AutoQuestion(
-                "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO))),
-        () -> autoBuilder.rpAuto());
+                "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO)),
+            new AutoQuestion(
+                "1st Reef?",
+                List.of(
+                    AutoQuestionResponse.EMPTY,
+                    AutoQuestionResponse.E,
+                    AutoQuestionResponse.F,
+                    AutoQuestionResponse.G)),
+            new AutoQuestion(
+                "2nd Reef?",
+                List.of(
+                    AutoQuestionResponse.EMPTY,
+                    AutoQuestionResponse.A,
+                    AutoQuestionResponse.B,
+                    AutoQuestionResponse.C,
+                    AutoQuestionResponse.D,
+                    AutoQuestionResponse.E,
+                    AutoQuestionResponse.F)),
+            new AutoQuestion(
+                "3rd Reef?",
+                List.of(
+                    AutoQuestionResponse.EMPTY,
+                    AutoQuestionResponse.A,
+                    AutoQuestionResponse.B,
+                    AutoQuestionResponse.C,
+                    AutoQuestionResponse.D,
+                    AutoQuestionResponse.E,
+                    AutoQuestionResponse.F)),
+            new AutoQuestion(
+                "4th Reef?",
+                List.of(
+                    AutoQuestionResponse.EMPTY,
+                    AutoQuestionResponse.A,
+                    AutoQuestionResponse.B,
+                    AutoQuestionResponse.C,
+                    AutoQuestionResponse.D,
+                    AutoQuestionResponse.E,
+                    AutoQuestionResponse.F))),
+        () -> autoBuilder.shrimpleOcrAuto());
     autoSelector.addRoutine(
         "Taxi Wall",
         List.of(
             new AutoQuestion(
                 "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO))),
         () -> autoBuilder.taxiAuto("t_WALL"));
-    autoSelector.addRoutine(
-        "Max 5 Coral",
-        List.of(
-            new AutoQuestion(
-                "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO))),
-        () -> autoBuilder.max5Coral());
-    autoSelector.addRoutine(
-        "Safe 5 Coral",
-        List.of(
-            new AutoQuestion(
-                "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO))),
-        () -> autoBuilder.safe5Coal());
-    autoSelector.addRoutine(
-        "Vanilla Hybrid",
-        List.of(
-            new AutoQuestion(
-                "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO))),
-        () -> autoBuilder.vanHybridAuto());
-    autoSelector.addRoutine(
-        "Test 3 Coral",
-        List.of(
-            new AutoQuestion(
-                "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO))),
-        () -> autoBuilder.test3Coral());
+    // autoSelector.addRoutine(
+    //     "(ECD) Shrimple Coral Auto",
+    //     List.of(
+    //         new AutoQuestion(
+    //             "Is Processor Side?", List.of(AutoQuestionResponse.YES,
+    // AutoQuestionResponse.NO))),
+    //     () -> autoBuilder.ECDshrimpleCoralAuto());
+    // autoSelector.addRoutine(
+    //     "(FEBA) Shrimple Coral Auto",
+    //     List.of(
+    //         new AutoQuestion(
+    //             "Is Processor Side?", List.of(AutoQuestionResponse.YES,
+    // AutoQuestionResponse.NO))),
+    //     () -> autoBuilder.FEBAshrimpleCoralAuto());
+    // autoSelector.addRoutine(
+    //     "RP Auto",
+    //     List.of(
+    //         new AutoQuestion(
+    //             "Is Processor Side?", List.of(AutoQuestionResponse.YES,
+    // AutoQuestionResponse.NO))),
+    //     () -> autoBuilder.rpAuto());
+    // autoSelector.addRoutine(
+    //     "Max 5 Coral",
+    //     List.of(
+    //         new AutoQuestion(
+    //             "Is Processor Side?", List.of(AutoQuestionResponse.YES,
+    // AutoQuestionResponse.NO))),
+    //     () -> autoBuilder.max5Coral());
+    // autoSelector.addRoutine(
+    //     "Safe 5 Coral",
+    //     List.of(
+    //         new AutoQuestion(
+    //             "Is Processor Side?", List.of(AutoQuestionResponse.YES,
+    // AutoQuestionResponse.NO))),
+    //     () -> autoBuilder.safe5Coal());
+    // autoSelector.addRoutine(
+    //     "Vanilla Hybrid",
+    //     List.of(
+    //         new AutoQuestion(
+    //             "Is Processor Side?", List.of(AutoQuestionResponse.YES,
+    // AutoQuestionResponse.NO))),
+    //     () -> autoBuilder.vanHybridAuto());
+    // autoSelector.addRoutine(
+    //     "Test 3 Coral",
+    //     List.of(
+    //         new AutoQuestion(
+    //             "Is Processor Side?", List.of(AutoQuestionResponse.YES,
+    // AutoQuestionResponse.NO))),
+    //     () -> autoBuilder.test3Coral());
   }
 
   private void configureTuningRoutines() {
