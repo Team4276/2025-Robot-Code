@@ -45,7 +45,7 @@ public class AutoScore {
                 .until(drive::isAutoAligned)
                 .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)))
         .alongWith(vision.setEnableCameraCommand(1, false))
-        .finallyDo(() -> vision.setEnableCamera(1, false));
+        .finallyDo(() -> vision.setEnableCamera(1, true));
   }
 
   public static Command getAutoHeadingAlignScoreCommand(

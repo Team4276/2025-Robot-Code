@@ -80,7 +80,7 @@ public class AutoBuilder { // TODO: fix auto not intaking
 
     for (int i = 0; i < reefs.size(); i++) {
       scoringCommand.addCommands(
-          vision.setCamerasEnabledCommand(true, false),
+          vision.setCamerasEnabledCommand(true, true),
           followTrajectory(
               drive,
               i == 0
@@ -92,7 +92,7 @@ public class AutoBuilder { // TODO: fix auto not intaking
               .withDeadline(
                   Commands.waitUntil(() -> superstructure.atGoal())
                       .andThen(scoreCommand(superstructure))),
-          vision.setCamerasEnabledCommand(false, false),
+          vision.setCamerasEnabledCommand(true, true),
           followTrajectory(
               drive,
               getPathPlannerTrajectoryFromChoreo(

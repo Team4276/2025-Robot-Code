@@ -717,7 +717,7 @@ public class RobotContainer {
     return autoSelector
         .getCommand()
         .beforeStarting(() -> vision.setCamerasEnabled(false, false))
-        .finallyDo(() -> vision.setCamerasEnabled(true, false));
+        .finallyDo(() -> vision.setCamerasEnabled(true, true));
   }
 
   public boolean hasAutoChanged() {
