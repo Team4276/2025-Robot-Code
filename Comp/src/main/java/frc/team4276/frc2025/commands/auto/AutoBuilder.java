@@ -75,8 +75,7 @@ public class AutoBuilder { // TODO: fix auto not intaking
 
     var scoringCommand = new SequentialCommandGroup();
 
-    var traj1 =
-        getPathPlannerTrajectoryFromChoreo("c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise);
+    var traj1 = getPathPlannerTrajectoryFromChoreo("c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise);
 
     for (int i = 0; i < reefs.size(); i++) {
       scoringCommand.addCommands(
@@ -124,7 +123,12 @@ public class AutoBuilder { // TODO: fix auto not intaking
             AutoQuestionResponse.F,
             AutoQuestionResponse.E,
             AutoQuestionResponse.B,
-            AutoQuestionResponse.A));
+            AutoQuestionResponse.A),
+        List.of(
+            AutoQuestionResponse.L2,
+            AutoQuestionResponse.L2,
+            AutoQuestionResponse.L2,
+            AutoQuestionResponse.L2));
   }
 
   public Command shrimpleOcrAuto() {
@@ -425,27 +429,26 @@ public class AutoBuilder { // TODO: fix auto not intaking
   }
 
   public Command vanHybridAuto() {
-    var command =
-        algaeStart(AutoQuestionResponse.CLOSE)
-            .andThen(
-                coralScoreAuto(
-                    List.of(
-                        AutoQuestionResponse.A,
-                        AutoQuestionResponse.A,
-                        AutoQuestionResponse.B,
-                        AutoQuestionResponse.B),
-                    List.of(
-                        AutoQuestionResponse.L2,
-                        AutoQuestionResponse.L1_LEFT,
-                        AutoQuestionResponse.L2,
-                        AutoQuestionResponse.L1_RIGHT),
-                    List.of(
-                        AutoQuestionResponse.CLOSE,
-                        AutoQuestionResponse.CLOSE,
-                        AutoQuestionResponse.CLOSE,
-                        AutoQuestionResponse.CLOSE),
-                    false,
-                    AutoQuestionResponse.CLOSE));
+    var command = algaeStart(AutoQuestionResponse.CLOSE)
+        .andThen(
+            coralScoreAuto(
+                List.of(
+                    AutoQuestionResponse.A,
+                    AutoQuestionResponse.A,
+                    AutoQuestionResponse.B,
+                    AutoQuestionResponse.B),
+                List.of(
+                    AutoQuestionResponse.L2,
+                    AutoQuestionResponse.L1_LEFT,
+                    AutoQuestionResponse.L2,
+                    AutoQuestionResponse.L1_RIGHT),
+                List.of(
+                    AutoQuestionResponse.CLOSE,
+                    AutoQuestionResponse.CLOSE,
+                    AutoQuestionResponse.CLOSE,
+                    AutoQuestionResponse.CLOSE),
+                false,
+                AutoQuestionResponse.CLOSE));
     return command;
   }
 
@@ -480,7 +483,7 @@ public class AutoBuilder { // TODO: fix auto not intaking
   }
 
   /** fms convention (A-L) */
-  private int[] scoringAvailable = {2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1};
+  private final int[] scoringAvailable = { 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1 };
 
   public List<AutoQuestionResponse> reefsToLevels(List<AutoQuestionResponse> reefs) {
     if (reefs.isEmpty()) {
