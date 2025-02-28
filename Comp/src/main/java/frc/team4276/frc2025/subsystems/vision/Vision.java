@@ -145,16 +145,15 @@ public class Vision extends SubsystemBase {
           }
 
           // Send vision observation
-
-          if (!camerasEnabled[cameraIndex]) {
-            robotPosesCanceled.add(robotPose3d);
-          } else {
+          if (camerasEnabled[cameraIndex]) {
             robotPosesAccepted.add(robotPose3d);
 
             consumer.accept(
                 robotPose3d.toPose2d(),
                 observation.timestamp(),
                 VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+          } else {
+            robotPosesCanceled.add(robotPose3d);
           }
         }
 

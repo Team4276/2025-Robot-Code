@@ -20,7 +20,7 @@ public class Arm extends SubsystemBase {
     STOW(new LoggedTunableNumber("Arm/StowDegrees", 110.0)),
     INTAKE(new LoggedTunableNumber("Arm/IntakeDegrees", 65.0)),
     HOLD(new LoggedTunableNumber("Arm/HoldDegrees", 110.0)),
-    SCORE(new LoggedTunableNumber("Arm/ScoreDegrees", 90.0)),
+    SCORE(new LoggedTunableNumber("Arm/ScoreDegrees", 100.0)),
     CHARACTERIZING(() -> 90.0),
     CUSTOM(new LoggedTunableNumber("Arm/CustomSetpoint", 90.0));
 

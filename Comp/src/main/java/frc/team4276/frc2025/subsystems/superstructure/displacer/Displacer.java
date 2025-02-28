@@ -10,7 +10,7 @@ import org.littletonrobotics.junction.Logger;
 public class Displacer {
   public enum Goal {
     IDLE(() -> 0.0),
-    MOOORV(new LoggedTunableNumber("Displacer/MOOORVVolts", 0.0)),
+    MOOORV(new LoggedTunableNumber("Displacer/MOOORVVolts", 2.0)),
     VROOOM(new LoggedTunableNumber("Displacer/VROOMVolts", -12.0));
 
     private final DoubleSupplier voltageGoal;

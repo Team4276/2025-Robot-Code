@@ -8,16 +8,16 @@ import org.littletonrobotics.junction.Logger;
 
 public class EndEffector {
   private static final LoggedTunableNumber favorVolts =
-      new LoggedTunableNumber("EndEffector/FavorVolts", 10.0);
+      new LoggedTunableNumber("EndEffector/FavorVolts", 3.0);
   private static final LoggedTunableNumber lagVolts =
-      new LoggedTunableNumber("EndEffector/LagVolts", 4.0);
+      new LoggedTunableNumber("EndEffector/LagVolts", 1.0);
 
   public enum Goal {
     IDLE(() -> 0.0, () -> 0.0),
     INTAKE(new LoggedTunableNumber("EndEffector/IntakeVolts", 6.0)),
     SLOINTAKE(new LoggedTunableNumber("EndEffector/SlowIntakeVolts", 3.0)),
-    SCORE(new LoggedTunableNumber("EndEffector/ScoreVolts", 8.0)),
-    REVERSE(new LoggedTunableNumber("EndEffector/ReverseVolts", -2.0)),
+    SCORE(new LoggedTunableNumber("EndEffector/ScoreVolts", 3.0)),
+    REVERSE(new LoggedTunableNumber("EndEffector/ReverseVolts", -1.0)),
     FAVOR_LEFT(favorVolts, lagVolts),
     FAVOR_RIGHT(lagVolts, favorVolts);
 
