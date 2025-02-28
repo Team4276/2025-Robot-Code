@@ -132,18 +132,10 @@ public class AutoSelector extends VirtualSubsystem {
       return;
     }
 
-    if (AllianceFlipUtil.shouldFlip() != wasRed) {
-      autoChanged = true;
-    }
-
     wasRed = AllianceFlipUtil.shouldFlip();
 
     SmartDashboard.putNumber("Comp/Auto/Num Coral Submitted ", getCoralInput());
     SmartDashboard.putNumber("Comp/Auto/Delay Input Submitted ", getDelayInput());
-
-    if (getCoralInput() != prevCoralInput || getDelayInput() != prevDelayInput) {
-      autoChanged = true;
-    }
 
     // Update the list of questions
     var selectedRoutine = routineChooser.get();
@@ -174,7 +166,7 @@ public class AutoSelector extends VirtualSubsystem {
     // Update the routine and responses
     lastRoutine = selectedRoutine;
     var cachedResponses =
-        lastResponses.isEmpty()
+        lastResponses.isEmpty() || autoChanged
             ? List.of(
                 AutoQuestionResponse.EMPTY,
                 AutoQuestionResponse.EMPTY,
@@ -193,6 +185,14 @@ public class AutoSelector extends VirtualSubsystem {
           responseString == null
               ? lastRoutine.questions().get(i).responses().get(0)
               : responseString);
+    }
+
+    if (getCoralInput() != prevCoralInput || getDelayInput() != prevDelayInput) {
+      autoChanged = true;
+    }
+
+    if (AllianceFlipUtil.shouldFlip() != wasRed) {
+      autoChanged = true;
     }
   }
 
