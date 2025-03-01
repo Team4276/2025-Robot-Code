@@ -230,7 +230,7 @@ public class Drive extends SubsystemBase {
       // Calculate setpoints
       ChassisSpeeds setpointSpeeds;
       SwerveModuleState[] setpointStates;
-      if (useSetpointGenerator && mode != DriveMode.TRAJECTORY) {
+      if (useSetpointGenerator && mode != DriveMode.TRAJECTORY && mode != DriveMode.TELEOP) {
         prevSetpoint = swerveSetpointGenerator.generateSetpoint(prevSetpoint, desiredSpeeds, 0.02);
         setpointSpeeds = prevSetpoint.robotRelativeSpeeds();
         setpointStates = prevSetpoint.moduleStates();
