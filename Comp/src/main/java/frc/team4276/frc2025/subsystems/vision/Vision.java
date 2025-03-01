@@ -123,7 +123,10 @@ public class Vision extends SubsystemBase {
             continue;
           }
 
-          if (avgTagDist > maxDist || (avgTagDist <= 0.01 && avgTagDist >= -0.01)) {
+          if (
+          // avgTagDist > maxDist ||
+
+          (avgTagDist <= 0.01 && avgTagDist >= -0.01)) {
             robotPosesRejected.add(robotPose3d);
             continue;
           }

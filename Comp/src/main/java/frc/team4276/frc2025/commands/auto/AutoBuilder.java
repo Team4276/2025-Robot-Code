@@ -23,10 +23,7 @@ public class AutoBuilder {
   private final AutoSelector autoSelector;
 
   public AutoBuilder(
-      Drive drive,
-      Superstructure superstructure,
-      Vision vision,
-      AutoSelector autoSelector) {
+      Drive drive, Superstructure superstructure, Vision vision, AutoSelector autoSelector) {
     this.drive = drive;
     this.superstructure = superstructure;
     this.vision = vision;

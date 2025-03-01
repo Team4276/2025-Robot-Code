@@ -44,7 +44,7 @@ public class AutoScore {
             DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose)
                 .until(drive::isAutoAligned)
                 .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)))
-        .alongWith(vision.setEnableCameraCommand(1, false))
+        .alongWith(vision.setEnableCameraCommand(1, true))
         .finallyDo(() -> vision.setEnableCamera(1, true));
   }
 

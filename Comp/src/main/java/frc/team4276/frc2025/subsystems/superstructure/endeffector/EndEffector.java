@@ -14,7 +14,7 @@ public class EndEffector {
 
   public enum Goal {
     IDLE(() -> 0.0, () -> 0.0),
-    INTAKE(new LoggedTunableNumber("EndEffector/IntakeVolts", 6.0)),
+    INTAKE(new LoggedTunableNumber("EndEffector/IntakeVolts", 5.0)),
     SLOINTAKE(new LoggedTunableNumber("EndEffector/SlowIntakeVolts", 3.0)),
     SCORE(new LoggedTunableNumber("EndEffector/ScoreVolts", 4.0)),
     REVERSE(new LoggedTunableNumber("EndEffector/ReverseVolts", -1.0)),
