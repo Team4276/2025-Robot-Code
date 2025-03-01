@@ -28,7 +28,7 @@ public class Vision extends SubsystemBase {
   private final Transform3d[] robotToCam = {robotToCamera0, robotToCamera1};
   private final Alert[] disconnectedAlerts;
 
-  private boolean[] camerasEnabled = {true, false};
+  private boolean[] camerasEnabled = {true, true};
 
   public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
