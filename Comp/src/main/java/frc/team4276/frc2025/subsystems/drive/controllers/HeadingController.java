@@ -15,7 +15,7 @@ public class HeadingController {
 
   public HeadingController() {
     controller =
-        new LoggedTunablePID(4.0, 0.0, 0.1, Units.degreesToRadians(3.0), "HeadingController");
+        new LoggedTunablePID(3.0, 0.0, 0.1, Units.degreesToRadians(1.0), "HeadingController");
 
     controller.enableContinuousInput(-Math.PI, Math.PI);
 

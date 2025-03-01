@@ -32,7 +32,7 @@ public class AutoAlignController {
             "AutoAlignController/Translation", 3.0, 0.0, 0.0, 0.01, 3.0, 3.0);
     thetaController =
         new LoggedTunableProfiledPID(
-            "AutoAlignController/Rotation", 4.0, 0.0, 0.0, Units.degreesToRadians(3.0), 6.0, 3.0);
+            "AutoAlignController/Rotation", 3.0, 0.0, 0.0, Units.degreesToRadians(1.0), 6.0, 3.0);
 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
   }
@@ -102,10 +102,13 @@ public class AutoAlignController {
 
     var teleopSpeeds = teleopDriveController.updateRaw(currentPose.getRotation());
 
-    // cancelX = (useCancel ? cancelX : false) || Math.abs(teleopSpeeds.vxMetersPerSecond) > 1e-6;
-    // cancelY = (useCancel ? cancelY : false) || Math.abs(teleopSpeeds.vyMetersPerSecond) > 1e-6;
+    // cancelX = (useCancel ? cancelX : false) ||
+    // Math.abs(teleopSpeeds.vxMetersPerSecond) > 1e-6;
+    // cancelY = (useCancel ? cancelY : false) ||
+    // Math.abs(teleopSpeeds.vyMetersPerSecond) > 1e-6;
     // cancelTheta =
-    //     (useCancel ? cancelTheta : false) || Math.abs(teleopSpeeds.omegaRadiansPerSecond) > 1e-6;
+    // (useCancel ? cancelTheta : false) ||
+    // Math.abs(teleopSpeeds.omegaRadiansPerSecond) > 1e-6;
 
     Logger.recordOutput("AutoAlignController/CancelX", cancelX);
     Logger.recordOutput("AutoAlignController/CancelY", cancelY);

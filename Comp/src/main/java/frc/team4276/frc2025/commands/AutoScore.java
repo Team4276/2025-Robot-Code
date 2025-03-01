@@ -13,7 +13,7 @@ public class AutoScore {
   private static final LoggedTunableNumber reefAlignThreshold =
       new LoggedTunableNumber("AutoScore/ReefAlignThreshold", 1.0);
   private static final LoggedTunableNumber reefNudgeThreshold =
-      new LoggedTunableNumber("AutoScore/ReefNudgeThreshold", 0.01);
+      new LoggedTunableNumber("AutoScore/ReefNudgeThreshold", 0.1);
 
   public static Command getAutoScoreCommand(
       Drive drive, Superstructure superstructure, Vision vision, ScoringHelper scoringHelper) {
