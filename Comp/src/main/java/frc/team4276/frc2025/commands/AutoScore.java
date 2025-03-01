@@ -11,9 +11,9 @@ import frc.team4276.util.dashboard.LoggedTunableNumber;
 
 public class AutoScore {
   private static final LoggedTunableNumber reefAlignThreshold =
-      new LoggedTunableNumber("AutoScore/ReefAlignThreshold", 2.0);
+      new LoggedTunableNumber("AutoScore/ReefAlignThreshold", 1.0);
   private static final LoggedTunableNumber reefNudgeThreshold =
-      new LoggedTunableNumber("AutoScore/ReefNudgeThreshold", 0.5);
+      new LoggedTunableNumber("AutoScore/ReefNudgeThreshold", 0.01);
 
   public static Command getAutoScoreCommand(
       Drive drive, Superstructure superstructure, Vision vision, ScoringHelper scoringHelper) {

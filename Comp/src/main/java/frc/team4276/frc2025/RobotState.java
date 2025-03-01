@@ -84,8 +84,8 @@ public class RobotState {
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
-    poseEstimator.addVisionMeasurement(
-        visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+    var pose = new Pose2d(visionRobotPoseMeters.getTranslation(), getEstimatedPose().getRotation());
+    poseEstimator.addVisionMeasurement(pose, timestampSeconds, visionMeasurementStdDevs);
   }
 
   @AutoLogOutput(key = "RobotState/EstimatedPose")
