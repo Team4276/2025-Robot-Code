@@ -67,24 +67,25 @@ public class AutoBuilder {
         getPathPlannerTrajectoryFromChoreo("c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise);
 
     for (int i = 0; i < reefs.size(); i++) {
+      var scTraj =
+          i == 0
+              ? traj1
+              : getPathPlannerTrajectoryFromChoreo(
+                  "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 0);
+      var intTraj =
+          getPathPlannerTrajectoryFromChoreo(
+              "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 1);
+
       scoringCommand.addCommands(
           vision.setCamerasEnabledCommand(true, true),
-          followTrajectory(
-              drive,
-              i == 0
-                  ? traj1
-                  : getPathPlannerTrajectoryFromChoreo(
-                      "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 0)),
+          followTrajectory(drive, scTraj),
           superstructure
               .setGoalCommand(toGoal(levels.get(i)))
               .withDeadline(
                   Commands.waitUntil(() -> superstructure.atGoal())
                       .andThen(scoreCommand(superstructure))),
           vision.setCamerasEnabledCommand(true, true),
-          followTrajectory(
-              drive,
-              getPathPlannerTrajectoryFromChoreo(
-                  "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 1)),
+          followTrajectory(drive, intTraj),
           superstructure.setGoalCommand(Goal.INTAKE).withTimeout(intakeWaitTime));
     }
 
