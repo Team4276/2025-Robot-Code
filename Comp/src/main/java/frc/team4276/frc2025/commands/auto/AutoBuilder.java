@@ -85,8 +85,10 @@ public class AutoBuilder {
                   Commands.waitUntil(() -> superstructure.atGoal())
                       .andThen(scoreCommand(superstructure))),
           vision.setCamerasEnabledCommand(true, true),
-          followTrajectory(drive, intTraj),
-          superstructure.setGoalCommand(Goal.INTAKE).withTimeout(intakeWaitTime));
+          superstructure
+              .setGoalCommand(Goal.INTAKE)
+              .withDeadline(
+                  followTrajectory(drive, intTraj).andThen(Commands.waitSeconds(intakeWaitTime))));
     }
 
     return Commands.sequence(
