@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.team4276.frc2025.AutoSelector;
 import frc.team4276.frc2025.AutoSelector.AutoQuestionResponse;
+import frc.team4276.frc2025.Constants;
+import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
@@ -78,17 +80,26 @@ public class AutoBuilder {
 
       scoringCommand.addCommands(
           vision.setCamerasEnabledCommand(true, true),
-          followTrajectory(drive, scTraj),
-          superstructure
-              .setGoalCommand(toGoal(levels.get(i)))
-              .withDeadline(
-                  Commands.waitUntil(() -> superstructure.atGoal())
-                      .andThen(scoreCommand(superstructure))),
+          Commands.parallel(
+              followTrajectory(drive, scTraj),
+              Commands.waitSeconds(scTraj.getTotalTimeSeconds() - 0.75)
+                  .andThen(
+                      superstructure
+                          .setGoalCommand(toGoal(levels.get(i)))
+                          .withDeadline(
+                              Commands.waitUntil(
+                                      () ->
+                                          drive.isTrajectoryCompleted() && superstructure.atGoal())
+                                  .andThen(scoreCommand(superstructure))))),
           vision.setCamerasEnabledCommand(true, true),
           superstructure
               .setGoalCommand(Goal.INTAKE)
               .withDeadline(
-                  followTrajectory(drive, intTraj).andThen(Commands.waitSeconds(intakeWaitTime))));
+                  followTrajectory(drive, intTraj)
+                      .andThen(
+                          Constants.getMode() == Mode.SIM
+                              ? Commands.waitSeconds(intakeWaitTime)
+                              : Commands.waitUntil(() -> superstructure.hasCoral()))));
     }
 
     return Commands.sequence(
