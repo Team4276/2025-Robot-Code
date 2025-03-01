@@ -220,7 +220,7 @@ public class RobotContainer {
   }
 
   private void configureAutos() {
-    autoBuilder = new AutoBuilder(drive, superstructure, arm, roller, vision, autoSelector);
+    autoBuilder = new AutoBuilder(drive, superstructure, vision, autoSelector);
 
     // Set up auto routines
     autoSelector.addRoutine(
@@ -284,55 +284,6 @@ public class RobotContainer {
             new AutoQuestion(
                 "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO))),
         () -> autoBuilder.taxiAuto("t_WALL"));
-    // autoSelector.addRoutine(
-    // "(ECD) Shrimple Coral Auto",
-    // List.of(
-    // new AutoQuestion(
-    // "Is Processor Side?", List.of(AutoQuestionResponse.YES,
-    // AutoQuestionResponse.NO))),
-    // () -> autoBuilder.ECDshrimpleCoralAuto());
-    // autoSelector.addRoutine(
-    // "(FEBA) Shrimple Coral Auto",
-    // List.of(
-    // new AutoQuestion(
-    // "Is Processor Side?", List.of(AutoQuestionResponse.YES,
-    // AutoQuestionResponse.NO))),
-    // () -> autoBuilder.FEBAshrimpleCoralAuto());
-    // autoSelector.addRoutine(
-    // "RP Auto",
-    // List.of(
-    // new AutoQuestion(
-    // "Is Processor Side?", List.of(AutoQuestionResponse.YES,
-    // AutoQuestionResponse.NO))),
-    // () -> autoBuilder.rpAuto());
-    // autoSelector.addRoutine(
-    // "Max 5 Coral",
-    // List.of(
-    // new AutoQuestion(
-    // "Is Processor Side?", List.of(AutoQuestionResponse.YES,
-    // AutoQuestionResponse.NO))),
-    // () -> autoBuilder.max5Coral());
-    // autoSelector.addRoutine(
-    // "Safe 5 Coral",
-    // List.of(
-    // new AutoQuestion(
-    // "Is Processor Side?", List.of(AutoQuestionResponse.YES,
-    // AutoQuestionResponse.NO))),
-    // () -> autoBuilder.safe5Coal());
-    // autoSelector.addRoutine(
-    // "Vanilla Hybrid",
-    // List.of(
-    // new AutoQuestion(
-    // "Is Processor Side?", List.of(AutoQuestionResponse.YES,
-    // AutoQuestionResponse.NO))),
-    // () -> autoBuilder.vanHybridAuto());
-    // autoSelector.addRoutine(
-    // "Test 3 Coral",
-    // List.of(
-    // new AutoQuestion(
-    // "Is Processor Side?", List.of(AutoQuestionResponse.YES,
-    // AutoQuestionResponse.NO))),
-    // () -> autoBuilder.test3Coral());
   }
 
   private void configureTuningRoutines() {
