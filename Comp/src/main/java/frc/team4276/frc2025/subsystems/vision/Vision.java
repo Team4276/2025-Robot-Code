@@ -7,7 +7,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
@@ -25,7 +24,6 @@ public class Vision extends SubsystemBase {
   private final VisionConsumer consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
-  private final Transform3d[] robotToCam = {robotToCamera0, robotToCamera1};
   private final Alert[] disconnectedAlerts;
 
   private boolean[] camerasEnabled = {true, true};
@@ -86,20 +84,20 @@ public class Vision extends SubsystemBase {
       // Loop over pose observations
       for (var observation : inputs[cameraIndex].poseObservations) {
         Pose3d robotPose3d = null;
-        double avgTagDist = 0.0;
         boolean useVisionRotation = false;
         if (observation.tagCount() > 1) {
-          var fieldToRobot = observation.fieldToCam1().plus(robotToCam[cameraIndex].inverse());
+          var fieldToRobot =
+              observation.fieldToCam1().plus(configs[cameraIndex].robotToCamera.inverse());
           // Add pose to log
           robotPoses.add(fieldToRobot);
           robotPose3d = fieldToRobot;
 
-          avgTagDist = observation.avgTagDistance1();
-
           useVisionRotation = true;
         } else if (observation.tagCount() == 1) {
-          var fieldToRobot0 = observation.fieldToCam1().plus(robotToCam[cameraIndex].inverse());
-          var fieldToRobot1 = observation.fieldToCam2().plus(robotToCam[cameraIndex].inverse());
+          var fieldToRobot0 =
+              observation.fieldToCam1().plus(configs[cameraIndex].robotToCamera.inverse());
+          var fieldToRobot1 =
+              observation.fieldToCam2().plus(configs[cameraIndex].robotToCamera.inverse());
 
           // Add pose to log
           robotPoses.add(fieldToRobot0);
@@ -112,10 +110,8 @@ public class Vision extends SubsystemBase {
             if (Math.abs(currentRotation.minus(visionRotation0).getRadians())
                 < Math.abs(currentRotation.minus(visionRotation1).getRadians())) {
               robotPose3d = fieldToRobot0;
-              avgTagDist = observation.avgTagDistance1();
             } else {
               robotPose3d = fieldToRobot1;
-              avgTagDist = observation.avgTagDistance2();
             }
           }
 
@@ -123,10 +119,7 @@ public class Vision extends SubsystemBase {
             continue;
           }
 
-          if (
-          // avgTagDist > maxDist ||
-
-          (avgTagDist <= 0.01 && avgTagDist >= -0.01)) {
+          if (observation.avgTagDistance() <= 0.01 && observation.avgTagDistance() >= -0.01) {
             robotPosesRejected.add(robotPose3d);
             continue;
           }
@@ -144,12 +137,13 @@ public class Vision extends SubsystemBase {
 
           useVisionRotation = false;
           // Calculate standard deviations
-          double stdDevFactor = Math.pow(avgTagDist, 2.0) / observation.tagCount();
+          double stdDevFactor =
+              Math.pow(observation.avgTagDistance(), 2.0) / observation.tagCount();
           double linearStdDev =
-              linearStdDevBaseline * stdDevFactor * cameraStdDevFactors[cameraIndex];
+              linearStdDevBaseline * stdDevFactor * configs[cameraIndex].stdDevFactor;
           double angularStdDev =
               useVisionRotation
-                  ? angularStdDevBaseline * stdDevFactor * cameraStdDevFactors[cameraIndex]
+                  ? angularStdDevBaseline * stdDevFactor * configs[cameraIndex].stdDevFactor
                   : Double.POSITIVE_INFINITY;
 
           // Send vision observation

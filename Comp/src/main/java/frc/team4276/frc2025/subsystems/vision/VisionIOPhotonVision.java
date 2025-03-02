@@ -4,6 +4,7 @@ import static frc.team4276.frc2025.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,18 +13,14 @@ import org.photonvision.PhotonCamera;
 
 /** IO implementation for real PhotonVision hardware. */
 public class VisionIOPhotonVision implements VisionIO {
+  protected final int index;
   protected final PhotonCamera camera;
   protected final Transform3d robotToCamera;
 
-  /**
-   * Creates a new VisionIOPhotonVision.
-   *
-   * @param name The configured name of the camera.
-   * @param rotationSupplier The 3D position of the camera relative to the robot.
-   */
-  public VisionIOPhotonVision(String name, Transform3d robotToCamera) {
-    camera = new PhotonCamera(name);
-    this.robotToCamera = robotToCamera;
+  public VisionIOPhotonVision(int index) {
+    this.index = index;
+    camera = new PhotonCamera(configs[index].name);
+    robotToCamera = configs[index].robotToCamera;
   }
 
   @Override
@@ -33,7 +30,24 @@ public class VisionIOPhotonVision implements VisionIO {
     // Read new camera observations
     Set<Short> tagIds = new HashSet<>();
     List<PoseObservation> poseObservations = new ArrayList<>();
+    List<TargetObservation> txtyObservations = new ArrayList<>();
     for (var result : camera.getAllUnreadResults()) {
+      // Add tx/ty observation
+      if (result.hasTargets()) {
+        for (var target : result.getTargets()) {
+          if (target.getFiducialId() != -1) {
+            txtyObservations.add(
+                new TargetObservation(
+                    result.getTimestampSeconds(),
+                    target.getFiducialId(),
+                    index,
+                    Units.degreesToRadians(target.getYaw()),
+                    Units.degreesToRadians(target.getPitch()),
+                    target.bestCameraToTarget.getTranslation().getNorm()));
+          }
+        }
+      }
+
       // Add pose observation
       if (result.multitagResult.isPresent()) {
         var multitagResult = result.multitagResult.get();
@@ -60,9 +74,8 @@ public class VisionIOPhotonVision implements VisionIO {
                 camPose, // 3D pose estimate
                 multitagResult.estimatedPose.ambiguity, // Ambiguity
                 totalTagDistance / result.targets.size(), // Average tag distance
-                totalTagDistance / result.targets.size(), // Average tag distance
                 PoseObservationType.PHOTONVISION)); // Observation type
-      } else if (result.targets.size() == 1) { // Single tag result
+      } else if (!result.targets.isEmpty()) { // Single tag result
         var target = result.targets.get(0);
 
         // Calculate robot pose
@@ -94,10 +107,15 @@ public class VisionIOPhotonVision implements VisionIO {
                   camPose2, // 3D pose estimate
                   target.poseAmbiguity, // Ambiguity
                   cameraToTarget1.getTranslation().getNorm(), // Tag distances
-                  cameraToTarget2.getTranslation().getNorm(), // Tag distances
                   PoseObservationType.PHOTONVISION)); // Observation type
         }
       }
+    }
+
+    // Save tx/ty observations to inputs object
+    inputs.targetObservations = new TargetObservation[txtyObservations.size()];
+    for (int i = 0; i < txtyObservations.size(); i++) {
+      inputs.targetObservations[i] = txtyObservations.get(i);
     }
 
     // Save pose observations to inputs object

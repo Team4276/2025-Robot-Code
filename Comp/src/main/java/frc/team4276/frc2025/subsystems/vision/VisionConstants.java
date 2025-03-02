@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import frc.team4276.frc2025.Constants;
 import frc.team4276.frc2025.Constants.Mode;
+import frc.team4276.util.CameraConfig;
 
 public class VisionConstants {
   private static final boolean forceEnableInstanceLogging = false;
@@ -17,24 +18,25 @@ public class VisionConstants {
   public static AprilTagFieldLayout aprilTagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
-  // Camera names, must match names configured on coprocessor
-  public static String camera0Name = "Arducam_OV9281_USB_Camera";
-  public static String camera1Name = "Arducam_12MP";
-
-  // Robot to camera transforms
-  // (Not used by Limelight, configure in web UI instead)
-  public static Transform3d robotToCamera0 =
-      new Transform3d(
-          Units.inchesToMeters(11.078124),
-          Units.inchesToMeters(0.0),
-          Units.inchesToMeters(8.152866),
-          new Rotation3d(0.0, Math.toRadians(20.0) * -1.0, 0.0));
-  public static Transform3d robotToCamera1 =
-      new Transform3d(
-          Units.inchesToMeters(1.573079),
-          Units.inchesToMeters(9.498816) * -1.0,
-          Units.inchesToMeters(39.580820),
-          new Rotation3d(0.0, Math.toRadians(25.0) * -1.0, Math.PI));
+  public static final CameraConfig[] configs =
+      new CameraConfig[] {
+        new CameraConfig(
+            "Arducam_OV9281_USB_Camera",
+            new Transform3d(
+                Units.inchesToMeters(11.078124),
+                Units.inchesToMeters(0.0),
+                Units.inchesToMeters(8.152866),
+                new Rotation3d(0.0, Math.toRadians(20.0) * -1.0, 0.0)),
+            1),
+        new CameraConfig(
+            "Arducam_12MP",
+            new Transform3d(
+                Units.inchesToMeters(1.573079),
+                Units.inchesToMeters(9.498816) * -1.0,
+                Units.inchesToMeters(39.580820),
+                new Rotation3d(0.0, Math.toRadians(25.0) * -1.0, Math.PI)),
+            0.75)
+      };
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
@@ -47,12 +49,4 @@ public class VisionConstants {
   // (Adjusted automatically based on distance and # of tags)
   public static double linearStdDevBaseline = 0.02; // Meters
   public static double angularStdDevBaseline = 0.06; // Radians
-
-  // Standard deviation multipliers for each camera
-  // (Adjust to trust some cameras more than others)
-  public static double[] cameraStdDevFactors =
-      new double[] {
-        1.0, // Camera 0
-        0.75 // Camera 1
-      };
 }

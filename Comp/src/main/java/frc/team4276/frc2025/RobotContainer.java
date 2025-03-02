@@ -44,7 +44,6 @@ import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffector;
 import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffectorIO;
 import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffectorIOSparkMax;
 import frc.team4276.frc2025.subsystems.vision.Vision;
-import frc.team4276.frc2025.subsystems.vision.VisionConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVision;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVisionSim;
@@ -126,10 +125,8 @@ public class RobotContainer {
           vision =
               new Vision(
                   RobotState.getInstance()::addVisionMeasurement,
-                  new VisionIOPhotonVision(
-                      VisionConstants.camera0Name, VisionConstants.robotToCamera0),
-                  new VisionIOPhotonVision(
-                      VisionConstants.camera1Name, VisionConstants.robotToCamera1));
+                  new VisionIOPhotonVision(0),
+                  new VisionIOPhotonVision(1));
         }
 
         case SIMBOT -> {
@@ -155,14 +152,8 @@ public class RobotContainer {
             vision =
                 new Vision(
                     RobotState.getInstance()::addVisionMeasurement,
-                    new VisionIOPhotonVisionSim(
-                        VisionConstants.camera0Name,
-                        VisionConstants.robotToCamera0,
-                        RobotState.getInstance()::getEstimatedPose),
-                    new VisionIOPhotonVisionSim(
-                        VisionConstants.camera1Name,
-                        VisionConstants.robotToCamera1,
-                        RobotState.getInstance()::getEstimatedPose));
+                    new VisionIOPhotonVisionSim(0, RobotState.getInstance()::getEstimatedPose),
+                    new VisionIOPhotonVisionSim(1, RobotState.getInstance()::getEstimatedPose));
           }
         }
       }
