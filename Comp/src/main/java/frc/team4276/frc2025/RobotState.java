@@ -85,6 +85,7 @@ public class RobotState {
 
     poseEstimatorOdom.updateWithTime(timestamp, yaw, wheelPositions);
     poseEstimator.updateWithTime(timestamp, yaw, wheelPositions);
+    odomPoseBuffer.addSample(timestamp, poseEstimatorOdom.getEstimatedPosition());
   }
 
   /** Adds a new timestamped vision measurement. */
@@ -97,7 +98,39 @@ public class RobotState {
   }
 
   /** Adds a new timestamped vision measurement. */
-  public void addTxTyObservation(TargetObservation targetObs) {}
+  public void addTxTyObservation(TargetObservation targetObs) {
+
+    // Use 3D distance and tag angles to find robot pose
+    // Translation2d camToTagTranslation =
+    //     new Pose3d(Translation3d.kZero, new Rotation3d(0, ty, -tx))
+    //         .transformBy(
+    //             new Transform3d(new Translation3d(observation.distance(), 0, 0),
+    // Rotation3d.kZero))
+    //         .getTranslation()
+    //         .rotateBy(new Rotation3d(0, cameraPose.getRotation().getY(), 0))
+    //         .toTranslation2d();
+    // Rotation2d camToTagRotation =
+    //     robotRotation.plus(
+    //         cameraPose.toPose2d().getRotation().plus(camToTagTranslation.getAngle()));
+    // var tagPose2d = tagPoses2d.get(observation.tagId());
+    // if (tagPose2d == null) return;
+    // Translation2d fieldToCameraTranslation =
+    //     new Pose2d(tagPose2d.getTranslation(), camToTagRotation.plus(Rotation2d.kPi))
+    //         .transformBy(GeomUtil.toTransform2d(camToTagTranslation.getNorm(), 0.0))
+    //         .getTranslation();
+    // Pose2d robotPose =
+    //     new Pose2d(
+    //             fieldToCameraTranslation,
+    // robotRotation.plus(cameraPose.toPose2d().getRotation()))
+    //         .transformBy(new Transform2d(cameraPose.toPose2d(), Pose2d.kZero));
+    // // Use gyro angle at time for robot rotation
+    // robotPose = new Pose2d(robotPose.getTranslation(), robotRotation);
+
+    // // Add transform to current odometry based pose for latency correction
+    // txTyPoses.put(
+    //     observation.tagId(),
+    //     new TxTyPoseRecord(robotPose, camToTagTranslation.getNorm(), observation.timestamp()));
+  }
 
   @AutoLogOutput(key = "RobotState/EstimatedPose")
   public Pose2d getEstimatedPose() {

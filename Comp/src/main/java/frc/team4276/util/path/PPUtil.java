@@ -4,16 +4,14 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.DriveFeedforwards;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.team4276.frc2025.subsystems.drive.DriveConstants;
 import frc.team4276.util.AllianceFlipUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class PPUtil {  
+public class PPUtil {
   public static PathPlannerTrajectory getPathPlannerTrajectoryFromChoreo(String name) {
     return getPathPlannerTrajectoryFromChoreo(name, false);
   }
@@ -62,7 +60,6 @@ public class PPUtil {
       return new PathPlannerTrajectory(List.of(new PathPlannerTrajectoryState()));
     }
   }
-
 
   public static PathPlannerTrajectory mirrorLengthwise(PathPlannerTrajectory trajectory) {
     List<PathPlannerTrajectoryState> mirroredStates = new ArrayList<>();
