@@ -18,7 +18,7 @@ import java.util.List;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class TrajectoryController {
+public class TrajectoryController { // TODO: impl and test choreo trajectory auto
   private final LoggedTunableNumber maxError =
       new LoggedTunableNumber("TrajectoryController/maxError", 0.75);
 

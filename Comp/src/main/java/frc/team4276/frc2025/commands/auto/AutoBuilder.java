@@ -1,7 +1,7 @@
 package frc.team4276.frc2025.commands.auto;
 
 import static frc.team4276.frc2025.commands.auto.AutoCommands.*;
-import static frc.team4276.util.path.ChoreoUtil.*;
+import static frc.team4276.util.path.PPUtil.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;

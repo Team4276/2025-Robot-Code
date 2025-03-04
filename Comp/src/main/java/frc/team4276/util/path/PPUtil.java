@@ -1,18 +1,69 @@
 package frc.team4276.util.path;
 
-import static frc.team4276.frc2025.field.FieldConstants.*;
-
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.DriveFeedforwards;
-import edu.wpi.first.math.geometry.Pose2d;
+
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.team4276.frc2025.subsystems.drive.DriveConstants;
+import frc.team4276.util.AllianceFlipUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class PPUtil {
+public class PPUtil {  
+  public static PathPlannerTrajectory getPathPlannerTrajectoryFromChoreo(String name) {
+    return getPathPlannerTrajectoryFromChoreo(name, false);
+  }
+
+  public static PathPlannerTrajectory getPathPlannerTrajectoryFromChoreo(
+      String name, boolean mirrorLengthwise) {
+    try {
+      var traj =
+          PathPlannerPath.fromChoreoTrajectory(name)
+              .generateTrajectory(
+                  new ChassisSpeeds(), Rotation2d.kZero, DriveConstants.driveConfig);
+
+      if (mirrorLengthwise) {
+        traj = mirrorLengthwise(traj);
+      }
+
+      return AllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
+    } catch (Exception e) {
+      System.out.println("Failed to load Choreo Trajectory from PPlib " + name);
+      System.out.println(e);
+      return new PathPlannerTrajectory(List.of(new PathPlannerTrajectoryState()));
+    }
+  }
+
+  public static PathPlannerTrajectory getPathPlannerTrajectoryFromChoreo(String name, int split) {
+    return getPathPlannerTrajectoryFromChoreo(name, false, split);
+  }
+
+  public static PathPlannerTrajectory getPathPlannerTrajectoryFromChoreo(
+      String name, boolean mirrorLengthwise, int split) {
+    try {
+      var traj =
+          PathPlannerPath.fromChoreoTrajectory(name, split)
+              .generateTrajectory(
+                  new ChassisSpeeds(), Rotation2d.kZero, DriveConstants.driveConfig);
+
+      if (mirrorLengthwise) {
+        traj = mirrorLengthwise(traj);
+      }
+
+      return AllianceFlipUtil.shouldFlip() ? traj.flip() : traj;
+    } catch (Exception e) {
+      System.out.println(
+          "Failed to load split " + split + " of Choreo Trajectory from PPlib " + name);
+      System.out.println(e);
+      return new PathPlannerTrajectory(List.of(new PathPlannerTrajectoryState()));
+    }
+  }
+
+
   public static PathPlannerTrajectory mirrorLengthwise(PathPlannerTrajectory trajectory) {
     List<PathPlannerTrajectoryState> mirroredStates = new ArrayList<>();
     for (var state : trajectory.getStates()) {
@@ -28,32 +79,12 @@ public class PPUtil {
 
     flipped.timeSeconds = state.timeSeconds;
     flipped.linearVelocity = state.linearVelocity;
-    flipped.pose = mirrorLengthwise(state.pose);
+    flipped.pose = PathUtil.mirrorLengthwise(state.pose);
     flipped.feedforwards =
         new DriveFeedforwards(dummyList, dummyList, dummyList, dummyList, dummyList);
-    flipped.fieldSpeeds = mirrorLengthwise(state.fieldSpeeds);
-    flipped.heading = mirrorLengthwise(state.heading);
+    flipped.fieldSpeeds = PathUtil.mirrorLengthwise(state.fieldSpeeds);
+    flipped.heading = PathUtil.mirrorLengthwise(state.heading);
 
     return flipped;
-  }
-
-  private static Translation2d mirrorLengthwise(Translation2d trans) {
-    return new Translation2d(trans.getX(), fieldWidth - trans.getY());
-  }
-
-  private static Rotation2d mirrorLengthwise(Rotation2d trans) {
-    return trans.unaryMinus();
-  }
-
-  private static Pose2d mirrorLengthwise(Pose2d pose) {
-    return new Pose2d(
-        mirrorLengthwise(pose.getTranslation()), mirrorLengthwise(pose.getRotation()));
-  }
-
-  private static ChassisSpeeds mirrorLengthwise(ChassisSpeeds speeds) {
-    return new ChassisSpeeds(
-        speeds.vxMetersPerSecond,
-        -1.0 * speeds.vyMetersPerSecond,
-        -1.0 * speeds.omegaRadiansPerSecond);
   }
 }
