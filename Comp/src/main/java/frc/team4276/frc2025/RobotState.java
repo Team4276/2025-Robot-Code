@@ -6,12 +6,16 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.team4276.frc2025.subsystems.vision.VisionIO.TargetObservation;
 import frc.team4276.util.dashboard.ElasticUI;
+import java.util.HashMap;
+import java.util.Map;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class RobotState {
@@ -28,6 +32,10 @@ public class RobotState {
       new SwerveDrivePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions, Pose2d.kZero);
   private SwerveDrivePoseEstimator poseEstimatorOdom =
       new SwerveDrivePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions, Pose2d.kZero);
+  private TimeInterpolatableBuffer<Pose2d> odomPoseBuffer =
+      TimeInterpolatableBuffer.createBuffer(2.0);
+
+  private final Map<Integer, TxTyPoseRecord> txTyPoses = new HashMap<>();
 
   private ChassisSpeeds robotVelocity = new ChassisSpeeds();
 
@@ -88,6 +96,9 @@ public class RobotState {
     poseEstimator.addVisionMeasurement(pose, timestampSeconds, visionMeasurementStdDevs);
   }
 
+  /** Adds a new timestamped vision measurement. */
+  public void addTxTyObservation(TargetObservation targetObs) {}
+
   @AutoLogOutput(key = "RobotState/EstimatedPose")
   public Pose2d getEstimatedPose() {
     return useTrajectorySetpoint() ? trajectorySetpoint : poseEstimator.getEstimatedPosition();
@@ -101,6 +112,13 @@ public class RobotState {
   @AutoLogOutput(key = "RobotState/EstimatedVisionPose")
   public Pose2d getEstimatedVisionPose() {
     return poseEstimator.getEstimatedPosition();
+  }
+
+  @AutoLogOutput(key = "RobotState/EstimatedTxTyVisionPose")
+  public Pose2d
+      getTxTyPose() { // TODO: add offset from poseEstimator (also find a way to expose it)
+
+    return Pose2d.kZero;
   }
 
   private boolean useTrajectorySetpoint() {
@@ -117,4 +135,6 @@ public class RobotState {
   public ChassisSpeeds getFieldVelocity() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotVelocity, getEstimatedPose().getRotation());
   }
+
+  public record TxTyPoseRecord() {}
 }

@@ -21,15 +21,13 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
-  private final VisionConsumer consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
   private boolean[] camerasEnabled = {true, true};
 
-  public Vision(VisionConsumer consumer, VisionIO... io) {
-    this.consumer = consumer;
+  public Vision(VisionIO... io) {
     this.io = io;
 
     // Initialize inputs
@@ -150,14 +148,21 @@ public class Vision extends SubsystemBase {
           if (camerasEnabled[cameraIndex]) {
             robotPosesAccepted.add(robotPose3d);
 
-            consumer.accept(
-                robotPose3d.toPose2d(),
-                observation.timestamp(),
-                VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+            RobotState.getInstance()
+                .addVisionMeasurement(
+                    robotPose3d.toPose2d(),
+                    observation.timestamp(),
+                    VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
           } else {
             robotPosesCanceled.add(robotPose3d);
           }
         }
+      }
+
+      // Send Tx Ty Data
+      // TODO: test filtering methods
+      for (var tagObs : inputs[cameraIndex].targetObservations) {
+        RobotState.getInstance().addTxTyObservation(tagObs);
       }
 
       if (enableInstanceLogging) {
