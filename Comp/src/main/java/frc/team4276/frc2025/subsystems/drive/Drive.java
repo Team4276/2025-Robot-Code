@@ -1,7 +1,9 @@
 package frc.team4276.frc2025.subsystems.drive;
 
-import static edu.wpi.first.units.Units.*;
-import static frc.team4276.frc2025.subsystems.drive.DriveConstants.*;
+import static edu.wpi.first.units.Units.Volts;
+import static frc.team4276.frc2025.subsystems.drive.DriveConstants.driveConfig;
+import static frc.team4276.frc2025.subsystems.drive.DriveConstants.kinematics;
+import static frc.team4276.frc2025.subsystems.drive.DriveConstants.maxSteerVelocity;
 
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.DriveFeedforwards;
@@ -156,6 +158,7 @@ public class Drive extends SubsystemBase {
 
       boolean includeMeasurement = true;
       if (lastModulePositions != null) {
+
         double dt = sampleTimestamps[i] - lastTime;
         for (int j = 0; j < modules.length; j++) {
           double velocity =
@@ -163,10 +166,16 @@ public class Drive extends SubsystemBase {
           double omega =
               modulePositions[j].angle.minus(lastModulePositions[j].angle).getRadians() / dt;
           // Check if delta is too large
-          if (Math.abs(omega) > DriveConstants.maxSpeed * 5.0
-              || Math.abs(velocity) > DriveConstants.maxAngularSpeed * 5.0) {
+          if (Math.abs(omega) > DriveConstants.maxSpeed * 1.5
+              || Math.abs(velocity) > DriveConstants.maxAngularSpeed * 1.5) {
             includeMeasurement = false;
             break;
+          }
+          if (Math.sqrt(
+                  gyroInputs.pitchPosition.getDegrees() * 2
+                      + gyroInputs.pitchPosition.getDegrees() * 2)
+              > 0.2) {
+            includeMeasurement = false;
           }
         }
       }

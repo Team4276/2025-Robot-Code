@@ -1,6 +1,13 @@
 package frc.team4276.frc2025.subsystems.vision;
 
-import static frc.team4276.frc2025.subsystems.vision.VisionConstants.*;
+import static frc.team4276.frc2025.subsystems.vision.VisionConstants.angularStdDevBaseline;
+import static frc.team4276.frc2025.subsystems.vision.VisionConstants.aprilTagLayout;
+import static frc.team4276.frc2025.subsystems.vision.VisionConstants.configs;
+import static frc.team4276.frc2025.subsystems.vision.VisionConstants.enableInstanceLogging;
+import static frc.team4276.frc2025.subsystems.vision.VisionConstants.fieldBorderMargin;
+import static frc.team4276.frc2025.subsystems.vision.VisionConstants.linearStdDevBaseline;
+import static frc.team4276.frc2025.subsystems.vision.VisionConstants.maxAmbiguity;
+import static frc.team4276.frc2025.subsystems.vision.VisionConstants.maxZError;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;

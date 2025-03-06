@@ -22,6 +22,9 @@ public class GyroIOADIS implements GyroIO {
     inputs.yawPosition = Rotation2d.fromDegrees(gyro.getAngle());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(gyro.getRate());
 
+    inputs.pitchPosition = Rotation2d.fromDegrees(gyro.getAngle(gyro.getPitchAxis()));
+    inputs.rollPosition = Rotation2d.fromDegrees(gyro.getAngle(gyro.getRollAxis()));
+
     inputs.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
     inputs.odometryYawPositions =
