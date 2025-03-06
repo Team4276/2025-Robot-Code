@@ -1,9 +1,11 @@
 package frc.team4276.frc2025.commands;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.ScoringHelper;
+import frc.team4276.frc2025.field.FieldConstants.Reef;
 import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
 import frc.team4276.frc2025.subsystems.vision.Vision;
@@ -24,7 +26,10 @@ public class AutoScore {
                                 .getSelectedAlignPose()
                                 .getTranslation()
                                 .getDistance(
-                                    RobotState.getInstance().getEstimatedPose().getTranslation())
+                                    getRobotPose(
+                                            scoringHelper.getSelectedReef(),
+                                            scoringHelper.getSelectedAlignPose())
+                                        .getTranslation())
                             < reefAlignThreshold.getAsDouble()))
                 .deadlineFor(
                     DriveCommands.headingAlignCommand(
@@ -36,8 +41,9 @@ public class AutoScore {
                                     .getSelectedAlignPose()
                                     .getTranslation()
                                     .getDistance(
-                                        RobotState.getInstance()
-                                            .getEstimatedPose()
+                                        getRobotPose(
+                                                scoringHelper.getSelectedReef(),
+                                                scoringHelper.getSelectedScorePose())
                                             .getTranslation())
                                 < reefNudgeThreshold.getAsDouble()
                             && drive.isAutoHeadingAligned())),
@@ -53,5 +59,9 @@ public class AutoScore {
     return DriveCommands.headingAlignCommand(
             drive, () -> scoringHelper.getSelectedScorePose().getRotation())
         .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal));
+  }
+
+  public static Pose2d getRobotPose(Reef reef, Pose2d finalPose) {
+    return RobotState.getInstance().getReefPose(reef.ordinal() / 2, finalPose);
   }
 }

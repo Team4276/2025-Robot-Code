@@ -26,7 +26,10 @@ public class AutoAlignController {
   private boolean cancelY = false;
   private boolean cancelTheta = false;
 
-  public AutoAlignController() {
+  public
+  AutoAlignController() { // TODO: feed txtypose into auto align when auto aligning with reef (or
+    // change
+    // to command structure)
     driveController =
         new LoggedTunableProfiledPID(
             "AutoAlignController/Translation", 3.0, 0.0, 0.0, 0.01, 3.0, 3.0);
