@@ -10,6 +10,7 @@ import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
 import frc.team4276.frc2025.subsystems.vision.Vision;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
+import java.util.function.DoubleSupplier;
 
 public class AutoScore {
   private static final LoggedTunableNumber reefAlignThreshold =
@@ -18,47 +19,44 @@ public class AutoScore {
       new LoggedTunableNumber("AutoScore/ReefNudgeThreshold", 0.1);
 
   public static Command getAutoScoreCommand(
-      Drive drive, Superstructure superstructure, Vision vision, ScoringHelper scoringHelper) {
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Superstructure superstructure,
+      Vision vision,
+      ScoringHelper scoringHelper) {
     return Commands.sequence(
-            Commands.waitUntil(
-                    () ->
-                        (scoringHelper
-                                .getSelectedAlignPose()
-                                .getTranslation()
-                                .getDistance(
-                                    getRobotPose(
-                                            scoringHelper.getSelectedReef(),
-                                            scoringHelper.getSelectedAlignPose())
-                                        .getTranslation())
-                            < reefAlignThreshold.getAsDouble()))
-                .deadlineFor(
-                    DriveCommands.headingAlignCommand(
-                        drive, () -> scoringHelper.getSelectedScorePose().getRotation())),
-            DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedAlignPose)
-                .until(
-                    () ->
-                        (scoringHelper
-                                    .getSelectedAlignPose()
-                                    .getTranslation()
-                                    .getDistance(
-                                        getRobotPose(
-                                                scoringHelper.getSelectedReef(),
-                                                scoringHelper.getSelectedScorePose())
-                                            .getTranslation())
-                                < reefNudgeThreshold.getAsDouble()
-                            && drive.isAutoHeadingAligned())),
-            DriveCommands.driveToPoseCommand(drive, scoringHelper::getSelectedScorePose)
-                .until(drive::isAutoAligned)
-                .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)))
-        .alongWith(vision.setEnableCameraCommand(1, true))
-        .finallyDo(() -> vision.setEnableCamera(1, true));
-  }
-
-  public static Command getAutoHeadingAlignScoreCommand(
-      Drive drive, Superstructure superstructure, ScoringHelper scoringHelper) {
-    return DriveCommands.headingAlignCommand(
-            drive, () -> scoringHelper.getSelectedScorePose().getRotation())
-        .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal));
+        Commands.waitUntil(
+                () ->
+                    (scoringHelper
+                            .getSelectedAlignPose()
+                            .getTranslation()
+                            .getDistance(
+                                getRobotPose(
+                                        scoringHelper.getSelectedReef(),
+                                        scoringHelper.getSelectedAlignPose())
+                                    .getTranslation())
+                        < reefAlignThreshold.getAsDouble()))
+            .deadlineFor(
+                DriveCommands.joystickDriveAtHeading(
+                    drive,
+                    xSupplier,
+                    ySupplier,
+                    () -> scoringHelper.getSelectedScorePose().getRotation().getRadians())),
+        new DriveToPose(drive, scoringHelper::getSelectedAlignPose)
+            .until(
+                () ->
+                    (scoringHelper
+                            .getSelectedAlignPose()
+                            .getTranslation()
+                            .getDistance(
+                                getRobotPose(
+                                        scoringHelper.getSelectedReef(),
+                                        scoringHelper.getSelectedScorePose())
+                                    .getTranslation())
+                        < reefNudgeThreshold.getAsDouble())),
+        new DriveToPose(drive, scoringHelper::getSelectedScorePose)
+            .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
   }
 
   public static Pose2d getRobotPose(Reef reef, Pose2d finalPose) {

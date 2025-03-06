@@ -11,31 +11,29 @@ import frc.team4276.frc2025.AutoSelector;
 import frc.team4276.frc2025.AutoSelector.AutoQuestionResponse;
 import frc.team4276.frc2025.Constants;
 import frc.team4276.frc2025.Constants.Mode;
+import frc.team4276.frc2025.commands.DriveTrajectory;
 import frc.team4276.frc2025.subsystems.drive.Drive;
+import frc.team4276.frc2025.subsystems.drive.Drive.DriveMode;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
-import frc.team4276.frc2025.subsystems.vision.Vision;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AutoBuilder {
   private final Drive drive; // TODO: add drive to pose auto
   private final Superstructure superstructure;
-  private final Vision vision;
   private final AutoSelector autoSelector;
 
-  public AutoBuilder(
-      Drive drive, Superstructure superstructure, Vision vision, AutoSelector autoSelector) {
+  public AutoBuilder(Drive drive, Superstructure superstructure, AutoSelector autoSelector) {
     this.drive = drive;
     this.superstructure = superstructure;
-    this.vision = vision;
     this.autoSelector = autoSelector;
   }
 
   public Command testTraj(String name) {
     var traj = getPathPlannerTrajectoryFromChoreo(name);
 
-    return resetPose(traj.getInitialPose()).andThen(followTrajectory(drive, traj));
+    return resetPose(traj.getInitialPose()).andThen(new DriveTrajectory(drive, traj));
   }
 
   public Command taxiAuto(String name) {
@@ -47,7 +45,7 @@ public class AutoBuilder {
     return Commands.sequence(
         resetPose(traj.getInitialPose()),
         Commands.waitSeconds(autoSelector.getDelayInput()),
-        followTrajectory(drive, traj));
+        new DriveTrajectory(drive, traj));
   }
 
   public Command shrimpleOcrAuto(
@@ -79,9 +77,8 @@ public class AutoBuilder {
               "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 1);
 
       scoringCommand.addCommands(
-          vision.setCamerasEnabledCommand(true, true),
           Commands.parallel(
-              followTrajectory(drive, scTraj),
+              new DriveTrajectory(drive, scTraj),
               Commands.waitSeconds(scTraj.getTotalTimeSeconds() - 0.75)
                   .andThen(
                       superstructure
@@ -89,13 +86,13 @@ public class AutoBuilder {
                           .withDeadline(
                               Commands.waitUntil(
                                       () ->
-                                          drive.isTrajectoryCompleted() && superstructure.atGoal())
+                                          drive.getMode() != DriveMode.TRAJECTORY
+                                              && superstructure.atGoal())
                                   .andThen(scoreCommand(superstructure))))),
-          vision.setCamerasEnabledCommand(true, true),
           superstructure
               .setGoalCommand(Goal.INTAKE)
               .withDeadline(
-                  followTrajectory(drive, intTraj)
+                  new DriveTrajectory(drive, intTraj)
                       .andThen(
                           Constants.getMode() == Mode.SIM
                               ? Commands.waitSeconds(intakeWaitTime)
@@ -105,6 +102,7 @@ public class AutoBuilder {
     return Commands.sequence(
         resetPose(traj1.getInitialPose()),
         Commands.waitSeconds(autoSelector.getDelayInput()),
+        Commands.runOnce(() -> superstructure.overrideCoral(true)),
         scoringCommand);
   }
 
@@ -115,9 +113,8 @@ public class AutoBuilder {
   public Command rpShrimpleOcrAuto() {
     return shrimpleOcrAuto(List.of(AutoQuestionResponse.G))
         .withDeadline(
-            Commands.waitUntil(() -> drive.getMode() == Drive.DriveMode.TRAJECTORY)
-                .andThen(Commands.waitUntil(() -> drive.isTrajectoryCompleted()))
-                .andThen(Commands.waitUntil(() -> drive.getMode() == Drive.DriveMode.TRAJECTORY)));
+            Commands.waitUntil(
+                () -> !superstructure.hasCoral() && superstructure.getGoal() == Goal.INTAKE));
   }
 
   public Command FEBAshrimpleOcrAuto() {
@@ -179,16 +176,17 @@ public class AutoBuilder {
     int[] totalAvailable = scoringAvailable;
 
     for (var reef : reefs) {
-      int available = totalAvailable[reef.ordinal() - AutoQuestionResponse.A.ordinal()];
+      int currentReef = reef.ordinal() - AutoQuestionResponse.A.ordinal();
+      int available = totalAvailable[currentReef];
 
       if (available > 1) {
         levels.add(AutoQuestionResponse.L2);
-        totalAvailable[reef.ordinal() - AutoQuestionResponse.A.ordinal()]--;
+        totalAvailable[currentReef]--;
 
       } else {
         levels.add(
             available % 2 == 0 ? AutoQuestionResponse.L1_LEFT : AutoQuestionResponse.L1_RIGHT);
-        totalAvailable[reef.ordinal() - AutoQuestionResponse.A.ordinal()]--;
+        totalAvailable[currentReef]--;
       }
     }
 

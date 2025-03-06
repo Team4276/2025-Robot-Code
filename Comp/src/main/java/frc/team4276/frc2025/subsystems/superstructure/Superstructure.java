@@ -80,7 +80,6 @@ public class Superstructure extends SubsystemBase {
           currentGoal == Goal.L1
               ? (leftL1 ? EndEffector.Goal.FAVOR_LEFT : EndEffector.Goal.FAVOR_RIGHT)
               : EndEffector.Goal.SCORE);
-      hasCoral = false;
     } else {
       endeffector.setGoal(EndEffector.Goal.IDLE);
     }
@@ -228,7 +227,10 @@ public class Superstructure extends SubsystemBase {
           wantScore = true;
           leftL1 = isLeftL1;
         },
-        () -> wantScore = false);
+        () -> {
+          wantScore = false;
+          hasCoral = false;
+        });
   }
 
   public void acceptCharacterizationInput(double input) {
@@ -260,6 +262,10 @@ public class Superstructure extends SubsystemBase {
 
   public boolean hasCoral() {
     return hasCoral;
+  }
+
+  public void overrideCoral(boolean hasCoral) {
+    this.hasCoral = hasCoral;
   }
 
   public Command toggleDisplacerCommand() {
