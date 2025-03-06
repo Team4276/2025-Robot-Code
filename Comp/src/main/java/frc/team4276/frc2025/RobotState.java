@@ -5,20 +5,35 @@ import static frc.team4276.frc2025.subsystems.drive.DriveConstants.kinematics;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+import frc.team4276.frc2025.field.FieldConstants;
+import frc.team4276.frc2025.subsystems.vision.VisionConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO.TargetObservation;
 import frc.team4276.util.dashboard.ElasticUI;
+import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotState {
+  private LoggedTunableNumber txTyObservationStaleSecs =
+      new LoggedTunableNumber("RobotState/TxTyObsStaleSecs", 0.5);
+
   private SwerveModulePosition[] lastWheelPositions =
       new SwerveModulePosition[] {
         new SwerveModulePosition(),
@@ -34,6 +49,16 @@ public class RobotState {
       new SwerveDrivePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions, Pose2d.kZero);
   private TimeInterpolatableBuffer<Pose2d> odomPoseBuffer =
       TimeInterpolatableBuffer.createBuffer(2.0);
+
+  private static final Map<Integer, Pose2d> tagPoses2d = new HashMap<>();
+
+  static {
+    for (int i = 1; i <= FieldConstants.aprilTagCount; i++) {
+      tagPoses2d.put(
+          i,
+          FieldConstants.apriltagLayout.getTagPose(i).map(Pose3d::toPose2d).orElse(new Pose2d()));
+    }
+  }
 
   private final Map<Integer, TxTyPoseRecord> txTyPoses = new HashMap<>();
 
@@ -99,37 +124,59 @@ public class RobotState {
 
   /** Adds a new timestamped vision measurement. */
   public void addTxTyObservation(TargetObservation targetObs) {
+    if (txTyPoses.containsKey(targetObs.tagId())
+        && targetObs.timestamp() >= txTyPoses.get(targetObs.tagId()).timestamp()) {
+      return;
+    }
+
+    // Get rotation at timestamp
+    var sample = odomPoseBuffer.getSample(targetObs.timestamp());
+    if (sample.isEmpty()) {
+      // exit if not there
+      return;
+    }
+    Rotation2d robotRotation =
+        poseEstimator
+            .getEstimatedPosition()
+            .transformBy(new Transform2d(poseEstimatorOdom.getEstimatedPosition(), sample.get()))
+            .getRotation();
+
+    Transform3d cameraPose = VisionConstants.configs[targetObs.camera()].robotToCamera;
 
     // Use 3D distance and tag angles to find robot pose
-    // Translation2d camToTagTranslation =
-    //     new Pose3d(Translation3d.kZero, new Rotation3d(0, ty, -tx))
-    //         .transformBy(
-    //             new Transform3d(new Translation3d(observation.distance(), 0, 0),
-    // Rotation3d.kZero))
-    //         .getTranslation()
-    //         .rotateBy(new Rotation3d(0, cameraPose.getRotation().getY(), 0))
-    //         .toTranslation2d();
-    // Rotation2d camToTagRotation =
-    //     robotRotation.plus(
-    //         cameraPose.toPose2d().getRotation().plus(camToTagTranslation.getAngle()));
-    // var tagPose2d = tagPoses2d.get(observation.tagId());
-    // if (tagPose2d == null) return;
-    // Translation2d fieldToCameraTranslation =
-    //     new Pose2d(tagPose2d.getTranslation(), camToTagRotation.plus(Rotation2d.kPi))
-    //         .transformBy(GeomUtil.toTransform2d(camToTagTranslation.getNorm(), 0.0))
-    //         .getTranslation();
-    // Pose2d robotPose =
-    //     new Pose2d(
-    //             fieldToCameraTranslation,
-    // robotRotation.plus(cameraPose.toPose2d().getRotation()))
-    //         .transformBy(new Transform2d(cameraPose.toPose2d(), Pose2d.kZero));
-    // // Use gyro angle at time for robot rotation
-    // robotPose = new Pose2d(robotPose.getTranslation(), robotRotation);
+    Translation2d camToTagTranslation =
+        new Pose3d(Translation3d.kZero, new Rotation3d(0, targetObs.ty(), -targetObs.tx()))
+            .transformBy(
+                new Transform3d(new Translation3d(targetObs.distance(), 0, 0), Rotation3d.kZero))
+            .getTranslation()
+            .rotateBy(new Rotation3d(0, cameraPose.getRotation().getY(), 0))
+            .toTranslation2d();
+    Rotation2d camToTagRotation =
+        robotRotation.plus(
+            cameraPose.getRotation().toRotation2d().plus(camToTagTranslation.getAngle()));
+    var tagPose2d = tagPoses2d.get(targetObs.tagId());
+    if (tagPose2d == null) return;
+    Translation2d fieldToCameraTranslation =
+        new Pose2d(tagPose2d.getTranslation(), camToTagRotation.plus(Rotation2d.kPi))
+            .transformBy(new Transform2d(camToTagTranslation.getNorm(), 0.0, new Rotation2d()))
+            .getTranslation();
+    Pose2d robotPose =
+        new Pose2d(
+                fieldToCameraTranslation,
+                robotRotation.plus(cameraPose.getRotation().toRotation2d()))
+            .transformBy(
+                new Transform2d(
+                    new Pose2d(
+                        cameraPose.getTranslation().toTranslation2d(),
+                        cameraPose.getRotation().toRotation2d()),
+                    Pose2d.kZero));
+    // Use gyro angle at time for robot rotation
+    robotPose = new Pose2d(robotPose.getTranslation(), robotRotation);
 
-    // // Add transform to current odometry based pose for latency correction
-    // txTyPoses.put(
-    //     observation.tagId(),
-    //     new TxTyPoseRecord(robotPose, camToTagTranslation.getNorm(), observation.timestamp()));
+    // Add transform to current odometry based pose for latency correction
+    txTyPoses.put(
+        targetObs.tagId(),
+        new TxTyPoseRecord(robotPose, camToTagTranslation.getNorm(), targetObs.timestamp()));
   }
 
   @AutoLogOutput(key = "RobotState/EstimatedPose")
@@ -147,11 +194,29 @@ public class RobotState {
     return poseEstimator.getEstimatedPosition();
   }
 
-  @AutoLogOutput(key = "RobotState/EstimatedTxTyVisionPose")
-  public Pose2d
-      getTxTyPose() { // TODO: add offset from poseEstimator (also find a way to expose it)
+  public Optional<Pose2d> getTxTyPose(
+      int tagId) { // TODO: add offset from poseEstimator (also find a way to expose it)
+    if (!txTyPoses.containsKey(tagId)) {
+      return Optional.empty();
+    }
+    var data = txTyPoses.get(tagId);
+    // Check if stale
+    if (Timer.getTimestamp() - data.timestamp() >= txTyObservationStaleSecs.get()) {
+      return Optional.empty();
+    }
+    // Get odometry based pose at timestamp
+    var sample = odomPoseBuffer.getSample(data.timestamp());
 
-    return Pose2d.kZero;
+    if (sample.isPresent()) {
+      Logger.recordOutput(
+          "RobotState/EstimatedTxTyPose",
+          data.pose()
+              .plus(new Transform2d(sample.get(), poseEstimatorOdom.getEstimatedPosition())));
+    }
+    // Latency compensate
+    return sample.map(
+        pose2d ->
+            data.pose().plus(new Transform2d(pose2d, poseEstimatorOdom.getEstimatedPosition())));
   }
 
   private boolean useTrajectorySetpoint() {
@@ -169,5 +234,5 @@ public class RobotState {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotVelocity, getEstimatedPose().getRotation());
   }
 
-  public record TxTyPoseRecord() {}
+  public record TxTyPoseRecord(Pose2d pose, double distance, double timestamp) {}
 }

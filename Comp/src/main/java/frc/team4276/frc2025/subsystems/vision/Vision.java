@@ -1,13 +1,6 @@
 package frc.team4276.frc2025.subsystems.vision;
 
-import static frc.team4276.frc2025.subsystems.vision.VisionConstants.angularStdDevBaseline;
-import static frc.team4276.frc2025.subsystems.vision.VisionConstants.aprilTagLayout;
-import static frc.team4276.frc2025.subsystems.vision.VisionConstants.configs;
-import static frc.team4276.frc2025.subsystems.vision.VisionConstants.enableInstanceLogging;
-import static frc.team4276.frc2025.subsystems.vision.VisionConstants.fieldBorderMargin;
-import static frc.team4276.frc2025.subsystems.vision.VisionConstants.linearStdDevBaseline;
-import static frc.team4276.frc2025.subsystems.vision.VisionConstants.maxAmbiguity;
-import static frc.team4276.frc2025.subsystems.vision.VisionConstants.maxZError;
+import static frc.team4276.frc2025.subsystems.vision.VisionConstants.*;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -28,13 +21,15 @@ import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
+  private final VisionConsumer consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
   private boolean[] camerasEnabled = {true, true};
 
-  public Vision(VisionIO... io) {
+  public Vision(VisionConsumer consumer, VisionIO... io) {
+    this.consumer = consumer;
     this.io = io;
 
     // Initialize inputs
@@ -155,11 +150,10 @@ public class Vision extends SubsystemBase {
           if (camerasEnabled[cameraIndex]) {
             robotPosesAccepted.add(robotPose3d);
 
-            RobotState.getInstance()
-                .addVisionMeasurement(
-                    robotPose3d.toPose2d(),
-                    observation.timestamp(),
-                    VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+            consumer.accept(
+                robotPose3d.toPose2d(),
+                observation.timestamp(),
+                VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
           } else {
             robotPosesCanceled.add(robotPose3d);
           }

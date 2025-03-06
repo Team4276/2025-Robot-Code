@@ -122,7 +122,11 @@ public class RobotContainer {
                   new RollerSensorsIOHardware());
           arm = new Arm(new ArmIOSparkMax());
           roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40, false, true));
-          vision = new Vision(new VisionIOPhotonVision(0), new VisionIOPhotonVision(1));
+          vision =
+              new Vision(
+                  RobotState.getInstance()::addVisionMeasurement,
+                  new VisionIOPhotonVision(0),
+                  new VisionIOPhotonVision(1));
         }
 
         case SIMBOT -> {
@@ -143,10 +147,11 @@ public class RobotContainer {
           arm = new Arm(new ArmIO() {});
           roller = new Roller(new RollerIO() {});
           if (disableVisionSim) {
-            vision = new Vision();
+            vision = new Vision(RobotState.getInstance()::addVisionMeasurement);
           } else {
             vision =
                 new Vision(
+                    RobotState.getInstance()::addVisionMeasurement,
                     new VisionIOPhotonVisionSim(0, RobotState.getInstance()::getEstimatedPose),
                     new VisionIOPhotonVisionSim(1, RobotState.getInstance()::getEstimatedPose));
           }
@@ -166,7 +171,9 @@ public class RobotContainer {
     }
 
     if (vision == null) {
-      vision = new Vision(new VisionIO() {}, new VisionIO() {});
+      vision =
+          new Vision(
+              RobotState.getInstance()::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
     }
 
     if (superstructure == null) {
