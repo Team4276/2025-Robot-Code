@@ -18,6 +18,8 @@ public class AutoScore {
   private static final LoggedTunableNumber reefNudgeThreshold =
       new LoggedTunableNumber("AutoScore/ReefNudgeThreshold", 0.1);
 
+  private static boolean cancelTxTy = true;
+
   public static Command getAutoScoreCommand(
       Drive drive,
       DoubleSupplier xSupplier,
@@ -69,7 +71,7 @@ public class AutoScore {
   }
 
   public static Pose2d getRobotPose(Reef reef, Pose2d finalPose) {
-    return Constants.isSim
+    return Constants.isSim || cancelTxTy
         ? RobotState.getInstance().getEstimatedPose()
         : RobotState.getInstance().getReefPose(reef.ordinal() / 2, finalPose);
   }

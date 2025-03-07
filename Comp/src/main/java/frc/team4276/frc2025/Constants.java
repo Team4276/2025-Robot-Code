@@ -46,7 +46,7 @@ public final class Constants {
 
   public static final boolean isTuning = true;
 
-  public static final boolean isSim = mode == Mode.SIM;
+  public static final boolean isSim = mode == Mode.REAL;
 
   /** Checks whether the correct robot is selected when deploying. */
   public static class CheckDeploy {
