@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.team4276.frc2025.Constants;
-import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.util.dashboard.ElasticUI;
 import frc.team4276.util.swerve.SwerveSetpointGenerator;
@@ -36,6 +35,9 @@ public class Drive extends SubsystemBase {
 
     /** Driving based on a trajectory. */
     TRAJECTORY,
+
+    /** Driving with a heading on the field automatically. */
+    HEADING_ALIGN,
 
     /** Driving to a location on the field automatically. */
     AUTO_ALIGN,
@@ -189,16 +191,22 @@ public class Drive extends SubsystemBase {
     }
 
     // Update gyro alert
-    gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.getMode() != Mode.SIM);
+    gyroDisconnectedAlert.set(!gyroInputs.connected && !Constants.isSim);
+
+    Logger.recordOutput("Drive/DriveMode", mode);
   }
 
   public void runVelocity(ChassisSpeeds speeds, DriveMode mode) {
     velocityMode = true;
+    this.mode = mode;
 
     // Calculate setpoints
     ChassisSpeeds setpointSpeeds;
     SwerveModuleState[] setpointStates;
-    if (useSetpointGenerator && mode != DriveMode.TRAJECTORY && mode != DriveMode.TELEOP) {
+    if (useSetpointGenerator
+        && mode != DriveMode.TRAJECTORY
+        && mode != DriveMode.TELEOP
+        && mode != DriveMode.HEADING_ALIGN) {
       prevSetpoint = swerveSetpointGenerator.generateSetpoint(prevSetpoint, speeds, 0.02);
       setpointSpeeds = prevSetpoint.robotRelativeSpeeds();
       setpointStates = prevSetpoint.moduleStates();
@@ -232,11 +240,15 @@ public class Drive extends SubsystemBase {
 
   public void runVelocity(ChassisSpeeds speeds, List<Vector<N2>> forces, DriveMode mode) {
     velocityMode = true;
+    this.mode = mode;
 
     // Calculate setpoints
     ChassisSpeeds setpointSpeeds;
     SwerveModuleState[] setpointStates;
-    if (useSetpointGenerator && mode != DriveMode.TRAJECTORY && mode != DriveMode.TELEOP) {
+    if (useSetpointGenerator
+        && mode != DriveMode.TRAJECTORY
+        && mode != DriveMode.TELEOP
+        && mode != DriveMode.HEADING_ALIGN) {
       prevSetpoint = swerveSetpointGenerator.generateSetpoint(prevSetpoint, speeds, 0.02);
       setpointSpeeds = prevSetpoint.robotRelativeSpeeds();
       setpointStates = prevSetpoint.moduleStates();

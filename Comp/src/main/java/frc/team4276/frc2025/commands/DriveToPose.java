@@ -15,36 +15,39 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveToPose extends Command {
-  private static final LoggedTunableProfiledPID driveController;
-  private static final LoggedTunableProfiledPID thetaController;
+  private static final LoggedTunableProfiledPID driveController =
+      new LoggedTunableProfiledPID("DriveToPose/Translation", 3.0, 0.0, 0.0, 0.01, 3.0, 3.0);
+  ;
+  private static final LoggedTunableProfiledPID thetaController =
+      new LoggedTunableProfiledPID(
+          "DriveToPose/Rotation", 3.0, 0.0, 0.0, Units.degreesToRadians(1.0), 6.0, 3.0);
+  ;
 
-  static {
-    driveController =
-        new LoggedTunableProfiledPID("DriveToPose/Translation", 3.0, 0.0, 0.0, 0.01, 3.0, 3.0);
-    thetaController =
-        new LoggedTunableProfiledPID(
-            "DriveToPose/Rotation", 3.0, 0.0, 0.0, Units.degreesToRadians(1.0), 6.0, 3.0);
+  private static boolean isRunning = false;
 
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-  }
-
-  private boolean isRunning = false;
-
-  private Pose2d error = Pose2d.kZero;
+  private static Pose2d error = Pose2d.kZero;
 
   private final Drive drive;
   private final Supplier<Pose2d> target;
+  private final Supplier<Pose2d> robotPose;
 
   public DriveToPose(Drive drive, Supplier<Pose2d> target) {
+    this(drive, target, () -> RobotState.getInstance().getEstimatedPose());
+  }
+
+  public DriveToPose(Drive drive, Supplier<Pose2d> target, Supplier<Pose2d> robotPose) {
     this.drive = drive;
     this.target = target;
+    this.robotPose = robotPose;
+
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
     addRequirements(drive);
   }
 
   @Override
   public void initialize() {
-    Pose2d currentPose = RobotState.getInstance().getEstimatedPose();
+    Pose2d currentPose = robotPose.get();
     ChassisSpeeds fieldVelocity = RobotState.getInstance().getFieldVelocity();
     Translation2d linearFieldVelocity =
         new Translation2d(fieldVelocity.vxMetersPerSecond, fieldVelocity.vyMetersPerSecond);
@@ -68,7 +71,7 @@ public class DriveToPose extends Command {
   public void execute() {
     isRunning = true;
 
-    Pose2d currentPose = RobotState.getInstance().getEstimatedPose();
+    Pose2d currentPose = robotPose.get();
 
     Translation2d trans = currentPose.getTranslation().minus(target.get().getTranslation());
     Translation2d linearOutput =
@@ -104,18 +107,18 @@ public class DriveToPose extends Command {
   }
 
   @AutoLogOutput(key = "DriveToPose/atGoal")
-  public boolean atGoal() {
+  public static boolean atGoal() {
     return isRunning && driveController.atGoal() && thetaController.atGoal();
   }
 
   @AutoLogOutput(key = "DriveToPose/withinTol")
-  public boolean withinTolerance(double translation, double heading) {
+  public static boolean withinTolerance(double translation, double heading) {
     return isRunning
         && Math.abs(error.getTranslation().getNorm()) < translation
         && Math.abs(error.getRotation().getRadians()) < heading;
   }
 
-  public Pose2d distToGoal() {
+  public static Pose2d distToGoal() {
     return error;
   }
 

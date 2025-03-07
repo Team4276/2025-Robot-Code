@@ -15,9 +15,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.team4276.frc2025.AutoSelector.AutoQuestion;
 import frc.team4276.frc2025.AutoSelector.AutoQuestionResponse;
-import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.frc2025.commands.AutoScore;
 import frc.team4276.frc2025.commands.DriveCommands;
+import frc.team4276.frc2025.commands.DriveToPose;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
 import frc.team4276.frc2025.commands.auto.AutoBuilder;
@@ -71,16 +71,13 @@ public class RobotContainer {
   private AutoBuilder autoBuilder;
 
   // Controller
-  private boolean useKeyboard = true;
-  // private boolean isDemo = false;
+  private final boolean isDemo = false;
 
   private final VikXboxController driver = new VikXboxController(0);
   private final CommandGenericHID buttonBoard = new CommandGenericHID(1);
-  private final CommandGenericHID keyboard = new CommandGenericHID(2);
-  private final VikXboxController operator = new VikXboxController(3);
+  private final VikXboxController operator = new VikXboxController(2);
 
-  private final ScoringHelper scoringHelper =
-      new ScoringHelper(buttonBoard, keyboard, operator, useKeyboard);
+  private final ScoringHelper scoringHelper = new ScoringHelper(buttonBoard, operator);
 
   private final Alert driverDisconnected =
       new Alert("Driver controller disconnected (port 0).", AlertType.kWarning);
@@ -332,18 +329,10 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Default command, normal field-relative drive
-    if (useKeyboard && Constants.getMode() == Mode.SIM) {
-      configureKeyBoardBindings();
+    if (isDemo) {
+      // configureDemoBindings();
 
-    }
-
-    // else if (isDemo) {
-    // configureDemoBindings();
-
-    // }
-
-    else {
+    } else {
       configureControllerBindings();
     }
   }
@@ -418,86 +407,8 @@ public class RobotContainer {
   // .whileTrue(arm.setGoalCommand(Arm.Goal.SCORE).alongWith(roller.setGoalCommand(Roller.Goal.SCORE)));
   // }
 
-  private void configureKeyBoardBindings() {
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -keyboard.getRawAxis(0),
-            () -> -keyboard.getRawAxis(1),
-            () -> -keyboard.getRawAxis(2)));
-
-    // Coral Intake Triggers
-    // keyboard
-    // .button(9)
-    // .whileTrue(
-    // superstructure
-    // .setGoalCommand(Superstructure.Goal.INTAKE)
-    // .alongWith(
-    // DriveCommands.headingAlignCommand(
-    // drive, () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(55.0)))));
-
-    // keyboard
-    // .button(10)
-    // .whileTrue(
-    // superstructure
-    // .setGoalCommand(Superstructure.Goal.INTAKE)
-    // .alongWith(
-    // DriveCommands.headingAlignCommand(
-    // drive, () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(305.0)))));
-
-    // Coral Scoring Triggers
-    // var headingAlignReefCommand = Commands.sequence(
-    // DriveCommands.headingAlignCommand(drive, () ->
-    // scoringHelper.getSelectedScorePose().getRotation())
-    // .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
-
-    // keyboard
-    // .button(12)
-    // .and(() -> !(keyboard.getHID().getRawButton(9) ||
-    // keyboard.getHID().getRawButton(10)))
-    // .whileTrue(
-    // // headingAlignReefCommand
-    // AutoScore.getAutoScoreCommand(drive, superstructure, vision, scoringHelper));
-
-    keyboard
-        .button(11)
-        .and(() -> !keyboard.getHID().getRawButton(12))
-        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE));
-
-    keyboard.button(11).and(keyboard.button(12)).whileTrue(superstructure.scoreCommand(false));
-
-    // Algae Scoring Triggers
-    keyboard.button(15).whileTrue(roller.setGoalCommand(Roller.Goal.SCORE));
-
-    // keyboard
-    // .button(11)
-    // .whileTrue(
-    // arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(
-    // roller.setGoalCommand(Roller.Goal.INTAKE)));
-
-    // keyboard
-    // .button(14)
-    // .whileTrue(
-    // Commands.either(
-    // superstructure.scoreCommand(true),
-    // arm.setGoalCommand(Arm.Goal.SCORE)
-    // .alongWith(
-    // Commands.startEnd(
-    // () -> drive.setHeadingGoal(
-    // () -> AllianceFlipUtil.apply(Rotation2d.kCCW_90deg)),
-    // drive::clearHeadingGoal)),
-    // keyboard.button(12)));
-
-    // Util
-    // driver
-    // .povUp()
-    // .toggleOnTrue(superstructure.unjamCommand()); // ned to bind
-
-  }
-
   private void configureControllerBindings() {
     /***************** Drive Triggers *****************/
-
     // Drive suppliers
     DoubleSupplier driverX = () -> -driver.getLeftWithDeadband().y;
     DoubleSupplier driverY = () -> -driver.getLeftWithDeadband().x;
@@ -554,27 +465,44 @@ public class RobotContainer {
                     Commands.waitUntil(superstructure::hasCoral)
                         .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 1.0))));
 
-    // Scoring
-    driver // TODO: impl rumbles
+    // Scoring // TODO: impl rumbles
+    driver
         .rightTrigger()
         .and(() -> !(driver.getHID().getXButton() || driver.getHID().getBButton()))
+        .and(() -> disableHeadingAutoAlign)
+        .whileTrue(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal));
+
+    driver
+        .rightTrigger()
+        .and(() -> !(driver.getHID().getXButton() || driver.getHID().getBButton()))
+        .and(
+            () ->
+                (disableTranslationAutoAlign && !disableHeadingAutoAlign)
+                    || scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L1)
         .whileTrue(
-            Commands.either(
-                superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal),
-                Commands.either(
-                    DriveCommands.joystickDriveAtHeading(
-                            drive,
-                            driverX,
-                            driverY,
-                            () -> scoringHelper.getSelectedScorePose().getRotation().getRadians())
-                        .alongWith(
-                            superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)),
-                    AutoScore.getAutoScoreCommand(
-                        drive, driverX, driverY, superstructure, vision, scoringHelper),
-                    () ->
-                        disableTranslationAutoAlign
-                            || scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L1),
-                () -> disableHeadingAutoAlign));
+            DriveCommands.joystickDriveAtHeading(
+                    drive,
+                    driverX,
+                    driverY,
+                    () -> scoringHelper.getSelectedScorePose().getRotation().getRadians())
+                .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
+
+    driver
+        .rightTrigger()
+        .and(() -> !(driver.getHID().getXButton() || driver.getHID().getBButton()))
+        .and(
+            () ->
+                !disableTranslationAutoAlign
+                    && !disableHeadingAutoAlign
+                    && scoringHelper.getSuperstructureGoal() != Superstructure.Goal.L1)
+        .whileTrue(
+            AutoScore.getAutoScoreCommand(drive, driverX, driverY, superstructure, scoringHelper)
+                .alongWith(
+                    Commands.waitUntil(
+                            () ->
+                                superstructure.getGoal() != Superstructure.Goal.STOW
+                                    && DriveToPose.atGoal())
+                        .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 0.2, 3))));
 
     driver.rightBumper().and(driver.rightTrigger()).whileTrue(superstructure.scoreCommand(false));
 
@@ -655,12 +583,14 @@ public class RobotContainer {
   public void updateAlerts() {
     // Controller disconnected alerts
     driverDisconnected.set(
-        useKeyboard
+        Constants.isSim
             ? false
             : !DriverStation.isJoystickConnected(driver.getHID().getPort())
                 || !DriverStation.getJoystickIsXbox(driver.getHID().getPort()));
     operatorDisconnected.set(
-        useKeyboard ? false : !DriverStation.isJoystickConnected(buttonBoard.getHID().getPort()));
+        Constants.isSim
+            ? false
+            : !DriverStation.isJoystickConnected(buttonBoard.getHID().getPort()));
   }
 
   /**

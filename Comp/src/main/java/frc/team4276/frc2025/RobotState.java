@@ -195,8 +195,7 @@ public class RobotState {
     return poseEstimator.getEstimatedPosition();
   }
 
-  public Optional<Pose2d> getTxTyPose(
-      int tagId) { // TODO: add offset from poseEstimator (also find a way to expose it)
+  public Optional<Pose2d> getTxTyPose(int tagId) {
     if (!txTyPoses.containsKey(tagId)) {
       return Optional.empty();
     }
@@ -253,7 +252,7 @@ public class RobotState {
   private boolean useTrajectorySetpoint() {
     return enableSimTrajPoseEstimation
         ? false
-        : Constants.getMode() == Constants.Mode.SIM && DriverStation.isAutonomousEnabled();
+        : Constants.isSim && DriverStation.isAutonomousEnabled();
   }
 
   public Pose2d getTrajectorySetpoint() {

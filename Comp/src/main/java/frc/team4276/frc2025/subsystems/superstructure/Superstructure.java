@@ -50,7 +50,7 @@ public class Superstructure extends SubsystemBase {
   private boolean cleared5 = false;
 
   private boolean hasCoral = false;
-  private boolean displace = true;
+  private boolean displace = false;
 
   public Superstructure(
       Elevator elevator, EndEffector endeffector, Displacer displacer, RollerSensorsIO sensorsIO) {

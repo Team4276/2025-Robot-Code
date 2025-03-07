@@ -70,23 +70,51 @@ public class DriveCommands {
       DoubleSupplier ySupplier,
       DoubleSupplier headingSupplier) {
     return Commands.run(
-        () -> {
-          controller.enableContinuousInput(-Math.PI, Math.PI);
+            () -> {
+              double linearMagnitude = Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
-          double target = headingSupplier.getAsDouble();
-          double error =
-              MathUtil.angleModulus(
-                  RobotState.getInstance()
-                      .getEstimatedPose()
-                      .getRotation()
-                      .minus(Rotation2d.fromRadians(headingSupplier.getAsDouble()))
-                      .getRadians());
+              // Square magnitude for more precise control
+              linearMagnitude = linearMagnitude * linearMagnitude;
 
-          double output = controller.calculate(error, 0.0);
+              Translation2d linearVelocity = Translation2d.kZero;
 
-          Logger.recordOutput("DriveAtAngle/TargetHeading", target);
-          Logger.recordOutput("DriveAtAngle/Error", error);
-          Logger.recordOutput("DriveAtAngle/Output", output);
-        });
+              if (linearMagnitude > 1e-6) {
+                linearVelocity =
+                    new Translation2d(
+                            linearMagnitude,
+                            new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble()))
+                        .times(LINEAR_VELOCITY_SCALAR);
+              }
+
+              controller.enableContinuousInput(-Math.PI, Math.PI);
+
+              double target = headingSupplier.getAsDouble();
+              double error =
+                  MathUtil.angleModulus(
+                      RobotState.getInstance()
+                          .getEstimatedPose()
+                          .getRotation()
+                          .minus(Rotation2d.fromRadians(headingSupplier.getAsDouble()))
+                          .getRadians());
+
+              double output = controller.calculate(error, 0.0);
+
+              Logger.recordOutput("DriveAtAngle/TargetHeading", target);
+              Logger.recordOutput("DriveAtAngle/Error", error);
+              Logger.recordOutput("DriveAtAngle/Output", output);
+
+              drive.runVelocity(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      new ChassisSpeeds(
+                          linearVelocity.getX() * DriveConstants.maxSpeed,
+                          linearVelocity.getY() * DriveConstants.maxSpeed,
+                          output),
+                      AllianceFlipUtil.apply(
+                          RobotState.getInstance().getEstimatedPose().getRotation())),
+                  DriveMode.TELEOP);
+            },
+            drive)
+        // Reset PID controller when command starts
+        .beforeStarting(() -> controller.reset());
   }
 }

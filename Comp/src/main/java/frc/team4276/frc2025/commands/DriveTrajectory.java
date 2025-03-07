@@ -129,4 +129,9 @@ public class DriveTrajectory extends Command { // TODO: impl and test choreo tra
   public boolean isFinished() {
     return getTrajectoryTime() > trajectory.getTotalTimeSeconds();
   }
+
+  @Override
+  public void end(boolean interrupted) {
+    drive.stop();
+  }
 }
