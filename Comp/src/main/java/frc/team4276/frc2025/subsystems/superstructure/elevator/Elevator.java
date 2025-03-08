@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.team4276.frc2025.Constants;
-import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -172,8 +171,7 @@ public class Elevator {
     }
 
     goalViz.update(goal.getPositionMetres());
-    measuredViz.update(
-        Constants.getMode() == Mode.SIM ? goal.getPositionMetres() : getPositionMetres());
+    measuredViz.update(Constants.isSim ? goal.getPositionMetres() : getPositionMetres());
     Logger.recordOutput("Elevator/Goal", goal);
     Logger.recordOutput("Elevator/GoalMetres", goal.getPositionMetres());
     Logger.recordOutput("Elevator/GoalRotations", metresToRotations(goal.getPositionMetres()));
@@ -191,7 +189,7 @@ public class Elevator {
   }
 
   public boolean atGoal() {
-    return Constants.getMode() == Mode.SIM
+    return Constants.isSim
         ? true
         : MathUtil.isNear(goal.getPositionMetres(), getPositionMetres(), tolerance);
   }

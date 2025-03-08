@@ -7,14 +7,10 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
-
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -27,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.team4276.frc2025.Constants;
-import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.frc2025.RobotState;
 import static frc.team4276.frc2025.subsystems.drive.DriveConstants.driveConfig;
 import static frc.team4276.frc2025.subsystems.drive.DriveConstants.kinematics;
@@ -38,6 +33,11 @@ import frc.team4276.frc2025.subsystems.drive.controllers.TeleopDriveController;
 import frc.team4276.frc2025.subsystems.drive.controllers.TrajectoryController;
 import frc.team4276.util.dashboard.ElasticUI;
 import frc.team4276.util.swerve.SwerveSetpointGenerator;
+import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
   public enum DriveMode {
@@ -46,6 +46,9 @@ public class Drive extends SubsystemBase {
 
     /** Driving based on a trajectory. */
     TRAJECTORY,
+
+    /** Driving with a heading on the field automatically. */
+    HEADING_ALIGN,
 
     /** Driving to a location on the field automatically. */
     AUTO_ALIGN,
@@ -56,6 +59,8 @@ public class Drive extends SubsystemBase {
     /** Running wheel radius characterization routine (spinning in circle) */
     WHEEL_RADIUS_CHARACTERIZATION
   }
+
+  private boolean velocityMode = false;
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
@@ -73,17 +78,9 @@ public class Drive extends SubsystemBase {
       new SwerveSetpointGenerator(driveConfig, maxSteerVelocity);
   private SwerveSetpoint prevSetpoint;
   private boolean disableTrajFF = true;
+  private final double[] dummyForces = {0.0, 0.0, 0.0, 0.0};
 
   private DriveMode mode = DriveMode.TELEOP;
-  private boolean isHeadingControlled = false;
-
-  private final TeleopDriveController teleopDriveController = new TeleopDriveController();
-  private final HeadingController headingController = new HeadingController();
-  private final TrajectoryController trajectoryController = new TrajectoryController();
-  private final AutoAlignController autoAlignController = new AutoAlignController();
-
-  private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
-  private double characterizationInput = 0.0;
 
   public Drive(
       GyroIO gyroIO,
@@ -195,160 +192,127 @@ public class Drive extends SubsystemBase {
                 gyroInputs.connected ? gyroInputs.yawPosition : null,
                 modulePositions);
         lastTime = sampleTimestamps[i];
+        RobotState.getInstance().addDriveSpeeds(getChassisSpeeds());
       }
     }
 
-    RobotState.getInstance().addDriveSpeeds(getChassisSpeeds());
+    // Update current setpoint if not in velocity mode
+    if (!velocityMode) {
+      prevSetpoint =
+          new SwerveSetpoint(
+              getChassisSpeeds(),
+              getModuleStates(),
+              new DriveFeedforwards(
+                  dummyForces, dummyForces, dummyForces, dummyForces, dummyForces));
+    }
 
     // Update gyro alert
-    gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.getMode() != Mode.SIM);
+    gyroDisconnectedAlert.set(!gyroInputs.connected && !Constants.isSim);
 
-    Pose2d currentPose = RobotState.getInstance().getEstimatedPose();
-
-    switch (mode) {
-      case TELEOP:
-        desiredSpeeds = teleopDriveController.update(currentPose.getRotation());
-
-        if (isHeadingControlled) {
-          desiredSpeeds.omegaRadiansPerSecond =
-              headingController.update(currentPose.getRotation().getRadians());
-        }
-
-        break;
-      case AUTO_ALIGN:
-        desiredSpeeds = autoAlignController.update(currentPose);
-
-        break;
-      case TRAJECTORY:
-        desiredSpeeds = trajectoryController.update(currentPose);
-
-        if (isHeadingControlled) {
-          desiredSpeeds.omegaRadiansPerSecond =
-              headingController.update(currentPose.getRotation().getRadians());
-        }
-
-        break;
-      case CHARACTERIZATION:
-        for (Module module : modules) {
-          module.runCharacterization(characterizationInput);
-        }
-
-        break;
-      case WHEEL_RADIUS_CHARACTERIZATION:
-        desiredSpeeds = new ChassisSpeeds(0.0, 0.0, characterizationInput);
-
-        break;
-      default:
-        break;
-    }
-
-    if (mode != DriveMode.CHARACTERIZATION) {
-      // Calculate setpoints
-      ChassisSpeeds setpointSpeeds;
-      SwerveModuleState[] setpointStates;
-      if (useSetpointGenerator && mode != DriveMode.TRAJECTORY && mode != DriveMode.TELEOP) {
-        prevSetpoint = swerveSetpointGenerator.generateSetpoint(prevSetpoint, desiredSpeeds, 0.02);
-        setpointSpeeds = prevSetpoint.robotRelativeSpeeds();
-        setpointStates = prevSetpoint.moduleStates();
-      } else {
-        setpointSpeeds = ChassisSpeeds.discretize(desiredSpeeds, 0.02);
-        setpointStates = kinematics.toSwerveModuleStates(setpointSpeeds);
-      }
-
-      SwerveModuleState[] setpointTorques =
-          new SwerveModuleState[] {
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState(),
-            new SwerveModuleState()
-          };
-
-      // Send setpoints to modules
-      for (int i = 0; i < 4; i++) {
-        Vector<N2> forces = VecBuilder.fill(0.0, 0.0);
-        if (mode == DriveMode.TRAJECTORY && !disableTrajFF) {
-          forces = trajectoryController.getModuleForces().get(i);
-        }
-
-        modules[i].runSetpoint(setpointStates[i], forces);
-      }
-
-      // Log optimized setpoints (runSetpoint mutates each state)
-      Logger.recordOutput("Drive/SetpointSpeeds", setpointSpeeds);
-      Logger.recordOutput("Drive/SwerveStates/OptimizedSetpoints", setpointStates);
-      Logger.recordOutput("Drive/SwerveStates/Torques", setpointTorques);
-    }
-
-    Logger.recordOutput(
-        "Drive/SwerveStates/Setpoints",
-        kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(desiredSpeeds, 0.02)));
-    Logger.recordOutput("Drive/DesiredSpeeds", desiredSpeeds);
     Logger.recordOutput("Drive/DriveMode", mode);
   }
 
-  public void feedTeleopInput(double x, double y, double omega) {
-    teleopDriveController.feedDriveInput(x, y, omega);
-    autoAlignController.feedTeleopInput(x, y, omega);
-  }
+  public void runVelocity(ChassisSpeeds speeds, DriveMode mode) {
+    velocityMode = true;
+    this.mode = mode;
 
-  public void setHeadingGoal(Supplier<Rotation2d> goalHeadingSupplier) {
-    headingController.setTarget(goalHeadingSupplier);
-    isHeadingControlled = true;
-  }
+    // Calculate setpoints
+    ChassisSpeeds setpointSpeeds;
+    SwerveModuleState[] setpointStates;
+    if (useSetpointGenerator
+        && mode != DriveMode.TRAJECTORY
+        && mode != DriveMode.TELEOP
+        && mode != DriveMode.HEADING_ALIGN) {
+      prevSetpoint = swerveSetpointGenerator.generateSetpoint(prevSetpoint, speeds, 0.02);
+      setpointSpeeds = prevSetpoint.robotRelativeSpeeds();
+      setpointStates = prevSetpoint.moduleStates();
+    } else {
+      setpointSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+      setpointStates = kinematics.toSwerveModuleStates(setpointSpeeds);
+    }
 
-  public void clearHeadingGoal() {
-    isHeadingControlled = false;
-  }
+    SwerveModuleState[] setpointTorques =
+        new SwerveModuleState[] {
+          new SwerveModuleState(),
+          new SwerveModuleState(),
+          new SwerveModuleState(),
+          new SwerveModuleState()
+        };
 
-  public void setTrajectory(PathPlannerTrajectory traj) {
-    if (DriverStation.isAutonomousEnabled()) {
-      trajectoryController.setTrajectory(traj);
-      mode = DriveMode.TRAJECTORY;
+    // Log optimized setpoints (runSetpoint mutates each state)
+    Logger.recordOutput("Drive/SetpointSpeeds", setpointSpeeds);
+    Logger.recordOutput("Drive/SwerveStates/OptimizedSetpoints", setpointStates);
+    Logger.recordOutput("Drive/SwerveStates/Torques", setpointTorques);
+    Logger.recordOutput(
+        "Drive/SwerveStates/UnoptimizedSetpoints",
+        kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(speeds, 0.02)));
+    Logger.recordOutput("Drive/DesiredSpeeds", speeds);
+
+    // Send setpoints to modules
+    for (int i = 0; i < 4; i++) {
+      modules[i].runSetpoint(setpointStates[i]);
     }
   }
 
-  public boolean isTrajectoryCompleted() {
-    return trajectoryController.isFinished();
+  public void runVelocity(ChassisSpeeds speeds, List<Vector<N2>> forces, DriveMode mode) {
+    velocityMode = true;
+    this.mode = mode;
+
+    // Calculate setpoints
+    ChassisSpeeds setpointSpeeds;
+    SwerveModuleState[] setpointStates;
+    if (useSetpointGenerator
+        && mode != DriveMode.TRAJECTORY
+        && mode != DriveMode.TELEOP
+        && mode != DriveMode.HEADING_ALIGN) {
+      prevSetpoint = swerveSetpointGenerator.generateSetpoint(prevSetpoint, speeds, 0.02);
+      setpointSpeeds = prevSetpoint.robotRelativeSpeeds();
+      setpointStates = prevSetpoint.moduleStates();
+    } else {
+      setpointSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+      setpointStates = kinematics.toSwerveModuleStates(setpointSpeeds);
+    }
+
+    SwerveModuleState[] setpointTorques =
+        new SwerveModuleState[] {
+          new SwerveModuleState(),
+          new SwerveModuleState(),
+          new SwerveModuleState(),
+          new SwerveModuleState()
+        };
+
+    // Log optimized setpoints (runSetpoint mutates each state)
+    Logger.recordOutput("Drive/SetpointSpeeds", setpointSpeeds);
+    Logger.recordOutput("Drive/SwerveStates/OptimizedSetpoints", setpointStates);
+    Logger.recordOutput("Drive/SwerveStates/Torques", setpointTorques);
+    Logger.recordOutput(
+        "Drive/SwerveStates/UnoptimizedSetpoints",
+        kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(speeds, 0.02)));
+    Logger.recordOutput("Drive/DesiredSpeeds", speeds);
+
+    // Send setpoints to modules
+    for (int i = 0; i < 4; i++) {
+      if (disableTrajFF) {
+        modules[i].runSetpoint(setpointStates[i]);
+
+      } else {
+        modules[i].runSetpoint(setpointStates[i], forces.get(i));
+      }
+    }
   }
 
-  public void clearTrajectory() {
-    trajectoryController.stopTraj();
-    mode = DriveMode.TELEOP;
-  }
-
-  public void setAutoAlignPosition(Pose2d pose) {
-    autoAlignController.setSetpoint(pose);
-    mode = DriveMode.AUTO_ALIGN;
-  }
-
-  public Pose2d getAutoAlignDistanceToGoal() {
-    return autoAlignController.distToGoal();
-  }
-
-  public boolean isAutoHeadingAligned() {
-    return autoAlignController.isHeadingAligned();
-  }
-
-  public boolean disableBackVision() {
-    return
-    // isAutoHeadingAligned()
-    // && getAutoAlignDistanceToGoal().getTranslation().getNorm() <
-    // disableBackVisionDistance;
-    true;
-  }
-
-  public boolean isAutoAligned() {
-    return autoAlignController.atGoal();
-  }
-
-  public void disableAutoAlign() {
-    mode = DriveMode.TELEOP;
+  /** Stops the drive. */
+  public void stop() {
+    runVelocity(new ChassisSpeeds(), DriveMode.TELEOP);
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
   public void runCharacterization(double output) {
-    characterizationInput = output;
+    velocityMode = false;
     mode = DriveMode.CHARACTERIZATION;
+    for (int i = 0; i < 4; i++) {
+      modules[i].runCharacterization(output);
+    }
   }
 
   /** Returns the average velocity of the modules in rad/sec. */
@@ -360,13 +324,9 @@ public class Drive extends SubsystemBase {
     return output;
   }
 
-  public void endCharacterizaton() {
-    mode = DriveMode.TELEOP;
-  }
-
   public void runWheelRadiusCharacterization(double omegaSpeed) {
-    characterizationInput = omegaSpeed;
     mode = DriveMode.WHEEL_RADIUS_CHARACTERIZATION;
+    runVelocity(new ChassisSpeeds(0.0, 0.0, omegaSpeed), mode);
   }
 
   /** Returns the position of each module in radians. */

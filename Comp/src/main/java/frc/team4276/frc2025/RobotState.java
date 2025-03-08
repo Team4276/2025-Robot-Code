@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.team4276.frc2025.field.FieldConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO.TargetObservation;
+import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.dashboard.ElasticUI;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.HashMap;
@@ -194,8 +195,7 @@ public class RobotState {
     return poseEstimator.getEstimatedPosition();
   }
 
-  public Optional<Pose2d> getTxTyPose(
-      int tagId) { // TODO: add offset from poseEstimator (also find a way to expose it)
+  public Optional<Pose2d> getTxTyPose(int tagId) {
     if (!txTyPoses.containsKey(tagId)) {
       return Optional.empty();
     }
@@ -219,10 +219,40 @@ public class RobotState {
             data.pose().plus(new Transform2d(pose2d, poseEstimatorOdom.getEstimatedPosition())));
   }
 
+  /**
+   * Get estimated pose using txty data given tagId on reef and aligned pose on reef. Used for algae
+   * intaking and coral scoring.
+   */
+  public Pose2d getReefPose(int face, Pose2d finalPose) {
+    final boolean isRed = AllianceFlipUtil.shouldFlip();
+    var tagPose =
+        getTxTyPose(
+            switch (face) {
+              case 1 -> isRed ? 6 : 19;
+              case 2 -> isRed ? 11 : 20;
+              case 3 -> isRed ? 10 : 21;
+              case 4 -> isRed ? 9 : 22;
+              case 5 -> isRed ? 8 : 17;
+                // 0
+              default -> isRed ? 7 : 18;
+            });
+    // Use estimated pose if tag pose is not present
+    if (tagPose.isEmpty()) return RobotState.getInstance().getEstimatedPose();
+    // Use distance from estimated pose to final pose to get t value
+    // final double t = MathUtil.clamp(
+    // (getEstimatedPose().getTranslation().getDistance(finalPose.getTranslation())
+    // - minDistanceTagPoseBlend.get())
+    // / (maxDistanceTagPoseBlend.get() - minDistanceTagPoseBlend.get()),
+    // 0.0,
+    // 1.0);
+    // return getEstimatedPose().interpolate(tagPose.get(), 1.0 - t);
+    return tagPose.get();
+  }
+
   private boolean useTrajectorySetpoint() {
     return enableSimTrajPoseEstimation
         ? false
-        : Constants.getMode() == Constants.Mode.SIM && DriverStation.isAutonomousEnabled();
+        : Constants.isSim && DriverStation.isAutonomousEnabled();
   }
 
   public Pose2d getTrajectorySetpoint() {

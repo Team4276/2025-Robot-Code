@@ -217,6 +217,18 @@
               "data_type": "string",
               "show_submit_button": false
             }
+          },
+          {
+            "title": "FMSInfo",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "FMSInfo",
+            "properties": {
+              "topic": "/FMSInfo",
+              "period": 0.02
+            }
           }
         ]
       }
@@ -270,22 +282,21 @@
         "containers": [
           {
             "title": "DriveMode",
-            "x": 576.0,
+            "x": 384.0,
             "y": 512.0,
             "width": 192.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Large Text Display",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Drive/DriveMode",
               "period": 0.06,
-              "data_type": "string",
-              "show_submit_button": false
+              "data_type": "string"
             }
           },
           {
             "title": "Swerve Drive",
             "x": 1280.0,
-            "y": 0.0,
+            "y": 128.0,
             "width": 256.0,
             "height": 256.0,
             "type": "SwerveDrive",
@@ -298,203 +309,15 @@
           },
           {
             "title": "CurrentGoal (S)",
-            "x": 576.0,
-            "y": 256.0,
+            "x": 192.0,
+            "y": 512.0,
             "width": 192.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Large Text Display",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Superstructure/CurrentGoal",
               "period": 0.06,
-              "data_type": "string",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "G",
-            "x": 288.0,
-            "y": 0.0,
-            "width": 96.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/G",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4294967040,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "I",
-            "x": 96.0,
-            "y": 128.0,
-            "width": 96.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/I",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4294967040,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "J",
-            "x": 0.0,
-            "y": 128.0,
-            "width": 96.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/J",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4294967040,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "K",
-            "x": 0.0,
-            "y": 320.0,
-            "width": 96.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/K",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4294967040,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "L",
-            "x": 96.0,
-            "y": 320.0,
-            "width": 96.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/L",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4294967040,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "A",
-            "x": 192.0,
-            "y": 448.0,
-            "width": 96.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/A",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4294967040,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "B",
-            "x": 288.0,
-            "y": 448.0,
-            "width": 96.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/B",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4294967040,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "D",
-            "x": 480.0,
-            "y": 320.0,
-            "width": 96.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/D",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4294967040,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "C",
-            "x": 384.0,
-            "y": 320.0,
-            "width": 96.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/C",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4294967040,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "E",
-            "x": 480.0,
-            "y": 128.0,
-            "width": 96.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/E",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4294967040,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "F",
-            "x": 384.0,
-            "y": 128.0,
-            "width": 96.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/F",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4294967040,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
+              "data_type": "string"
             }
           },
           {
@@ -549,126 +372,11 @@
             }
           },
           {
-            "title": "L4",
-            "x": 768.0,
-            "y": 128.0,
-            "width": 320.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/L4",
-              "period": 0.06,
-              "true_color": 4294902010,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Chassis Aligned",
-            "x": 192.0,
-            "y": 320.0,
-            "width": 192.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/AutoAlignController/atGoal",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4278255360,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Elevator Ready",
-            "x": 192.0,
-            "y": 192.0,
-            "width": 192.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Elevator/AtGoal",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4278255360,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "H",
-            "x": 192.0,
-            "y": 0.0,
-            "width": 96.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/H",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4294967040,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "DesiredGoal (S)",
-            "x": 576.0,
-            "y": 384.0,
-            "width": 192.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Superstructure/DesiredGoal",
-              "period": 0.06,
-              "data_type": "string",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "Displace",
-            "x": 576.0,
-            "y": 128.0,
-            "width": 192.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Superstructure/Displace",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4278255360,
-              "false_color": 4294901760,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "WantScore",
-            "x": 768.0,
-            "y": 0.0,
-            "width": 320.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/Superstructure/WantScore",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4278255615,
-              "false_color": 4278190080,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
             "title": "HasCoral",
-            "x": 1088.0,
+            "x": 1280.0,
             "y": 0.0,
-            "width": 192.0,
-            "height": 256.0,
+            "width": 256.0,
+            "height": 128.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Superstructure/HasCoral",
@@ -681,23 +389,11 @@
             }
           },
           {
-            "title": "FMSInfo",
-            "x": 1088.0,
-            "y": 256.0,
-            "width": 448.0,
-            "height": 128.0,
-            "type": "FMSInfo",
-            "properties": {
-              "topic": "/FMSInfo",
-              "period": 0.06
-            }
-          },
-          {
             "title": "Match Time",
-            "x": 576.0,
+            "x": 1088.0,
             "y": 0.0,
             "width": 192.0,
-            "height": 128.0,
+            "height": 384.0,
             "type": "Match Time",
             "properties": {
               "topic": "/SmartDashboard/Match Time",
@@ -727,7 +423,7 @@
           },
           {
             "title": "Drive Align Enabled",
-            "x": 384.0,
+            "x": 576.0,
             "y": 512.0,
             "width": 192.0,
             "height": 128.0,
@@ -758,8 +454,34 @@
               "show_other_objects": true,
               "show_trajectories": true,
               "field_rotation": 0.0,
-              "robot_color": 4294198070,
+              "robot_color": 4291163190,
               "trajectory_color": 4294967295
+            }
+          },
+          {
+            "title": "USB Camera 0",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 768.0,
+            "height": 512.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/USB Camera 0",
+              "period": 0.02,
+              "rotation_turns": 0
+            }
+          },
+          {
+            "title": "SelectedReef",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 320.0,
+            "height": 256.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/ScoringHelper/SelectedReef",
+              "period": 0.02,
+              "data_type": "string"
             }
           }
         ]

@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.frc2025.Constants;
-import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -141,7 +140,7 @@ public class Arm extends SubsystemBase {
     }
 
     goalViz.update(goal.getRads());
-    measuredViz.update(Constants.getMode() == Mode.SIM ? goal.getRads() : inputs.positionRads);
+    measuredViz.update(Constants.isSim ? goal.getRads() : inputs.positionRads);
     Logger.recordOutput("Arm/Goal", goal);
     Logger.recordOutput("Arm/Measured/PositionDeg", Units.radiansToDegrees(inputs.positionRads));
     Logger.recordOutput("Arm/Measured/PositionRad", inputs.positionRads);

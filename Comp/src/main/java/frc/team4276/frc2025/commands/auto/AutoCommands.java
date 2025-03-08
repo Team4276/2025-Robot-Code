@@ -1,19 +1,15 @@
 package frc.team4276.frc2025.commands.auto;
 
-import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.field.FieldConstants;
-import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
 import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.dashboard.Elastic;
 import frc.team4276.util.dashboard.Elastic.Notification;
 import frc.team4276.util.dashboard.Elastic.Notification.NotificationLevel;
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 public class AutoCommands {
   private AutoCommands() {}
@@ -23,33 +19,6 @@ public class AutoCommands {
 
   public static Command resetPose(Pose2d pose) {
     return Commands.runOnce(() -> RobotState.getInstance().resetPose(pose));
-  }
-
-  /** Creates a command that follows a trajectory, command ends when the trajectory is finished */
-  public static Command followTrajectory(Drive drive, PathPlannerTrajectory trajectory) {
-    return followTrajectory(drive, () -> trajectory);
-  }
-
-  /** Creates a command that follows a trajectory, command ends when the trajectory is finished */
-  public static Command followTrajectory(
-      Drive drive, PathPlannerTrajectory trajectory, BooleanSupplier endCondition) {
-    return followTrajectory(drive, () -> trajectory, endCondition);
-  }
-
-  /** Creates a command that follows a trajectory, command ends when the trajectory is finished */
-  public static Command followTrajectory(
-      Drive drive, Supplier<PathPlannerTrajectory> trajectorySupplier) {
-    return followTrajectory(drive, trajectorySupplier, drive::isTrajectoryCompleted);
-  }
-
-  /** Creates a command that follows a trajectory, command ends when the trajectory is finished */
-  public static Command followTrajectory(
-      Drive drive,
-      Supplier<PathPlannerTrajectory> trajectorySupplier,
-      BooleanSupplier endCondition) {
-    return Commands.startEnd(
-            () -> drive.setTrajectory(trajectorySupplier.get()), drive::clearTrajectory)
-        .until(endCondition);
   }
 
   /**
