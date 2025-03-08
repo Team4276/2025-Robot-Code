@@ -171,10 +171,10 @@ public class Drive extends SubsystemBase {
             includeMeasurement = false;
             break;
           }
-          if (Math.sqrt(
-                  gyroInputs.pitchPosition.getDegrees() * 2
-                      + gyroInputs.pitchPosition.getDegrees() * 2)
-              > 0.2) {
+          double magAngle = Math.hypot(gyroInputs.rollPosition, gyroInputs.pitchPosition);
+
+          Logger.recordOutput("Drive/magAngle", magAngle);
+          if (magAngle > 5) {
             includeMeasurement = false;
           }
         }

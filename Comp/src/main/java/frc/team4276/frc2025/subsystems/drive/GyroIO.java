@@ -8,8 +8,12 @@ public interface GyroIO {
   public static class GyroIOInputs {
     public boolean connected = false;
     public Rotation2d yawPosition = Rotation2d.kZero;
-    public Rotation2d pitchPosition = Rotation2d.kZero;
-    public Rotation2d rollPosition = Rotation2d.kZero;
+    public double pitchPosition = 0;
+    public double rollPosition = 0;
+
+    public double rollError = 0;
+    public double pitchError = 0;
+
     public double yawVelocityRadPerSec = 0.0;
     public double[] odometryYawTimestamps = new double[] {};
     public Rotation2d[] odometryYawPositions = new Rotation2d[] {};

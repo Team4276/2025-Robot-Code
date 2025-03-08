@@ -3,10 +3,15 @@ package frc.team4276.frc2025.subsystems.drive;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.Queue;
+import org.littletonrobotics.junction.Logger;
 
 public class GyroIOADIS implements GyroIO {
   private final ADIS16470_IMU gyro = new ADIS16470_IMU();
+  private double timeSinceLastReset = 0;
+  private int iter = 0;
+  private boolean isConfig = false;
   private final Queue<Double> yawPositionQueue;
   private final Queue<Double> yawTimestampQueue;
 
@@ -22,8 +27,18 @@ public class GyroIOADIS implements GyroIO {
     inputs.yawPosition = Rotation2d.fromDegrees(gyro.getAngle());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(gyro.getRate());
 
-    inputs.pitchPosition = Rotation2d.fromDegrees(gyro.getAngle(gyro.getPitchAxis()));
-    inputs.rollPosition = Rotation2d.fromDegrees(gyro.getAngle(gyro.getRollAxis()));
+    if (timeSinceLastReset > 60 && Math.hypot(inputs.pitchPosition, inputs.rollPosition) < 2) {
+      gyro.setGyroAngle(gyro.getPitchAxis(), 0);
+      gyro.setGyroAngle(gyro.getRollAxis(), 0);
+      timeSinceLastReset = 0;
+      iter++;
+    } else {
+      timeSinceLastReset = (Timer.getFPGATimestamp() - (60 * iter));
+    }
+    Logger.recordOutput("/Debug/timeSinceReset", timeSinceLastReset);
+
+    inputs.pitchPosition = gyro.getAngle(gyro.getPitchAxis());
+    inputs.rollPosition = gyro.getAngle(gyro.getRollAxis());
 
     inputs.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
