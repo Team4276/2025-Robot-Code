@@ -1,13 +1,16 @@
 package frc.team4276.frc2025.subsystems.drive;
 
-import static edu.wpi.first.units.Units.Volts;
-import static frc.team4276.frc2025.subsystems.drive.DriveConstants.driveConfig;
-import static frc.team4276.frc2025.subsystems.drive.DriveConstants.kinematics;
-import static frc.team4276.frc2025.subsystems.drive.DriveConstants.maxSteerVelocity;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,6 +19,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N2;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -25,17 +29,15 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.team4276.frc2025.Constants;
 import frc.team4276.frc2025.Constants.Mode;
 import frc.team4276.frc2025.RobotState;
+import static frc.team4276.frc2025.subsystems.drive.DriveConstants.driveConfig;
+import static frc.team4276.frc2025.subsystems.drive.DriveConstants.kinematics;
+import static frc.team4276.frc2025.subsystems.drive.DriveConstants.maxSteerVelocity;
 import frc.team4276.frc2025.subsystems.drive.controllers.AutoAlignController;
 import frc.team4276.frc2025.subsystems.drive.controllers.HeadingController;
 import frc.team4276.frc2025.subsystems.drive.controllers.TeleopDriveController;
 import frc.team4276.frc2025.subsystems.drive.controllers.TrajectoryController;
 import frc.team4276.util.dashboard.ElasticUI;
 import frc.team4276.util.swerve.SwerveSetpointGenerator;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
   public enum DriveMode {
@@ -171,12 +173,17 @@ public class Drive extends SubsystemBase {
             includeMeasurement = false;
             break;
           }
-          double magAngle = Math.hypot(gyroInputs.rollPosition, gyroInputs.pitchPosition);
+          // TODO: figure out more methods for filtering if still needed after vision
+          // Scrap pitch and roll checks for now. Due to questionable designs in the wpi lib driver
+          // for the adis gyro pitch and roll readings will be very inaccurate while the robot is
+          // accelerating
+
+          /*double magAngle = Math.hypot(gyroInputs.rollPosition, gyroInputs.pitchPosition);
 
           Logger.recordOutput("Drive/magAngle", magAngle);
           if (magAngle > 5) {
             includeMeasurement = false;
-          }
+          }*/
         }
       }
       // If delta isn't too large we can include the measurement.
