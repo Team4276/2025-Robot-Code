@@ -28,13 +28,14 @@ public class VisionConstants {
                 Units.inchesToMeters(8.152866),
                 new Rotation3d(0.0, Math.toRadians(20.0) * -1.0, 0.0)),
             1),
+        // TODO: get more accurate values when this is added to cad
         new CameraConfig(
             "Arducam_12MP",
             new Transform3d(
-                Units.inchesToMeters(1.573079),
-                Units.inchesToMeters(9.498816) * -1.0,
-                Units.inchesToMeters(39.580820),
-                new Rotation3d(0.0, Math.toRadians(25.0) * -1.0, Math.PI)),
+                Units.inchesToMeters(7.5),
+                Units.inchesToMeters(11.79) * -1.0,
+                Units.inchesToMeters(9.5),
+                new Rotation3d(0.0, 0.0, Math.toRadians(65))),
             0.75)
       };
 
