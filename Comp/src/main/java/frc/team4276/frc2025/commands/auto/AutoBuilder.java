@@ -3,6 +3,7 @@ package frc.team4276.frc2025.commands.auto;
 import static frc.team4276.frc2025.commands.auto.AutoCommands.*;
 import static frc.team4276.util.path.PPUtil.*;
 
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -46,7 +47,7 @@ public class AutoBuilder {
         new DriveTrajectory(drive, traj));
   }
 
-  public Command speedyIntakeAuto( // TODO: impl
+  public Command speedyIntakeAuto(
       List<AutoQuestionResponse> reefs, List<AutoQuestionResponse> levels) {
 
     if (reefs.isEmpty() || levels.isEmpty()) {
@@ -64,33 +65,22 @@ public class AutoBuilder {
     var traj1 =
         getPathPlannerTrajectoryFromChoreo("c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise);
 
-    for (int i = 0; i < reefs.size(); i++) {
-      var scTraj =
-          i == 0
-              ? traj1
-              : getPathPlannerTrajectoryFromChoreo(
-                  "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 0);
-      var intTraj =
-          getPathPlannerTrajectoryFromChoreo(
-              "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 1);
+    scoringCommand.addCommands(
+        Commands.sequence(
+                new DriveTrajectory(drive, traj1),
+                Commands.waitUntil(
+                    () -> superstructure.atGoal() && superstructure.getGoal() != Goal.STOW),
+                scoreCommand(superstructure))
+            .deadlineFor(
+                Commands.waitSeconds(traj1.getTotalTimeSeconds() - 0.75)
+                    .andThen(superstructure.setGoalCommand(toGoal(levels.get(0))))));
 
-      scoringCommand.addCommands(
-          Commands.sequence(
-                  new DriveTrajectory(drive, scTraj),
-                  Commands.waitUntil(
-                      () -> superstructure.atGoal() && superstructure.getGoal() != Goal.STOW),
-                  scoreCommand(superstructure))
-              .deadlineFor(
-                  Commands.waitSeconds(scTraj.getTotalTimeSeconds() - 0.75)
-                      .andThen(superstructure.setGoalCommand(toGoal(levels.get(i))))),
-          superstructure
-              .setGoalCommand(Goal.INTAKE)
-              .withDeadline(
-                  new DriveTrajectory(drive, intTraj)
-                      .andThen(
-                          Constants.isSim
-                              ? Commands.waitSeconds(intakeWaitTime)
-                              : Commands.waitUntil(() -> superstructure.hasCoral()))));
+    for (int i = 1; i < reefs.size(); i++) {
+      var traj =
+          getPathPlannerTrajectoryFromChoreo(
+              "c_sp_FAR_" + reefs.get(i).toString(), mirrorLengthwise);
+
+      scoringCommand.addCommands(speedyCoral(traj, toGoal(levels.get(i))));
     }
 
     return Commands.sequence(
@@ -98,6 +88,26 @@ public class AutoBuilder {
         Commands.waitSeconds(autoSelector.getDelayInput()),
         Commands.runOnce(() -> superstructure.overrideCoral(true)),
         scoringCommand);
+  }
+
+  private Command speedyCoral(PathPlannerTrajectory traj, Goal goal) {
+    return Commands.sequence(
+            new DriveTrajectory(drive, traj)
+                .andThen(
+                    Commands.waitUntil(
+                        () -> superstructure.atGoal() && superstructure.getGoal() != Goal.STOW),
+                    scoreCommand(superstructure)))
+        .deadlineFor(
+            superstructure
+                .setGoalCommand(Goal.INTAKE)
+                .withDeadline(
+                    Commands.either(
+                        Commands.waitSeconds(1.0),
+                        Commands.waitUntil(() -> superstructure.hasCoral()),
+                        () -> Constants.isSim))
+                .andThen(
+                    Commands.waitSeconds(traj.getTotalTimeSeconds() - 0.75)
+                        .andThen(superstructure.setGoalCommand(goal))));
   }
 
   public Command shrimpleOcrAuto(
@@ -128,23 +138,7 @@ public class AutoBuilder {
           getPathPlannerTrajectoryFromChoreo(
               "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 1);
 
-      scoringCommand.addCommands(
-          Commands.sequence(
-                  new DriveTrajectory(drive, scTraj),
-                  Commands.waitUntil(
-                      () -> superstructure.atGoal() && superstructure.getGoal() != Goal.STOW),
-                  scoreCommand(superstructure))
-              .deadlineFor(
-                  Commands.waitSeconds(scTraj.getTotalTimeSeconds() - 0.75)
-                      .andThen(superstructure.setGoalCommand(toGoal(levels.get(i))))),
-          superstructure
-              .setGoalCommand(Goal.INTAKE)
-              .withDeadline(
-                  new DriveTrajectory(drive, intTraj)
-                      .andThen(
-                          Constants.isSim
-                              ? Commands.waitSeconds(intakeWaitTime)
-                              : Commands.waitUntil(() -> superstructure.hasCoral()))));
+      scoringCommand.addCommands(shrimpleCoral(scTraj, intTraj, toGoal(levels.get(i))));
     }
 
     return Commands.sequence(
@@ -152,6 +146,27 @@ public class AutoBuilder {
         Commands.waitSeconds(autoSelector.getDelayInput()),
         Commands.runOnce(() -> superstructure.overrideCoral(true)),
         scoringCommand);
+  }
+
+  private Command shrimpleCoral(
+      PathPlannerTrajectory scTraj, PathPlannerTrajectory intTraj, Goal goal) {
+    return Commands.sequence(
+        Commands.sequence(
+                new DriveTrajectory(drive, scTraj),
+                Commands.waitUntil(
+                    () -> superstructure.atGoal() && superstructure.getGoal() != Goal.STOW),
+                scoreCommand(superstructure))
+            .deadlineFor(
+                Commands.waitSeconds(scTraj.getTotalTimeSeconds() - 0.75)
+                    .andThen(superstructure.setGoalCommand(goal))),
+        superstructure
+            .setGoalCommand(Goal.INTAKE)
+            .withDeadline(
+                new DriveTrajectory(drive, intTraj)
+                    .andThen(
+                        Constants.isSim
+                            ? Commands.waitSeconds(intakeWaitTime)
+                            : Commands.waitUntil(() -> superstructure.hasCoral()))));
   }
 
   public Command shrimpleOcrAuto(List<AutoQuestionResponse> reefs) {
