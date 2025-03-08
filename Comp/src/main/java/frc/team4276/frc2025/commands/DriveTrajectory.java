@@ -1,4 +1,4 @@
-package frc.team4276.frc2025.subsystems.drive.controllers;
+package frc.team4276.frc2025.commands;
 
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
@@ -10,28 +10,33 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.team4276.frc2025.RobotState;
+import frc.team4276.frc2025.subsystems.drive.Drive;
+import frc.team4276.frc2025.subsystems.drive.Drive.DriveMode;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import frc.team4276.util.dashboard.LoggedTunablePID;
 import java.util.ArrayList;
 import java.util.List;
-import org.littletonrobotics.junction.AutoLogOutput;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-public class TrajectoryController { // TODO: impl and test choreo trajectory auto
-  private final LoggedTunableNumber maxError =
-      new LoggedTunableNumber("TrajectoryController/maxError", 0.75);
+public class DriveTrajectory extends Command { // TODO: impl and test choreo trajectory auto
+  private static final LoggedTunablePID xController =
+      new LoggedTunablePID(4.0, 0.0, 0.0, 0.1, "DriveTrajectory/TranslationX");
+  private static final LoggedTunablePID yController =
+      new LoggedTunablePID(4.0, 0.0, 0.0, 0.1, "DriveTrajectory/TranslationY");
+  private static final LoggedTunablePID rotController =
+      new LoggedTunablePID(3.0, 0.0, 0.0, Math.toRadians(1.0), "DriveTrajectory/Rotation");
+  private static final LoggedTunableNumber maxError =
+      new LoggedTunableNumber("DriveTrajectory/maxError", 0.75);
 
-  private PathPlannerTrajectory traj;
+  private final Drive drive;
+  private final PathPlannerTrajectory trajectory;
+  private final Supplier<Pose2d> robotPose;
 
   private double startTime = 0.0;
   private double timeOffset = 0.0;
-
-  private boolean isFinished = true;
-
-  private final LoggedTunablePID xController;
-  private final LoggedTunablePID yController;
-  private final LoggedTunablePID rotController;
 
   private List<Vector<N2>> moduleForces =
       List.of(
@@ -39,36 +44,40 @@ public class TrajectoryController { // TODO: impl and test choreo trajectory aut
           VecBuilder.fill(0.0, 0.0),
           VecBuilder.fill(0.0, 0.0),
           VecBuilder.fill(0.0, 0.0));
+
   private final double[] dummyForces = {0.0, 0.0, 0.0, 0.0};
 
-  public TrajectoryController() {
-    xController = new LoggedTunablePID(4.0, 0.0, 0.0, 0.1, "TrajectoryController/TranslationX");
-    yController = new LoggedTunablePID(4.0, 0.0, 0.0, 0.1, "TrajectoryController/TranslationY");
-    rotController =
-        new LoggedTunablePID(3.0, 0.0, 0.0, Math.toRadians(1.0), "TrajectoryController/Rotation");
-
-    rotController.enableContinuousInput(-Math.PI, Math.PI);
+  public DriveTrajectory(Drive drive, PathPlannerTrajectory trajectory) {
+    this(drive, trajectory, () -> RobotState.getInstance().getEstimatedPose());
   }
 
-  public void setTrajectory(PathPlannerTrajectory traj) {
-    this.traj = traj;
-    isFinished = false;
+  public DriveTrajectory(
+      Drive drive, PathPlannerTrajectory trajectory, Supplier<Pose2d> robotPose) {
+    this.drive = drive;
+    this.trajectory = trajectory;
+    this.robotPose = robotPose;
+
+    rotController.enableContinuousInput(-Math.PI, Math.PI);
+    addRequirements(drive);
+  }
+
+  @Override
+  public void initialize() {
     startTime = Timer.getTimestamp();
     timeOffset = 0.0;
   }
 
-  public ChassisSpeeds update(Pose2d currentPose) {
-    if (getTrajectoryTime() > traj.getTotalTimeSeconds()) {
-      isFinished = true;
-    }
+  @Override
+  public void execute() {
+    var currentPose = robotPose.get();
 
-    var sampledState = traj.sample(getTrajectoryTime());
+    var sampledState = trajectory.sample(getTrajectoryTime());
 
     if (sampledState.pose.getTranslation().getDistance(currentPose.getTranslation())
         > maxError.getAsDouble()) {
       timeOffset += 0.02;
 
-      var dummyState = traj.sample(getTrajectoryTime());
+      var dummyState = trajectory.sample(getTrajectoryTime());
 
       sampledState = new PathPlannerTrajectoryState();
       sampledState.timeSeconds = dummyState.timeSeconds;
@@ -79,14 +88,6 @@ public class TrajectoryController { // TODO: impl and test choreo trajectory aut
     }
 
     RobotState.getInstance().setTrajectorySetpoint(sampledState.pose);
-
-    moduleForces = new ArrayList<>();
-    for (int i = 0; i < 4; i++) {
-      moduleForces.add(
-          VecBuilder.fill(
-              sampledState.feedforwards.robotRelativeForcesXNewtons()[i],
-              sampledState.feedforwards.robotRelativeForcesYNewtons()[i]));
-    }
 
     double xError = sampledState.pose.getX() - currentPose.getTranslation().getX();
     double yError = sampledState.pose.getY() - currentPose.getTranslation().getY();
@@ -104,29 +105,33 @@ public class TrajectoryController { // TODO: impl and test choreo trajectory aut
             sampledState.fieldSpeeds.omegaRadiansPerSecond + thetaFeedback,
             currentPose.getRotation());
 
-    Logger.recordOutput("TrajectoryController/SetpointPose", sampledState.pose);
-    Logger.recordOutput("TrajectoryController/SetpointSpeeds", sampledState.fieldSpeeds);
-    Logger.recordOutput("TrajectoryController/OutputSpeeds", outputSpeeds);
-    Logger.recordOutput("TrajectoryController/TranslationError", Math.hypot(xError, yError));
-    Logger.recordOutput("TrajectoryController/RotationError", thetaError);
+    moduleForces = new ArrayList<>();
+    for (int i = 0; i < 4; i++) {
+      moduleForces.add(
+          VecBuilder.fill(
+              sampledState.feedforwards.robotRelativeForcesXNewtons()[i],
+              sampledState.feedforwards.robotRelativeForcesYNewtons()[i]));
+    }
 
-    return outputSpeeds;
+    Logger.recordOutput("DriveTrajectory/SetpointPose", sampledState.pose);
+    Logger.recordOutput("DriveTrajectory/SetpointSpeeds", sampledState.fieldSpeeds);
+    Logger.recordOutput("DriveTrajectory/OutputSpeeds", outputSpeeds);
+    Logger.recordOutput("DriveTrajectory/TrajectoryTime", getTrajectoryTime());
+
+    drive.runVelocity(outputSpeeds, moduleForces, DriveMode.TRAJECTORY);
   }
 
   private double getTrajectoryTime() {
     return Timer.getTimestamp() - startTime - timeOffset;
   }
 
-  public void stopTraj() {
-    isFinished = true;
-  }
-
-  @AutoLogOutput(key = "TrajectoryController/Finished")
+  @Override
   public boolean isFinished() {
-    return isFinished;
+    return getTrajectoryTime() > trajectory.getTotalTimeSeconds();
   }
 
-  public List<Vector<N2>> getModuleForces() {
-    return moduleForces;
+  @Override
+  public void end(boolean interrupted) {
+    drive.stop();
   }
 }

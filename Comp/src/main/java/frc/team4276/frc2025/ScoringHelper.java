@@ -11,33 +11,21 @@ import org.littletonrobotics.junction.Logger;
 
 public class ScoringHelper extends VirtualSubsystem {
   private final CommandGenericHID buttonBoard;
-  private final CommandGenericHID keyboard;
   private final VikXboxController xbox;
-  private final boolean useKeyboard;
 
   private boolean isRight = false;
   private Goal level = Goal.L1;
   private int side = 0;
 
-  public ScoringHelper(
-      CommandGenericHID buttonBoard,
-      CommandGenericHID keyboard,
-      VikXboxController xbox,
-      boolean useKeyboard) {
+  public ScoringHelper(CommandGenericHID buttonBoard, VikXboxController xbox) {
     this.buttonBoard = buttonBoard;
-    this.keyboard = keyboard;
     this.xbox = xbox;
-    this.useKeyboard = useKeyboard;
   }
 
   @Override
   public void periodic() {
-    if (useKeyboard && Constants.getMode() == Constants.Mode.SIM) {
-      updateKeyboard();
-    } else {
-      updateXbox(); // redundancy
-      updateButtonBoard();
-    }
+    updateXbox(); // redundancy
+    updateButtonBoard();
 
     for (int i = 0; i < 12; i++) {
       SmartDashboard.putBoolean(
@@ -123,42 +111,8 @@ public class ScoringHelper extends VirtualSubsystem {
       level = Goal.L3;
     }
     // else if (xbox.getHID().getPOV() == 0) {
-    //   level = Goal.L3;
+    // level = Goal.L3;
     // }
-  }
-
-  private void updateKeyboard() {
-    // Update Positions
-    if (keyboard.getHID().getRawButtonPressed(1)) {
-      isRight = false;
-    } else if (keyboard.getHID().getRawButtonPressed(2)) {
-      isRight = true;
-    }
-
-    if (keyboard.getHID().getRawButtonPressed(3)) {
-      side = 0;
-    } else if (keyboard.getHID().getRawButtonPressed(4)) {
-      side = 1;
-    } else if (keyboard.getHID().getRawButtonPressed(5)) {
-      side = 2;
-    } else if (keyboard.getHID().getRawButtonPressed(6)) {
-      side = 3;
-    } else if (keyboard.getHID().getRawButtonPressed(7)) {
-      side = 4;
-    } else if (keyboard.getHID().getRawButtonPressed(8)) {
-      side = 5;
-    }
-
-    // Update Level
-    if (keyboard.getHID().getPOV() == 90) {
-      level = Goal.L1;
-    } else if (keyboard.getHID().getPOV() == 180) {
-      level = Goal.L2;
-    } else if (keyboard.getHID().getPOV() == 270) {
-      level = Goal.L3;
-    } else if (keyboard.getHID().getPOV() == 0) {
-      level = Goal.L3;
-    }
   }
 
   public Goal getSuperstructureGoal() {
