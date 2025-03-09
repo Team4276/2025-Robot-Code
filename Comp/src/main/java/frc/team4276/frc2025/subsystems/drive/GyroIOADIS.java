@@ -7,6 +7,8 @@ import java.util.Queue;
 
 public class GyroIOADIS implements GyroIO {
   private final ADIS16470_IMU gyro = new ADIS16470_IMU();
+  // private double timeSinceLastReset = 0;
+  // private int iter = 0;
   private final Queue<Double> yawPositionQueue;
   private final Queue<Double> yawTimestampQueue;
 
@@ -22,8 +24,16 @@ public class GyroIOADIS implements GyroIO {
     inputs.yawPosition = Rotation2d.fromDegrees(gyro.getAngle());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(gyro.getRate());
 
-    inputs.pitchPosition = Rotation2d.fromDegrees(gyro.getAngle(gyro.getPitchAxis()));
-    inputs.rollPosition = Rotation2d.fromDegrees(gyro.getAngle(gyro.getRollAxis()));
+    /*if (timeSinceLastReset > 60 && Math.hypot(inputs.pitchPosition, inputs.rollPosition) < 2) {
+      gyro.setGyroAngle(gyro.getPitchAxis(), 0);
+      gyro.setGyroAngle(gyro.getRollAxis(), 0);
+      timeSinceLastReset = 0;
+      iter++;
+    } else {
+      timeSinceLastReset = (Timer.getFPGATimestamp() - (60 * iter));
+    }*/
+    // inputs.pitchPosition = gyro.getAngle(gyro.getPitchAxis());
+    // inputs.rollPosition = gyro.getAngle(gyro.getRollAxis());
 
     inputs.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();

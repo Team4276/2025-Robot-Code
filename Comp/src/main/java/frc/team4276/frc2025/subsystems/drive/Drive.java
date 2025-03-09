@@ -159,12 +159,17 @@ public class Drive extends SubsystemBase {
             includeMeasurement = false;
             break;
           }
-          if (Math.sqrt(
-                  gyroInputs.pitchPosition.getDegrees() * 2
-                      + gyroInputs.pitchPosition.getDegrees() * 2)
-              > 0.2) {
+          // TODO: figure out more methods for filtering if still needed after vision
+          // Scrap pitch and roll checks for now. Due to questionable designs in the wpi lib driver
+          // for the adis gyro pitch and roll readings will be very inaccurate while the robot is
+          // accelerating
+
+          /*double magAngle = Math.hypot(gyroInputs.rollPosition, gyroInputs.pitchPosition);
+
+          Logger.recordOutput("Drive/magAngle", magAngle);
+          if (magAngle > 5) {
             includeMeasurement = false;
-          }
+          }*/
         }
       }
       // If delta isn't too large we can include the measurement.
