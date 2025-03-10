@@ -228,11 +228,11 @@ public class RobotState {
     var tagPose =
         getTxTyPose(
             switch (face) {
-              case 1 -> isRed ? 6 : 19;
-              case 2 -> isRed ? 11 : 20;
+              case 1 -> isRed ? 8 : 17;
+              case 2 -> isRed ? 9 : 22;
               case 3 -> isRed ? 10 : 21;
-              case 4 -> isRed ? 9 : 22;
-              case 5 -> isRed ? 8 : 17;
+              case 4 -> isRed ? 11 : 20;
+              case 5 -> isRed ? 6 : 19;
                 // 0
               default -> isRed ? 7 : 18;
             });
@@ -262,6 +262,10 @@ public class RobotState {
   @AutoLogOutput(key = "RobotState/FieldVelocity")
   public ChassisSpeeds getFieldVelocity() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(robotVelocity, getEstimatedPose().getRotation());
+  }
+
+  public void update() {
+    getReefPose(2, Pose2d.kZero);
   }
 
   public record TxTyPoseRecord(Pose2d pose, double distance, double timestamp) {}

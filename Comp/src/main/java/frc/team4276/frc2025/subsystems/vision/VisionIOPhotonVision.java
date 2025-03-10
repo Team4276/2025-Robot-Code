@@ -106,7 +106,7 @@ public class VisionIOPhotonVision implements VisionIO {
                   camPose1, // 3D pose estimate
                   camPose2, // 3D pose estimate
                   target.poseAmbiguity, // Ambiguity
-                  cameraToTarget1.getTranslation().getNorm(), // Tag distances
+                  cameraToTarget2.getTranslation().getNorm(), // Tag distances
                   PoseObservationType.PHOTONVISION)); // Observation type
         }
       }

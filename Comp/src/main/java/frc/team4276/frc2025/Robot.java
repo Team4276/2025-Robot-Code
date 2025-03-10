@@ -124,13 +124,14 @@ public class Robot extends LoggedRobot {
     robotContainer = new RobotContainer();
 
     CameraServer.startAutomaticCapture();
+
+    // Switch thread to high priority to improve loop timing
+    Threads.setCurrentThreadPriority(true, 10);
   }
 
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-    // Switch thread to high priority to improve loop timing
-    Threads.setCurrentThreadPriority(true, 99);
 
     VirtualSubsystem.periodicAll();
     ElasticUI.update();
@@ -157,6 +158,7 @@ public class Robot extends LoggedRobot {
 
     // Robot container periodic methods
     robotContainer.updateAlerts();
+    RobotState.getInstance().update();
 
     // Check CAN status
     var canStatus = RobotController.getCANStatus();
@@ -166,9 +168,6 @@ public class Robot extends LoggedRobot {
     canErrorAlert.set(
         !canErrorTimer.hasElapsed(canErrorTimeThreshold)
             && !canInitialErrorTimer.hasElapsed(canErrorTimeThreshold));
-
-    // Return to normal thread priority
-    Threads.setCurrentThreadPriority(false, 10);
   }
 
   /** This function is called once when the robot is disabled. */

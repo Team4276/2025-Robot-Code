@@ -43,7 +43,7 @@ public class Superstructure extends SubsystemBase {
 
   private double elevatorCharacterizationInput = 0.0;
 
-  private boolean cleared1 = false; // clean up this mess
+  private boolean hasGrasped = false; // clean up this mess
   private boolean cleared2 = false;
   private boolean cleared3 = false;
   private boolean cleared4 = false;
@@ -69,7 +69,12 @@ public class Superstructure extends SubsystemBase {
     sensorsIO.updateInputs(sensorsInputs);
     Logger.processInputs("RollersSensors", sensorsInputs);
 
-    currentGoal = desiredGoal.get();
+    if (desiredGoal.get() == Goal.STOW && currentGoal == Goal.INTAKE && hasGrasped && !cleared3) {
+      // Continue intaking
+
+    } else {
+      currentGoal = desiredGoal.get();
+    }
 
     if (wantUnjam) {
       currentGoal = Goal.UNJAM;
@@ -89,7 +94,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     if (currentGoal != Goal.INTAKE) {
-      cleared1 = false;
+      hasGrasped = false;
       cleared2 = false;
       cleared3 = false;
     }
@@ -135,8 +140,8 @@ public class Superstructure extends SubsystemBase {
         } else if (sensorsInputs.backCleared || cleared2) {
           cleared2 = true;
           endeffector.setGoal(EndEffector.Goal.REVERSE);
-        } else if (sensorsInputs.backTripped || cleared1) {
-          cleared1 = true;
+        } else if (sensorsInputs.backTripped || hasGrasped) {
+          hasGrasped = true;
           endeffector.setGoal(EndEffector.Goal.SLOINTAKE);
         } else {
           endeffector.setGoal(EndEffector.Goal.INTAKE);
