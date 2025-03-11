@@ -46,6 +46,7 @@
 // Setup
 
 // Button Pins
+const int Pin_Button_00 = 0;
 const int Pin_Button_01 = 1;
 const int Pin_Button_02 = 2;
 const int Pin_Button_03 = 3;
@@ -58,12 +59,16 @@ const int Pin_Button_09 = 9;
 const int Pin_Button_10 = 10;
 const int Pin_Button_11 = 11;
 const int Pin_Button_12 = 12;
+const int Pin_Button_13 = 13;
+const int Pin_Button_14 = A0;
+const int Pin_Button_15 = A1;
 
 
 void setup() {
 
 	// Set buttons as inputs, using internal pull-up resistors
-	pinMode(Pin_Button_01, INPUT_PULLUP);
+	pinMode(Pin_Button_00, INPUT_PULLUP);
+  pinMode(Pin_Button_01, INPUT_PULLUP);
   pinMode(Pin_Button_02, INPUT_PULLUP);
   pinMode(Pin_Button_03, INPUT_PULLUP);
   pinMode(Pin_Button_04, INPUT_PULLUP);
@@ -75,6 +80,9 @@ void setup() {
   pinMode(Pin_Button_10, INPUT_PULLUP);
   pinMode(Pin_Button_11, INPUT_PULLUP);
   pinMode(Pin_Button_12, INPUT_PULLUP);
+  pinMode(Pin_Button_13, INPUT_PULLUP);
+  pinMode(Pin_Button_14, INPUT_PULLUP);
+  pinMode(Pin_Button_15, INPUT_PULLUP);
 
 	XInput.setAutoSend(false);  // Wait for all controls before sending
 
@@ -84,6 +92,7 @@ void setup() {
 void loop() {
 	// Read pin values and store in variables
 	// (Note the "!" to invert the state, because LOW = pressed)
+	boolean button_00 = !digitalRead(Pin_Button_00);
 	boolean button_01 = !digitalRead(Pin_Button_01);
 	boolean button_02 = !digitalRead(Pin_Button_02);
 	boolean button_03 = !digitalRead(Pin_Button_03);
@@ -96,21 +105,29 @@ void loop() {
 	boolean button_10 = !digitalRead(Pin_Button_10);
 	boolean button_11 = !digitalRead(Pin_Button_11);
 	boolean button_12 = !digitalRead(Pin_Button_12);
+  boolean button_13 = !digitalRead(Pin_Button_13);
+  boolean button_14 = !digitalRead(Pin_Button_14);
+  boolean button_15 = !digitalRead(Pin_Button_15);
 	
 	// Set XInput buttons
-	XInput.setButton(BUTTON_A, button_01);
-	XInput.setButton(BUTTON_B, button_02);
-	XInput.setButton(BUTTON_X, button_03);
-	XInput.setButton(BUTTON_Y, button_04);
+	XInput.setButton(BUTTON_A, button_00);
+	XInput.setButton(BUTTON_B, button_01);
+	XInput.setButton(BUTTON_X, button_02);
+	XInput.setButton(BUTTON_Y, button_03);
 
-	XInput.setButton(BUTTON_LB, button_05);
-	XInput.setButton(BUTTON_RB, button_06);
+	XInput.setButton(BUTTON_LB, button_04);
+	XInput.setButton(BUTTON_RB, button_05);
 
-	XInput.setButton(BUTTON_L3, button_07);
-	XInput.setButton(BUTTON_R3, button_08);
+	XInput.setButton(BUTTON_L3, button_06);
+	XInput.setButton(BUTTON_R3, button_07);
 
 	// Set XInput DPAD values
-	XInput.setDpad(button_09, button_10, button_11, button_12);
+	XInput.setDpad(button_08, button_09, button_10, button_11);
+
+	XInput.setButton(TRIGGER_LEFT, button_12);
+	XInput.setButton(TRIGGER_RIGHT, button_13);
+	XInput.setButton(JOY_LEFT, button_14);
+	XInput.setButton(JOY_RIGHT, button_15);
 
 	// Send control data to the computer
 	XInput.send();
