@@ -118,8 +118,8 @@ void loop() {
 	XInput.setButton(BUTTON_LB, button_04);
 	XInput.setButton(BUTTON_RB, button_05);
 
-	XInput.setButton(BUTTON_L3, button_06);
-	XInput.setButton(BUTTON_R3, button_07);
+	XInput.setButton(BUTTON_BACK, button_06);
+	XInput.setButton(BUTTON_START, button_07);
 
 	// Set XInput DPAD values
 	XInput.setDpad(button_08, button_09, button_10, button_11);
