@@ -47,36 +47,50 @@ public class ScoringHelper extends VirtualSubsystem {
   }
 
   private void updateButtonBoard() {
-    // Update Positions
-    if (buttonBoard.getHID().getRawButtonPressed(9)) {
-      isRight = false;
-    } else if (buttonBoard.getHID().getRawButtonPressed(10)) {
-      isRight = true;
-    }
+    buttonBoard.getHID().getRawButtonPressed(4);
+    int buttonPressed = -1;
 
-    if (buttonBoard.getHID().getRawButtonPressed(4)) {
-      side = 0;
-    } else if (buttonBoard.getHID().getRawButtonPressed(3)) {
-      side = 1;
-    } else if (buttonBoard.getHID().getRawButtonPressed(2)) {
-      side = 2;
-    } else if (buttonBoard.getHID().getRawButtonPressed(1)) {
-      side = 3;
+    if (buttonBoard.getHID().getRawButtonPressed(5)) {
+        side = 0;
+        isRight = false;
     } else if (buttonBoard.getHID().getRawButtonPressed(6)) {
-      side = 4;
-    } else if (buttonBoard.getHID().getRawButtonPressed(5)) {
-      side = 5;
+        side = 0;
+        isRight = true;
     }
-
+    else if (buttonBoard.getHID().getRawButtonPressed(6)) {
+      side = 0;
+      isRight = true;
+  }
+  else if (buttonBoard.getHID().getRawButtonPressed(6)) {
+    side = 0;
+    isRight = true;
+}
+else if (buttonBoard.getHID().getRawButtonPressed(6)) {
+  side = 0;
+  isRight = true;
+}
+else if (buttonBoard.getHID().getRawButtonPressed(6)) {
+  side = 0;
+  isRight = true;
+}
+else if (buttonBoard.getHID().getRawButtonPressed(6)) {
+  side = 0;
+  isRight = true;
+}
+v
     // Update Level
     if (buttonBoard.getHID().getPOV() == 90) {
-      level = Goal.L1;
+      side = 4;
+      isRight = false;
     } else if (buttonBoard.getHID().getPOV() == 270) {
-      level = Goal.L2;
+      side = 4;
+      isRight = true;
     } else if (buttonBoard.getHID().getPOV() == 180) {
-      level = Goal.L3;
+      side = 3;
+      isRight = false;
     } else if (buttonBoard.getHID().getPOV() == 0) {
-      level = Goal.L3;
+      side = 3;
+      isRight = true;
     }
   }
 
