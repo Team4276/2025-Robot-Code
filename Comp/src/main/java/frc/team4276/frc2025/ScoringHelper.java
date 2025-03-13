@@ -51,33 +51,39 @@ public class ScoringHelper extends VirtualSubsystem {
     int buttonPressed = -1;
 
     if (buttonBoard.getHID().getRawButtonPressed(5)) {
-        side = 0;
-        isRight = false;
+      side = 0;
+      isRight = false;
     } else if (buttonBoard.getHID().getRawButtonPressed(6)) {
-        side = 0;
-        isRight = true;
-    }
-    else if (buttonBoard.getHID().getRawButtonPressed(6)) {
       side = 0;
       isRight = true;
-  }
-  else if (buttonBoard.getHID().getRawButtonPressed(6)) {
-    side = 0;
-    isRight = true;
-}
-else if (buttonBoard.getHID().getRawButtonPressed(6)) {
-  side = 0;
-  isRight = true;
-}
-else if (buttonBoard.getHID().getRawButtonPressed(6)) {
-  side = 0;
-  isRight = true;
-}
-else if (buttonBoard.getHID().getRawButtonPressed(6)) {
-  side = 0;
-  isRight = true;
-}
-v
+    } else if (buttonBoard.getHID().getRawButtonPressed(7)) {
+      side = 1;
+      isRight = false;
+    } else if (buttonBoard.getHID().getRawButtonPressed(8)) {
+      side = 1;
+      isRight = true;
+    } else if (buttonBoard.getHID().getRawButtonPressed(9)) {
+      side = 3;
+      isRight = true;
+    } else if (buttonBoard.getHID().getRawButtonPressed(10)) {
+      side = 3;
+      isRight = false;
+    } else if (buttonBoard.getHID().getRawButtonPressed(3)) {
+      side = 5;
+      isRight = false;
+    } else if (buttonBoard.getHID().getRawButtonPressed(4)) {
+      side = 5;
+      isRight = true;
+    } else if (buttonBoard.getRawAxis(2) == 1) {
+      level = Goal.L1;
+    } else if (buttonBoard.getRawAxis(3) == 1) {
+      level = Goal.L2;
+    } else if (buttonBoard.getHID().getRawButtonPressed(2)) {
+      level = Goal.L3;
+    } else if (buttonBoard.getHID().getRawButtonPressed(1)) {
+      level = Goal.L3;
+    }
+
     // Update Level
     if (buttonBoard.getHID().getPOV() == 90) {
       side = 4;

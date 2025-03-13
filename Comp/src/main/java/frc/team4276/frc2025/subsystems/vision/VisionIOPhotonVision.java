@@ -83,7 +83,6 @@ public class VisionIOPhotonVision implements VisionIO {
         // Calculate robot pose
         var tagPose = aprilTagLayout.getTagPose(target.fiducialId);
         if (tagPose.isPresent()) {
-          double avgDistanceToTarget;
           Transform3d fieldToTarget1 =
               new Transform3d(tagPose.get().getTranslation(), tagPose.get().getRotation());
           Transform3d cameraToTarget1 = target.bestCameraToTarget;
@@ -92,6 +91,7 @@ public class VisionIOPhotonVision implements VisionIO {
               new Pose3d(fieldToCamera1.getTranslation(), fieldToCamera1.getRotation());
 
           Pose3d camPose2;
+
           if (target.altCameraToTarget.getTranslation().getNorm() != 0) {
             Transform3d fieldToTarget2 =
                 new Transform3d(tagPose.get().getTranslation(), tagPose.get().getRotation());
@@ -102,13 +102,8 @@ public class VisionIOPhotonVision implements VisionIO {
             Logger.recordOutput("Debug/Camera/fieldToCamera2", fieldToCamera2);
 
             camPose2 = new Pose3d(fieldToCamera2.getTranslation(), fieldToCamera2.getRotation());
-            avgDistanceToTarget =
-                (cameraToTarget1.getTranslation().getNorm()
-                        + cameraToTarget2.getTranslation().getNorm())
-                    / 2;
           } else {
             camPose2 = camPose1;
-            avgDistanceToTarget = (cameraToTarget1.getTranslation().getNorm());
           }
 
           // Add tag ID
@@ -125,7 +120,7 @@ public class VisionIOPhotonVision implements VisionIO {
                   camPose1, // 3D pose estimate
                   camPose2, // 3D pose estimate
                   target.poseAmbiguity, // Ambiguity
-                  avgDistanceToTarget, // Tag distances
+                  cameraToTarget1.getTranslation().getNorm(), // Tag distances
                   PoseObservationType.PHOTONVISION)); // Observation type
         }
       }
