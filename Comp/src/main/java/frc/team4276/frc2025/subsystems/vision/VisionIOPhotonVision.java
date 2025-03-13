@@ -1,6 +1,7 @@
 package frc.team4276.frc2025.subsystems.vision;
 
-import static frc.team4276.frc2025.subsystems.vision.VisionConstants.*;
+import static frc.team4276.frc2025.subsystems.vision.VisionConstants.aprilTagLayout;
+import static frc.team4276.frc2025.subsystems.vision.VisionConstants.configs;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 
 /** IO implementation for real PhotonVision hardware. */
@@ -81,6 +83,7 @@ public class VisionIOPhotonVision implements VisionIO {
         // Calculate robot pose
         var tagPose = aprilTagLayout.getTagPose(target.fiducialId);
         if (tagPose.isPresent()) {
+          double avgDistanceToTarget;
           Transform3d fieldToTarget1 =
               new Transform3d(tagPose.get().getTranslation(), tagPose.get().getRotation());
           Transform3d cameraToTarget1 = target.bestCameraToTarget;
@@ -88,17 +91,33 @@ public class VisionIOPhotonVision implements VisionIO {
           Pose3d camPose1 =
               new Pose3d(fieldToCamera1.getTranslation(), fieldToCamera1.getRotation());
 
-          Transform3d fieldToTarget2 =
-              new Transform3d(tagPose.get().getTranslation(), tagPose.get().getRotation());
-          Transform3d cameraToTarget2 = target.altCameraToTarget;
-          Transform3d fieldToCamera2 = fieldToTarget2.plus(cameraToTarget2.inverse());
-          Pose3d camPose2 =
-              new Pose3d(fieldToCamera2.getTranslation(), fieldToCamera2.getRotation());
+          Pose3d camPose2;
+          if (target.altCameraToTarget.getTranslation().getNorm() != 0) {
+            Transform3d fieldToTarget2 =
+                new Transform3d(tagPose.get().getTranslation(), tagPose.get().getRotation());
+            Transform3d cameraToTarget2 = target.altCameraToTarget;
+            Logger.recordOutput("Debug/Camera/cameraToTarget2", cameraToTarget2);
+
+            Transform3d fieldToCamera2 = fieldToTarget2.plus(cameraToTarget2.inverse());
+            Logger.recordOutput("Debug/Camera/fieldToCamera2", fieldToCamera2);
+
+            camPose2 = new Pose3d(fieldToCamera2.getTranslation(), fieldToCamera2.getRotation());
+            avgDistanceToTarget =
+                (cameraToTarget1.getTranslation().getNorm()
+                        + cameraToTarget2.getTranslation().getNorm())
+                    / 2;
+          } else {
+            camPose2 = camPose1;
+            avgDistanceToTarget = (cameraToTarget1.getTranslation().getNorm());
+          }
 
           // Add tag ID
           tagIds.add((short) target.fiducialId);
 
           // Add observation
+          Logger.recordOutput("Debug/Camera/Pose1", camPose1);
+          Logger.recordOutput("Debug/Camera/Pose2", camPose2);
+
           poseObservations.add(
               new PoseObservation(
                   result.getTimestampSeconds(), // Timestamp
@@ -106,7 +125,7 @@ public class VisionIOPhotonVision implements VisionIO {
                   camPose1, // 3D pose estimate
                   camPose2, // 3D pose estimate
                   target.poseAmbiguity, // Ambiguity
-                  cameraToTarget2.getTranslation().getNorm(), // Tag distances
+                  avgDistanceToTarget, // Tag distances
                   PoseObservationType.PHOTONVISION)); // Observation type
         }
       }
