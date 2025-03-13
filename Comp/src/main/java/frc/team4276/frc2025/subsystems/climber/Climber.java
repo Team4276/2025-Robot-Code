@@ -43,7 +43,7 @@ public class Climber extends SubsystemBase {
 
   public Climber(ClimberIO io) {
     this.io = io;
-
+    goal = goal.IDLE;
     setDefaultCommand(setGoalCommand(Goal.IDLE));
   }
 

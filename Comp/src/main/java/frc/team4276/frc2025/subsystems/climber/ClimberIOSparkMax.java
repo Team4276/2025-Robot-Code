@@ -1,6 +1,7 @@
 package frc.team4276.frc2025.subsystems.climber;
 
-import static frc.team4276.util.SparkUtil.*;
+import static frc.team4276.util.SparkUtil.ifOk;
+import static frc.team4276.util.SparkUtil.tryUntilOk;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
