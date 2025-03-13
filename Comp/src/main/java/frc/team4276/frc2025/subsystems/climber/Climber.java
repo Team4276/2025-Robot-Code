@@ -1,81 +1,89 @@
 package frc.team4276.frc2025.subsystems.climber;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.team4276.frc2025.subsystems.climber.Climber.Goal;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
 
 public class Climber extends SubsystemBase {
-  static DoubleSupplier hookVolts = new LoggedTunableNumber("EndEffector/HookVolts", 5.0);
-  static DoubleSupplier whenchVolts = new LoggedTunableNumber("EndEffector/ClimbVolts", 5.0);
-  static DoubleSupplier reverseVolts = new LoggedTunableNumber("EndEffector/ReverseVolts", -5.0);
 
   public enum Goal {
     IDLE(() -> 0.0, () -> 0.0),
-    HOLD(() -> 0.0, () -> 0.0),
-    CLIMB(whenchVolts, hookVolts),
-    HOOK(() -> 0.0, hookVolts),
-    REVERSE(() -> 0.0, reverseVolts);
+    HOLD(() -> 0.0, new LoggedTunableNumber("Climber/Wheels/HoldVolts", 0.0)),
+    CLIMB(
+        new LoggedTunableNumber("Climber/ClimbVolts", -5.0),
+        new LoggedTunableNumber("Climber/Wheels/ClimbVolts", 5.0)),
+    LATCH(() -> 0.0, new LoggedTunableNumber("Climber/Wheels/LatchVolts", 5.0)),
+    RAISE(new LoggedTunableNumber("Climber/ReverseVolts", 5.0), () -> 0.0);
 
-    private final DoubleSupplier hookVolatge;
-    private final DoubleSupplier whenchVoltage;
+    private final DoubleSupplier wheelVolts;
+    private final DoubleSupplier whenchVolts;
 
-    private Goal(DoubleSupplier leftVoltageGoal, DoubleSupplier rightVoltageGoal) {
-      this.whenchVoltage = leftVoltageGoal;
-      this.hookVolatge = rightVoltageGoal;
-    }
-
-    private Goal(DoubleSupplier voltageGoal) {
-      this.whenchVoltage = voltageGoal;
-      this.hookVolatge = voltageGoal;
+    private Goal(DoubleSupplier whenchVolts, DoubleSupplier wheelVolts) {
+      this.whenchVolts = whenchVolts;
+      this.wheelVolts = wheelVolts;
     }
 
     public double getWhenchVolts() {
-      return whenchVoltage.getAsDouble();
+      return whenchVolts.getAsDouble();
     }
 
-    public double gethookVolts() {
-      return hookVolatge.getAsDouble();
+    public double getWheelVolts() {
+      return wheelVolts.getAsDouble();
     }
   }
 
   private Goal goal;
-  private final ClimberIO climberIO;
+  private final ClimberIO io;
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
 
   private boolean isClimbing = false;
 
   public Climber(ClimberIO io) {
-    climberIO = io;
+    this.io = io;
+
+    setDefaultCommand(setGoalCommand(Goal.IDLE));
   }
 
   @Override
   public void periodic() {
-    climberIO.updateInputs(inputs);
+    io.updateInputs(inputs);
     if (isClimbing) {
-      climberIO.runWheelsAtVolts(goal.gethookVolts());
-      climberIO.runRunWhenchAtVolts(goal.getWhenchVolts());
+      if (goal == Goal.IDLE) {
+        goal = Goal.HOLD;
+      }
+
+      io.runWheelsAtVolts(goal.getWheelVolts());
+      io.runRunWhenchAtVolts(goal.getWhenchVolts());
+
+    } else {
+      io.runWheelsAtVolts(0.0);
+      io.runRunWhenchAtVolts(0.0);
     }
+
+    Logger.recordOutput("Climber/Goal", goal.toString());
+    Logger.recordOutput("Climber/IsClimbing", isClimbing);
+  }
+
+  public void setIsClimbing(boolean isClimbing) {
+    this.isClimbing = isClimbing;
+  }
+
+  public Command isClimbingCommand() {
+    return Commands.startEnd(() -> setIsClimbing(true), () -> setIsClimbing(false));
   }
 
   public void setClimbState(Goal goal) {
     this.goal = goal;
   }
 
-  public Command hookCommand() {
-    return startEnd(() -> setClimbState(Goal.HOOK), () -> setClimbState(Goal.IDLE));
+  public Command setGoalCommand(Goal goal) {
+    return startEnd(() -> setClimbState(goal), () -> setClimbState(Goal.IDLE));
   }
 
-  public Command climbCommand() {
-    return startEnd(() -> setClimbState(Goal.CLIMB), () -> setClimbState(Goal.IDLE));
-  }
-
-  public Command holdCommand() {
-    return startEnd(() -> setClimbState(Goal.HOLD), () -> setClimbState(Goal.IDLE));
-  }
-
-  public Command stopCommand() {
-    return startEnd(() -> setClimbState(Goal.IDLE), () -> setClimbState(Goal.IDLE));
+  public boolean isClimbing() {
+    return isClimbing;
   }
 }

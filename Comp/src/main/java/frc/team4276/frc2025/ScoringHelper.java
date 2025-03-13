@@ -48,7 +48,6 @@ public class ScoringHelper extends VirtualSubsystem {
 
   private void updateButtonBoard() {
     buttonBoard.getHID().getRawButtonPressed(4);
-    int buttonPressed = -1;
 
     if (buttonBoard.getHID().getRawButtonPressed(5)) {
       side = 0;

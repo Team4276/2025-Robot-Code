@@ -1,26 +1,27 @@
 package frc.team4276.frc2025.subsystems.climber;
 
-import static frc.team4276.util.SparkUtil.ifOk;
-import static frc.team4276.util.SparkUtil.tryUntilOk;
+import static frc.team4276.util.SparkUtil.*;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import java.util.function.DoubleSupplier;
 
 public class ClimberIOSparkMax implements ClimberIO {
   private SparkMax whench;
-  private SparkMax wheel;
+  private SparkFlex wheel;
 
   public ClimberIOSparkMax(
       int whenchID, int wheelID, int whenchCurrentLimit, int wheelCurrentLimit) {
     SparkMaxConfig whenchConfig = new SparkMaxConfig();
-    SparkMaxConfig wheelConfig = new SparkMaxConfig();
+    SparkFlexConfig wheelConfig = new SparkFlexConfig();
 
-    wheel = new SparkMax(wheelID, MotorType.kBrushless);
+    wheel = new SparkFlex(wheelID, MotorType.kBrushless);
     wheelConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(wheelID);
     wheelConfig.signals.appliedOutputPeriodMs(20).busVoltagePeriodMs(20).outputCurrentPeriodMs(20);
     tryUntilOk(

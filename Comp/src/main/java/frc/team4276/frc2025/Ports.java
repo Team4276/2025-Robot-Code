@@ -21,6 +21,9 @@ public class Ports {
   public static final int ALGAE_INTAKE_ARM = 13;
   public static final int ALGAE_INTAKE_ROLLER = 14;
 
+  public static final int CLIMBER_WENCH = 16;
+  public static final int CLIMBER_WHEEL = 17;
+
   /* DIOs */
   public static final int ELEVATOR_COAST_OVERRIDE = 0;
   public static final int ARM_COAST_OVERRIDE = 1;

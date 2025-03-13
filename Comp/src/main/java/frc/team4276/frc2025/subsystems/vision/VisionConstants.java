@@ -24,9 +24,9 @@ public class VisionConstants {
             "Arducam_OV9281_USB_Camera",
             new Transform3d(
                 Units.inchesToMeters(11.475659),
-                Units.inchesToMeters(-7.818997),
+                Units.inchesToMeters(7.818997),
                 Units.inchesToMeters(7.919400),
-                new Rotation3d(0.0, Math.toRadians(70.0), -1.0 * Math.toRadians(15))),
+                new Rotation3d(0.0, -1.0 * Math.toRadians(20.0), -1.0 * Math.toRadians(15))),
             1),
         new CameraConfig(
             "Arducam_12MP",

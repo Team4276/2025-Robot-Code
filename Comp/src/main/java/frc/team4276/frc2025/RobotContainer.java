@@ -24,6 +24,9 @@ import frc.team4276.frc2025.commands.auto.AutoBuilder;
 import frc.team4276.frc2025.subsystems.arm.Arm;
 import frc.team4276.frc2025.subsystems.arm.ArmIO;
 import frc.team4276.frc2025.subsystems.arm.ArmIOSparkMax;
+import frc.team4276.frc2025.subsystems.climber.Climber;
+import frc.team4276.frc2025.subsystems.climber.ClimberIO;
+import frc.team4276.frc2025.subsystems.climber.ClimberIOSparkMax;
 import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.drive.GyroIO;
 import frc.team4276.frc2025.subsystems.drive.GyroIOADIS;
@@ -66,6 +69,7 @@ public class RobotContainer {
   private Superstructure superstructure;
   private Arm arm;
   private Roller roller;
+  private Climber climber;
   private Vision vision;
 
   private AutoBuilder autoBuilder;
@@ -120,6 +124,7 @@ public class RobotContainer {
                   new RollerSensorsIOHardware());
           arm = new Arm(new ArmIOSparkMax());
           roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40, false, true));
+          climber = new Climber(new ClimberIOSparkMax(0, 0, 40, 40));
           vision =
               new Vision(
                   RobotState.getInstance()::addVisionMeasurement,
@@ -144,6 +149,7 @@ public class RobotContainer {
                   new RollerSensorsIO() {});
           arm = new Arm(new ArmIO() {});
           roller = new Roller(new RollerIO() {});
+          climber = new Climber(new ClimberIO() {});
           if (disableVisionSim) {
             vision = new Vision(RobotState.getInstance()::addVisionMeasurement);
           } else {
@@ -189,6 +195,10 @@ public class RobotContainer {
 
     if (roller == null) {
       roller = new Roller(new RollerIO() {});
+    }
+
+    if (climber == null) {
+      climber = new Climber(new ClimberIO() {});
     }
 
     configureOverrides();
@@ -468,12 +478,14 @@ public class RobotContainer {
     // Scoring // TODO: impl rumbles
     driver
         .rightTrigger()
+        .and(() -> !climber.isClimbing())
         .and(() -> !(driver.getHID().getXButton() || driver.getHID().getBButton()))
         .and(() -> disableHeadingAutoAlign)
         .whileTrue(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal));
 
     driver
         .rightTrigger()
+        .and(() -> !climber.isClimbing())
         .and(() -> !(driver.getHID().getXButton() || driver.getHID().getBButton()))
         .and(
             () ->
@@ -489,6 +501,7 @@ public class RobotContainer {
 
     driver
         .rightTrigger()
+        .and(() -> !climber.isClimbing())
         .and(() -> !(driver.getHID().getXButton() || driver.getHID().getBButton()))
         .and(
             () ->
@@ -504,9 +517,17 @@ public class RobotContainer {
                                     && DriveToPose.atGoal())
                         .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 0.2, 3))));
 
-    driver.rightBumper().and(driver.rightTrigger()).whileTrue(superstructure.scoreCommand(false));
+    driver
+        .rightBumper()
+        .and(() -> !climber.isClimbing())
+        .and(driver.rightTrigger())
+        .whileTrue(superstructure.scoreCommand(false));
 
-    driver.leftBumper().and(driver.rightTrigger()).whileTrue(superstructure.scoreCommand(true));
+    driver
+        .leftBumper()
+        .and(() -> !climber.isClimbing())
+        .and(driver.rightTrigger())
+        .whileTrue(superstructure.scoreCommand(true));
 
     // Modal
     driver
@@ -530,6 +551,7 @@ public class RobotContainer {
     // Displacing
     driver
         .y()
+        .and(() -> !climber.isClimbing())
         .and(
             () ->
                 scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L2
@@ -538,12 +560,14 @@ public class RobotContainer {
 
     driver
         .y()
+        .and(() -> !climber.isClimbing())
         .and(() -> scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L3)
         .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.HI_ALGAE));
 
     // Intake
     driver
         .leftTrigger()
+        .and(() -> !climber.isClimbing())
         .and(() -> !driver.getHID().getLeftBumperButton())
         .whileTrue(
             arm.setGoalCommand(Arm.Goal.INTAKE)
@@ -566,8 +590,28 @@ public class RobotContainer {
     // Score
     driver
         .leftTrigger()
+        .and(() -> !climber.isClimbing())
         .and(driver.leftBumper())
         .whileTrue(roller.setGoalCommand(Roller.Goal.SCORE));
+
+    /***************** Climbing Triggers *****************/
+
+    driver.start().toggleOnTrue(climber.isClimbingCommand());
+
+    driver
+        .leftTrigger()
+        .and(() -> climber.isClimbing())
+        .whileTrue(climber.setGoalCommand(Climber.Goal.RAISE));
+
+    driver
+        .rightTrigger()
+        .and(() -> climber.isClimbing())
+        .whileTrue(climber.setGoalCommand(Climber.Goal.LATCH));
+
+    driver
+        .y()
+        .and(() -> climber.isClimbing())
+        .whileTrue(climber.setGoalCommand(Climber.Goal.CLIMB));
   }
 
   public void configureUI() {
