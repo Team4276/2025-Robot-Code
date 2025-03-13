@@ -47,8 +47,7 @@ public class ScoringHelper extends VirtualSubsystem {
   }
 
   private void updateButtonBoard() {
-    buttonBoard.getHID().getRawButtonPressed(4);
-
+    // Update Positions
     if (buttonBoard.getHID().getRawButtonPressed(5)) {
       side = 0;
       isRight = false;
@@ -73,18 +72,7 @@ public class ScoringHelper extends VirtualSubsystem {
     } else if (buttonBoard.getHID().getRawButtonPressed(4)) {
       side = 5;
       isRight = true;
-    } else if (buttonBoard.getRawAxis(2) == 1) {
-      level = Goal.L1;
-    } else if (buttonBoard.getRawAxis(3) == 1) {
-      level = Goal.L2;
-    } else if (buttonBoard.getHID().getRawButtonPressed(2)) {
-      level = Goal.L3;
-    } else if (buttonBoard.getHID().getRawButtonPressed(1)) {
-      level = Goal.L3;
-    }
-
-    // Update Level
-    if (buttonBoard.getHID().getPOV() == 90) {
+    } else if (buttonBoard.getHID().getPOV() == 90) {
       side = 4;
       isRight = false;
     } else if (buttonBoard.getHID().getPOV() == 270) {
@@ -96,6 +84,17 @@ public class ScoringHelper extends VirtualSubsystem {
     } else if (buttonBoard.getHID().getPOV() == 0) {
       side = 3;
       isRight = true;
+    }
+
+    // Update Level
+    if (buttonBoard.getRawAxis(2) == 1) {
+      level = Goal.L1;
+    } else if (buttonBoard.getRawAxis(3) == 1) {
+      level = Goal.L2;
+    } else if (buttonBoard.getHID().getRawButtonPressed(2)) {
+      level = Goal.L3;
+    } else if (buttonBoard.getHID().getRawButtonPressed(1)) {
+      level = Goal.L3;
     }
   }
 
