@@ -285,7 +285,7 @@
             "x": 384.0,
             "y": 512.0,
             "width": 192.0,
-            "height": 128.0,
+            "height": 192.0,
             "type": "Large Text Display",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Drive/DriveMode",
@@ -296,7 +296,7 @@
           {
             "title": "Swerve Drive",
             "x": 1280.0,
-            "y": 128.0,
+            "y": 192.0,
             "width": 256.0,
             "height": 256.0,
             "type": "SwerveDrive",
@@ -312,7 +312,7 @@
             "x": 192.0,
             "y": 512.0,
             "width": 192.0,
-            "height": 128.0,
+            "height": 192.0,
             "type": "Large Text Display",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Superstructure/CurrentGoal",
@@ -323,12 +323,12 @@
           {
             "title": "L1",
             "x": 768.0,
-            "y": 512.0,
+            "y": 576.0,
             "width": 320.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/L1",
+              "topic": "/SmartDashboard/Comp/ScoringHelper/L1",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294902010,
@@ -340,12 +340,12 @@
           {
             "title": "L2",
             "x": 768.0,
-            "y": 384.0,
+            "y": 448.0,
             "width": 320.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/L2",
+              "topic": "/SmartDashboard/Comp/ScoringHelper/L2",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294902010,
@@ -357,12 +357,12 @@
           {
             "title": "L3",
             "x": 768.0,
-            "y": 256.0,
+            "y": 320.0,
             "width": 320.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/SmartDashboard/Comp/ReefScoring/L3",
+              "topic": "/SmartDashboard/Comp/ScoringHelper/L3",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4294902010,
@@ -376,7 +376,7 @@
             "x": 1280.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 128.0,
+            "height": 192.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Superstructure/HasCoral",
@@ -390,10 +390,10 @@
           },
           {
             "title": "Match Time",
-            "x": 1088.0,
+            "x": 768.0,
             "y": 0.0,
-            "width": 192.0,
-            "height": 384.0,
+            "width": 320.0,
+            "height": 192.0,
             "type": "Match Time",
             "properties": {
               "topic": "/SmartDashboard/Match Time",
@@ -409,7 +409,7 @@
             "x": 0.0,
             "y": 512.0,
             "width": 192.0,
-            "height": 128.0,
+            "height": 192.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Heading Align Enabled",
@@ -426,7 +426,7 @@
             "x": 576.0,
             "y": 512.0,
             "width": 192.0,
-            "height": 128.0,
+            "height": 192.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Drive Align Enabled",
@@ -441,7 +441,7 @@
           {
             "title": "Field",
             "x": 1088.0,
-            "y": 384.0,
+            "y": 448.0,
             "width": 448.0,
             "height": 256.0,
             "type": "Field",
@@ -473,15 +473,32 @@
           },
           {
             "title": "SelectedReef",
-            "x": 768.0,
+            "x": 1088.0,
             "y": 0.0,
-            "width": 320.0,
-            "height": 256.0,
+            "width": 192.0,
+            "height": 448.0,
             "type": "Large Text Display",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/ScoringHelper/SelectedReef",
               "period": 0.02,
               "data_type": "string"
+            }
+          },
+          {
+            "title": "Net",
+            "x": 768.0,
+            "y": 192.0,
+            "width": 320.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/ScoringHelper/Net",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4278255513,
+              "false_color": 4278190080,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           }
         ]
@@ -492,175 +509,8 @@
       "grid_layout": {
         "layouts": [
           {
-            "title": "Arm",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "CustomSetpoint",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Arm/CustomSetpoint",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "HoldDegrees",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Arm/HoldDegrees",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "IntakeDegrees",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Arm/IntakeDegrees",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "ScoreDegrees",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Arm/ScoreDegrees",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "StowDegrees",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Arm/StowDegrees",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kG",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Arm/kG",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kGLoaded",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Arm/kGLoaded",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kS",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Arm/kS",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kV",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Arm/kV",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "maxAccelDeg",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Arm/maxAccelDeg",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "maxVelDeg",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Arm/maxVelDeg",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              }
-            ]
-          },
-          {
             "title": "Elevator",
-            "x": 256.0,
+            "x": 0.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
@@ -896,450 +746,8 @@
             ]
           },
           {
-            "title": "Auto Align Translation",
-            "x": 768.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 288.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "MaxAccel",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Translation/MaxAccel",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "MaxVel",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Translation/MaxVel",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "Tolerance",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Translation/Tolerance",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kD",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Translation/kD",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kI",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Translation/kI",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kP",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Translation/kP",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              }
-            ]
-          },
-          {
-            "title": "Auto Align Rotation",
-            "x": 1024.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 288.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "MaxAccel",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Rotation/MaxAccel",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "MaxVel",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Rotation/MaxVel",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "Tolerance",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Rotation/Tolerance",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kD",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Rotation/kD",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kI",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Rotation/kI",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kP",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/AutoAlignController/Rotation/kP",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              }
-            ]
-          },
-          {
-            "title": "Trajectory TranslationX",
-            "x": 0.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 288.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Tolerance",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/TrajectoryController/TranslationX/Tolerance",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kD",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/TrajectoryController/TranslationX/kD",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kI",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/TrajectoryController/TranslationX/kI",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kP",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/TrajectoryController/TranslationX/kP",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              }
-            ]
-          },
-          {
-            "title": "Trajectory TranslationY",
-            "x": 256.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 288.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Tolerance",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/TrajectoryController/TranslationY/Tolerance",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kD",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/TrajectoryController/TranslationY/kD",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kI",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/TrajectoryController/TranslationY/kI",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kP",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/TrajectoryController/TranslationY/kP",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              }
-            ]
-          },
-          {
-            "title": "Trajectory Rotation",
-            "x": 512.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 288.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "Tolerance",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/TrajectoryController/Rotation/Tolerance",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kD",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/TrajectoryController/Rotation/kD",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kI",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/TrajectoryController/Rotation/kI",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "kP",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/TrajectoryController/Rotation/kP",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              }
-            ]
-          },
-          {
-            "title": "Displacer",
-            "x": 768.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "List Layout",
-            "properties": {
-              "label_position": "TOP"
-            },
-            "children": [
-              {
-                "title": "MOOORVVolts",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Displacer/MOOORVVolts",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              },
-              {
-                "title": "VROOMVolts",
-                "x": 0.0,
-                "y": 0.0,
-                "width": 128.0,
-                "height": 128.0,
-                "type": "Text Display",
-                "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Displacer/VROOMVolts",
-                  "period": 0.02,
-                  "data_type": "double",
-                  "show_submit_button": false
-                }
-              }
-            ]
-          },
-          {
             "title": "EndEffector",
-            "x": 1024.0,
+            "x": 256.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
@@ -1435,8 +843,161 @@
             ]
           },
           {
-            "title": "Roller",
+            "title": "Arm",
             "x": 512.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "CustomSetpoint",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Algaefier/Arm/CustomSetpoint",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "HoldDegrees",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Algaefier/Arm/HoldDegrees",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "IntakeDegrees",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Algaefier/Arm/IntakeDegrees",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "ScoreDegrees",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Algaefier/Arm/ScoreDegrees",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "StowDegrees",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Algaefier/Arm/StowDegrees",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kG",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Algaefier/Arm/kG",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kS",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Algaefier/Arm/kS",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kV",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Algaefier/Arm/kV",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "maxAccelDeg",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Algaefier/Arm/maxAccelDeg",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "maxVelDeg",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Algaefier/Arm/maxVelDeg",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Gripper",
+            "x": 768.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
@@ -1453,8 +1014,8 @@
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Roller/HoldVolts",
-                  "period": 0.02,
+                  "topic": "SmartDashboard/TunableNumbers/Algaefier/Gripper/HoldVolts",
+                  "period": 0.06,
                   "data_type": "double",
                   "show_submit_button": false
                 }
@@ -1467,8 +1028,8 @@
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Roller/IntakeVolts",
-                  "period": 0.02,
+                  "topic": "SmartDashboard/TunableNumbers/Algaefier/Gripper/IntakeVolts",
+                  "period": 0.06,
                   "data_type": "double",
                   "show_submit_button": false
                 }
@@ -1481,8 +1042,8 @@
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/Roller/ScoreVolts",
-                  "period": 0.02,
+                  "topic": "SmartDashboard/TunableNumbers/Algaefier/Gripper/ScoreVolts",
+                  "period": 0.06,
                   "data_type": "double",
                   "show_submit_button": false
                 }
@@ -1490,11 +1051,121 @@
             ]
           },
           {
-            "title": "HeadingController",
+            "title": "Climber",
             "x": 1280.0,
-            "y": 288.0,
+            "y": 0.0,
             "width": 256.0,
-            "height": 288.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "ClimbVolts",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Climber/ClimbVolts",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "ReverseVolts",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Climber/ReverseVolts",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Trajectory Rotation",
+            "x": 512.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "kD",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveTrajectory/Rotation/kD",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kI",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveTrajectory/Rotation/kI",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kP",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveTrajectory/Rotation/kP",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Tolerance",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveTrajectory/Rotation/Tolerance",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Trajectory TranslationX",
+            "x": 0.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
             "type": "List Layout",
             "properties": {
               "label_position": "TOP"
@@ -1508,8 +1179,8 @@
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/HeadingController/Tolerance",
-                  "period": 0.02,
+                  "topic": "SmartDashboard/TunableNumbers/DriveTrajectory/TranslationX/Tolerance",
+                  "period": 0.06,
                   "data_type": "double",
                   "show_submit_button": false
                 }
@@ -1522,8 +1193,8 @@
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/HeadingController/kD",
-                  "period": 0.02,
+                  "topic": "SmartDashboard/TunableNumbers/DriveTrajectory/TranslationX/kD",
+                  "period": 0.06,
                   "data_type": "double",
                   "show_submit_button": false
                 }
@@ -1536,8 +1207,8 @@
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/HeadingController/kI",
-                  "period": 0.02,
+                  "topic": "SmartDashboard/TunableNumbers/DriveTrajectory/TranslationX/kI",
+                  "period": 0.06,
                   "data_type": "double",
                   "show_submit_button": false
                 }
@@ -1550,8 +1221,395 @@
                 "height": 128.0,
                 "type": "Text Display",
                 "properties": {
-                  "topic": "SmartDashboard/TunableNumbers/HeadingController/kP",
-                  "period": 0.02,
+                  "topic": "SmartDashboard/TunableNumbers/DriveTrajectory/TranslationX/kP",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Trajectory TranslationY",
+            "x": 256.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Tolerance",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveTrajectory/TranslationY/Tolerance",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kD",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveTrajectory/TranslationY/kD",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kI",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveTrajectory/TranslationY/kI",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kP",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveTrajectory/TranslationY/kP",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Hopper",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "ClimbPosition",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Hopper/ClimbPosition",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "MaxAccel",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Hopper/MaxAccel",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "MaxVel",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/Hopper/MaxVel",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Auto Align Translation",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "MaxAccel",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveToPose/Translation/MaxAccel",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "MaxVel",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveToPose/Translation/MaxVel",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Tolerance",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveToPose/Translation/Tolerance",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kD",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveToPose/Translation/kD",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kI",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveToPose/Translation/kI",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kP",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveToPose/Translation/kP",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Auto Align Rotation",
+            "x": 1024.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "MaxAccel",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveToPose/Rotation/MaxAccel",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "MaxVel",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveToPose/Rotation/MaxVel",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Tolerance",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveToPose/Rotation/Tolerance",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kD",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveToPose/Rotation/kD",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kI",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveToPose/Rotation/kI",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kP",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveToPose/Rotation/kP",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "DriveAtAngle",
+            "x": 1280.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Tolerance",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveAtAngle/Tolerance",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kD",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveAtAngle/kD",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kI",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveAtAngle/kI",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "kP",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "SmartDashboard/TunableNumbers/DriveAtAngle/kP",
+                  "period": 0.06,
                   "data_type": "double",
                   "show_submit_button": false
                 }
@@ -1561,25 +1619,11 @@
         ],
         "containers": [
           {
-            "title": "Trajectory maxError",
-            "x": 1280.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 96.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "SmartDashboard/TunableNumbers/TrajectoryController/maxError",
-              "period": 0.02,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
             "title": "ReefAlignThreshold",
-            "x": 1280.0,
-            "y": 96.0,
+            "x": 1024.0,
+            "y": 512.0,
             "width": 256.0,
-            "height": 96.0,
+            "height": 128.0,
             "type": "Text Display",
             "properties": {
               "topic": "SmartDashboard/TunableNumbers/AutoScore/ReefAlignThreshold",
@@ -1591,13 +1635,41 @@
           {
             "title": "ReefNudgeThreshold",
             "x": 1280.0,
-            "y": 192.0,
+            "y": 512.0,
             "width": 256.0,
-            "height": 96.0,
+            "height": 128.0,
             "type": "Text Display",
             "properties": {
               "topic": "SmartDashboard/TunableNumbers/AutoScore/ReefNudgeThreshold",
               "period": 0.02,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "TxTyObsStaleSecs",
+            "x": 256.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "SmartDashboard/TunableNumbers/RobotState/TxTyObsStaleSecs",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "maxError",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "SmartDashboard/TunableNumbers/DriveTrajectory/maxError",
+              "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
             }
