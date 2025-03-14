@@ -103,4 +103,13 @@ public class FieldConstants {
       return AllianceFlipUtil.flip(align);
     }
   }
+
+  public static final Pose2d bargeScoreClose =
+      new Pose2d(
+          7.585,
+          6.15,
+          Rotation2d
+              .kZero); // Only use X and rotational components; allow alignment along the whole
+  // barge
+  public static final Pose2d bargeScoreFar = new Pose2d(9.975, 6.15, Rotation2d.kPi);
 }

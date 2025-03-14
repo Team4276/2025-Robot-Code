@@ -20,7 +20,7 @@ public class AutoScore {
 
   private static boolean cancelTxTy = false;
 
-  public static Command getAutoScoreCommand(
+  public static Command coralScoreCommand(
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
@@ -74,5 +74,9 @@ public class AutoScore {
     return Constants.isSim || cancelTxTy
         ? RobotState.getInstance().getEstimatedPose()
         : RobotState.getInstance().getReefPose(reef.ordinal() / 2, finalPose);
+  }
+
+  public static Command bargeScoreCommand() {
+    return Commands.none();
   }
 }

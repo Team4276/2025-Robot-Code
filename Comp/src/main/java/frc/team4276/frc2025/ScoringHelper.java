@@ -1,10 +1,15 @@
 package frc.team4276.frc2025;
 
+import static frc.team4276.frc2025.field.FieldConstants.bargeScoreClose;
+import static frc.team4276.frc2025.field.FieldConstants.bargeScoreFar;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
+import frc.team4276.frc2025.field.FieldConstants;
 import frc.team4276.frc2025.field.FieldConstants.Reef;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
+import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.VikXboxController;
 import frc.team4276.util.drivers.VirtualSubsystem;
 import org.littletonrobotics.junction.Logger;
@@ -13,9 +18,8 @@ public class ScoringHelper extends VirtualSubsystem {
   private final CommandGenericHID buttonBoard;
   private final VikXboxController xbox;
 
-  private boolean isRight = false;
-  private Goal level = Goal.L1;
-  private int side = 0;
+  private Reef reef = Reef.A;
+  private Goal goal = Goal.L1;
 
   public ScoringHelper(CommandGenericHID buttonBoard, VikXboxController xbox) {
     this.buttonBoard = buttonBoard;
@@ -27,76 +31,59 @@ public class ScoringHelper extends VirtualSubsystem {
     updateXbox(); // redundancy
     updateButtonBoard();
 
-    for (int i = 0; i < 12; i++) {
-      SmartDashboard.putBoolean(
-          "Comp/ReefScoring/" + Reef.values()[i].toString(), getSelectedReef() == Reef.values()[i]);
-    }
-
-    // SmartDashboard.putBoolean("Comp/ReefScoring/L4", getSuperstructureGoal() ==
-    // Goal.L4);
-    SmartDashboard.putBoolean("Comp/ReefScoring/L3", getSuperstructureGoal() == Goal.L3);
-    SmartDashboard.putBoolean("Comp/ReefScoring/L2", getSuperstructureGoal() == Goal.L2);
-    SmartDashboard.putBoolean("Comp/ReefScoring/L1", getSuperstructureGoal() == Goal.L1);
+    SmartDashboard.putBoolean("Comp/ScoringHelper/Net", goal == Goal.NET);
+    SmartDashboard.putBoolean("Comp/ScoringHelper/L3", goal == Goal.L3);
+    SmartDashboard.putBoolean("Comp/ScoringHelper/L2", goal == Goal.L2);
+    SmartDashboard.putBoolean("Comp/ScoringHelper/L1", goal == Goal.L1);
 
     Logger.recordOutput("ScoringHelper/SelectedAlignPose", getSelectedAlignPose());
     Logger.recordOutput("ScoringHelper/SelectedScorePose", getSelectedScorePose());
-    Logger.recordOutput("ScoringHelper/IsRight", isRight);
-    Logger.recordOutput("ScoringHelper/Side", side);
-    Logger.recordOutput("ScoringHelper/Level", level);
+    Logger.recordOutput("ScoringHelper/Goal", goal);
     Logger.recordOutput("ScoringHelper/SelectedReef", getSelectedReef());
   }
 
   private void updateButtonBoard() {
     // Update Positions
     if (buttonBoard.getHID().getRawButtonPressed(5)) {
-      side = 0;
-      isRight = false;
+      reef = Reef.A;
     } else if (buttonBoard.getHID().getRawButtonPressed(6)) {
-      side = 0;
-      isRight = true;
+      reef = Reef.B;
     } else if (buttonBoard.getHID().getRawButtonPressed(7)) {
-      side = 1;
-      isRight = false;
+      reef = Reef.C;
     } else if (buttonBoard.getHID().getRawButtonPressed(8)) {
-      side = 1;
-      isRight = true;
+      reef = Reef.D;
     } else if (buttonBoard.getHID().getRawButtonPressed(9)) {
-      side = 3;
-      isRight = true;
+      reef = Reef.E;
     } else if (buttonBoard.getHID().getRawButtonPressed(10)) {
-      side = 3;
-      isRight = false;
+      reef = Reef.F;
     } else if (buttonBoard.getHID().getRawButtonPressed(3)) {
-      side = 5;
-      isRight = false;
+      reef = Reef.G;
     } else if (buttonBoard.getHID().getRawButtonPressed(4)) {
-      side = 5;
-      isRight = true;
+      reef = Reef.H;
     } else if (buttonBoard.getHID().getPOV() == 90) {
-      side = 4;
-      isRight = false;
+      reef = Reef.I;
     } else if (buttonBoard.getHID().getPOV() == 270) {
-      side = 4;
-      isRight = true;
+      reef = Reef.J;
     } else if (buttonBoard.getHID().getPOV() == 180) {
-      side = 3;
-      isRight = false;
+      reef = Reef.K;
     } else if (buttonBoard.getHID().getPOV() == 0) {
-      side = 3;
-      isRight = true;
+      reef = Reef.L;
     }
 
     // Update Level
     if (buttonBoard.getRawAxis(2) == 1) {
-      level = Goal.L1;
+      goal = Goal.L1;
     } else if (buttonBoard.getRawAxis(3) == 1) {
-      level = Goal.L2;
+      goal = Goal.L2;
     } else if (buttonBoard.getHID().getRawButtonPressed(2)) {
-      level = Goal.L3;
+      goal = Goal.L3;
     } else if (buttonBoard.getHID().getRawButtonPressed(1)) {
-      level = Goal.L3;
+      goal = Goal.NET;
     }
   }
+
+  private boolean isRight = false;
+  private int side = 0;
 
   private void updateXbox() {
     // Update Positions
@@ -122,19 +109,25 @@ public class ScoringHelper extends VirtualSubsystem {
 
     // Update Level
     if (xbox.getHID().getAButton()) {
-      level = Goal.L1;
+      goal = Goal.L1;
     } else if (xbox.getHID().getBButton()) {
-      level = Goal.L2;
+      goal = Goal.L2;
     } else if (xbox.getHID().getYButton()) {
-      level = Goal.L3;
+      goal = Goal.L3;
+    } else if (xbox.getHID().getPOV() == 0) {
+      goal = Goal.NET;
     }
-    // else if (xbox.getHID().getPOV() == 0) {
-    // level = Goal.L3;
-    // }
+
+    if (side > 1 && side < 5) {
+      reef = Reef.values()[(side * 2) + (isRight ? 0 : 1)];
+
+    } else {
+      reef = Reef.values()[(side * 2) + (isRight ? 1 : 0)];
+    }
   }
 
   public Goal getSuperstructureGoal() {
-    return level;
+    return goal;
   }
 
   public Pose2d getSelectedAlignPose() {
@@ -142,15 +135,20 @@ public class ScoringHelper extends VirtualSubsystem {
   }
 
   public Pose2d getSelectedScorePose() {
+    if (goal == Goal.NET) {
+      var trans = RobotState.getInstance().getEstimatedPose().getTranslation();
+      return trans.getDistance(
+                  AllianceFlipUtil.apply(FieldConstants.bargeScoreFar.getTranslation()))
+              < trans.getDistance(
+                  AllianceFlipUtil.apply(FieldConstants.bargeScoreClose.getTranslation()))
+          ? bargeScoreFar
+          : bargeScoreClose;
+    }
+
     return getSelectedReef().getScore();
   }
 
   public Reef getSelectedReef() {
-    if (side > 1 && side < 5) {
-      return Reef.values()[(side * 2) + (isRight ? 0 : 1)];
-
-    } else {
-      return Reef.values()[(side * 2) + (isRight ? 1 : 0)];
-    }
+    return reef;
   }
 }

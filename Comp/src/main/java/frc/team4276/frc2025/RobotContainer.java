@@ -19,6 +19,7 @@ import frc.team4276.frc2025.commands.AutoScore;
 import frc.team4276.frc2025.commands.DriveCommands;
 import frc.team4276.frc2025.commands.DriveToPose;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
+import frc.team4276.frc2025.commands.IntakeCommands;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
 import frc.team4276.frc2025.commands.auto.AutoBuilder;
 import frc.team4276.frc2025.subsystems.algaefier.Algaefier;
@@ -455,36 +456,27 @@ public class RobotContainer {
     // Intake
     driver
         .x()
+        .and(() -> !disableHeadingAutoAlign)
         .whileTrue(
-            superstructure
-                .setGoalCommand(Superstructure.Goal.INTAKE)
-                .alongWith(
-                    DriveCommands.joystickDriveAtHeading(
-                            drive,
-                            driverX,
-                            driverY,
-                            () ->
-                                AllianceFlipUtil.apply(Rotation2d.fromDegrees(305.0)).getRadians())
-                        .unless(() -> disableHeadingAutoAlign))
-                .alongWith(
-                    Commands.waitUntil(superstructure::hasCoral)
-                        .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 1.0))));
+            IntakeCommands.intakeAtAngle(
+                Rotation2d.fromDegrees(305), superstructure, drive, driver, driverX, driverY));
 
     driver
         .b()
+        .and(() -> !disableHeadingAutoAlign)
         .whileTrue(
-            superstructure
-                .setGoalCommand(Superstructure.Goal.INTAKE)
-                .alongWith(
-                    DriveCommands.joystickDriveAtHeading(
-                            drive,
-                            driverX,
-                            driverY,
-                            () -> AllianceFlipUtil.apply(Rotation2d.fromDegrees(55.0)).getRadians())
-                        .unless(() -> disableHeadingAutoAlign))
-                .alongWith(
-                    Commands.waitUntil(superstructure::hasCoral)
-                        .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 1.0))));
+            IntakeCommands.intakeAtAngle(
+                Rotation2d.fromDegrees(55), superstructure, drive, driver, driverX, driverY));
+
+    driver
+        .x()
+        .and(() -> disableHeadingAutoAlign)
+        .whileTrue(IntakeCommands.intake(superstructure, driver));
+
+    driver
+        .b()
+        .and(() -> disableHeadingAutoAlign)
+        .whileTrue(IntakeCommands.intake(superstructure, driver));
 
     // Scoring // TODO: impl rumbles
     driver
@@ -518,9 +510,10 @@ public class RobotContainer {
             () ->
                 !disableTranslationAutoAlign
                     && !disableHeadingAutoAlign
-                    && scoringHelper.getSuperstructureGoal() != Superstructure.Goal.L1)
+                    && scoringHelper.getSuperstructureGoal() != Superstructure.Goal.L1
+                    && scoringHelper.getSuperstructureGoal() != Superstructure.Goal.NET)
         .whileTrue(
-            AutoScore.getAutoScoreCommand(drive, driverX, driverY, superstructure, scoringHelper)
+            AutoScore.coralScoreCommand(drive, driverX, driverY, superstructure, scoringHelper)
                 .alongWith(
                     Commands.waitUntil(
                             () ->
@@ -561,9 +554,24 @@ public class RobotContainer {
 
     // Displacing
 
-    // Align
-
-    // Score
+    // Score // Also see coral scoring triggers
+    driver
+        .rightTrigger()
+        .and(() -> !climber.isClimbing())
+        .and(() -> !(driver.getHID().getXButton() || driver.getHID().getBButton()))
+        .and(
+            () ->
+                !disableTranslationAutoAlign
+                    && !disableHeadingAutoAlign
+                    && scoringHelper.getSuperstructureGoal() == Superstructure.Goal.NET)
+        .whileTrue(
+            AutoScore.bargeScoreCommand()
+                .alongWith(
+                    Commands.waitUntil(
+                            () ->
+                                superstructure.getGoal() != Superstructure.Goal.STOW
+                                    && DriveToPose.atGoal())
+                        .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 0.2, 3))));
 
     /***************** Climbing Triggers *****************/
 

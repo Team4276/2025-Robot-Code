@@ -9,7 +9,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-public class Superstructure extends SubsystemBase {
+public class Superstructure
+    extends SubsystemBase { // TODO: decide if we want a statemachine or not...
   private final Elevator elevator;
   private final EndEffector endeffector;
 
@@ -20,6 +21,8 @@ public class Superstructure extends SubsystemBase {
   private boolean wantScore = false;
   private boolean leftL1 = false;
 
+  private boolean wantFling = false;
+
   private boolean wantUnjam = false;
 
   public enum Goal {
@@ -28,6 +31,7 @@ public class Superstructure extends SubsystemBase {
     L1,
     L2,
     L3,
+    NET,
     LO_ALGAE,
     HI_ALGAE,
     UNJAM,
@@ -155,6 +159,15 @@ public class Superstructure extends SubsystemBase {
 
         break;
 
+      case NET:
+        if (wantFling) {
+          elevator.setGoal(Elevator.Goal.NET_SCORE);
+        }
+        elevator.setGoal(Elevator.Goal.NET_PREP);
+        endeffector.setGoal(EndEffector.Goal.IDLE);
+
+        break;
+
       case LO_ALGAE:
         elevator.setGoal(Elevator.Goal.LO_ALGAE);
         endeffector.setGoal(EndEffector.Goal.IDLE);
@@ -190,6 +203,10 @@ public class Superstructure extends SubsystemBase {
     return elevator.atGoal();
   }
 
+  public boolean withinTolerance(double tol) {
+    return Math.abs(elevator.getGoal().getPositionMetres() - elevator.getPositionMetres()) < tol;
+  }
+
   public void setGoal(Goal goal) {
     desiredGoal = () -> goal;
   }
@@ -219,6 +236,16 @@ public class Superstructure extends SubsystemBase {
         () -> {
           wantScore = false;
           hasCoral = false;
+        });
+  }
+
+  public Command flingCommand() {
+    return Commands.startEnd(
+        () -> {
+          wantFling = true;
+        },
+        () -> {
+          wantFling = false;
         });
   }
 

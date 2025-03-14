@@ -23,6 +23,8 @@ public class Elevator {
     L1(new LoggedTunableNumber("Elevator/L1Position", Units.inchesToMeters(0.0))),
     L2(new LoggedTunableNumber("Elevator/L2Position", Units.inchesToMeters(6.69))),
     L3(new LoggedTunableNumber("Elevator/L3Position", Units.inchesToMeters(21.26))),
+    NET_PREP(new LoggedTunableNumber("Elevator/NetPrep", Units.inchesToMeters(0.0))),
+    NET_SCORE(new LoggedTunableNumber("Elevator/NetScore", Units.inchesToMeters(21.26))),
     LO_ALGAE(new LoggedTunableNumber("Elevator/LoAlgae", Units.inchesToMeters(0.0))),
     HI_ALGAE(new LoggedTunableNumber("Elevator/HiAlgae", Units.inchesToMeters(17.32))),
     CHARACTERIZING(() -> 0.0),
@@ -34,7 +36,7 @@ public class Elevator {
       this.elevatorSetpointSupplier = elevatorSetpointSupplier;
     }
 
-    private double getPositionMetres() {
+    public double getPositionMetres() {
       return elevatorSetpointSupplier.getAsDouble();
     }
   }
