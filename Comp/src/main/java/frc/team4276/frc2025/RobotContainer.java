@@ -21,6 +21,7 @@ import frc.team4276.frc2025.commands.DriveToPose;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
 import frc.team4276.frc2025.commands.auto.AutoBuilder;
+import frc.team4276.frc2025.subsystems.algaefier.Algaefier;
 import frc.team4276.frc2025.subsystems.algaefier.arm.Arm;
 import frc.team4276.frc2025.subsystems.algaefier.arm.ArmIO;
 import frc.team4276.frc2025.subsystems.algaefier.arm.ArmIOSparkMax;
@@ -36,6 +37,9 @@ import frc.team4276.frc2025.subsystems.drive.GyroIOADIS;
 import frc.team4276.frc2025.subsystems.drive.ModuleIO;
 import frc.team4276.frc2025.subsystems.drive.ModuleIOSim;
 import frc.team4276.frc2025.subsystems.drive.ModuleIOSpark;
+import frc.team4276.frc2025.subsystems.hopper.Hopper;
+import frc.team4276.frc2025.subsystems.hopper.HopperIO;
+import frc.team4276.frc2025.subsystems.hopper.HopperIOSparkMax;
 import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIO;
 import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIOHardware;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
@@ -66,8 +70,8 @@ public class RobotContainer {
   // Subsystems
   private Drive drive;
   private Superstructure superstructure;
-  private Arm arm;
-  private Gripper roller;
+  private Algaefier algaefier;
+  private Hopper hopper;
   private Climber climber;
   private Vision vision;
 
@@ -120,8 +124,14 @@ public class RobotContainer {
                       new EndEffectorIOSparkMax(
                           Ports.ENDEFFECTOR_LEFT, Ports.ENDEFFECTOR_RIGHT, 40, false, true)),
                   new RollerSensorsIOHardware());
-          arm = new Arm(new ArmIOSparkMax());
-          roller = new Gripper(new RollerIOSparkMax(Ports.ALGAEFIER_GRIPPER, 40, false, true));
+          algaefier =
+              new Algaefier(
+                  new Arm(new ArmIOSparkMax()),
+                  new Gripper(new RollerIOSparkMax(Ports.ALGAEFIER_GRIPPER, 40, false, true)));
+          hopper =
+              new Hopper(
+                  new HopperIOSparkMax(Ports.HOPPER_LEFT, false),
+                  new HopperIOSparkMax(Ports.HOPPER_RIGHT, true));
           climber = new Climber(new ClimberIOSparkMax(0, 0, 40, 40));
           vision =
               new Vision(
@@ -144,8 +154,8 @@ public class RobotContainer {
                   new Elevator(new ElevatorIO() {}),
                   new EndEffector(new EndEffectorIO() {}),
                   new RollerSensorsIO() {});
-          arm = new Arm(new ArmIO() {});
-          roller = new Gripper(new RollerIO() {});
+          algaefier = new Algaefier(new Arm(new ArmIO() {}), new Gripper(new RollerIO() {}));
+          hopper = new Hopper(new HopperIO() {}, new HopperIO() {});
           climber = new Climber(new ClimberIO() {});
           if (disableVisionSim) {
             vision = new Vision(RobotState.getInstance()::addVisionMeasurement);
@@ -185,12 +195,12 @@ public class RobotContainer {
               new RollerSensorsIO() {});
     }
 
-    if (arm == null) {
-      arm = new Arm(new ArmIO() {});
+    if (algaefier == null) {
+      algaefier = new Algaefier(new Arm(new ArmIO() {}), new Gripper(new RollerIO() {}));
     }
 
-    if (roller == null) {
-      roller = new Gripper(new RollerIO() {});
+    if (hopper == null) {
+      hopper = new Hopper(new HopperIO() {}, new HopperIO() {});
     }
 
     if (climber == null) {
@@ -211,7 +221,7 @@ public class RobotContainer {
 
   private void configureOverrides() {
     superstructure.setCoastOverride(elevatorCoastOverride::get);
-    arm.setCoastOverride(armCoastOverride::get);
+    algaefier.setArmCoastOverride(armCoastOverride::get);
   }
 
   private void configureAutos() {
@@ -301,11 +311,21 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", () -> drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoSelector.addRoutine(
         "Drive SysId (Dynamic Reverse)", () -> drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    // autoSelector.addRoutine(
-    //     "Arm Simple FF Characterization",
-    //     () ->
-    //         new FeedForwardCharacterization(
-    //             arm, arm::runCharacterization, arm::getFFCharacterizationVelocity));
+    autoSelector.addRoutine(
+        "Arm Simple FF Characterization",
+        () ->
+            new FeedForwardCharacterization(
+                algaefier,
+                algaefier::acceptCharacterizationInput,
+                algaefier::getFFCharacterizationVelocity));
+    autoSelector.addRoutine(
+        "(Reverse) Arm Simple FF Characterization",
+        () ->
+            new FeedForwardCharacterization(
+                algaefier,
+                algaefier::acceptCharacterizationInput,
+                algaefier::getFFCharacterizationVelocity,
+                true));
     autoSelector.addRoutine(
         "Elevator Simple FF Characterization",
         () ->
@@ -313,11 +333,6 @@ public class RobotContainer {
                 superstructure,
                 superstructure::acceptCharacterizationInput,
                 superstructure::getFFCharacterizationVelocity));
-    // autoSelector.addRoutine(
-    //     "(Reverse) Arm Simple FF Characterization",
-    //     () ->
-    //         new FeedForwardCharacterization(
-    //             arm, arm::runCharacterization, arm::getFFCharacterizationVelocity, true));
     autoSelector.addRoutine(
         "(Reverse) Elevator Simple FF Characterization",
         () ->
@@ -545,54 +560,17 @@ public class RobotContainer {
     /***************** Algae Triggers *****************/
 
     // Displacing
-    driver
-        .y()
-        .and(() -> !climber.isClimbing())
-        .and(
-            () ->
-                scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L2
-                    || scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L1)
-        .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.LO_ALGAE));
-
-    driver
-        .y()
-        .and(() -> !climber.isClimbing())
-        .and(() -> scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L3)
-        .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.HI_ALGAE));
-
-    // Intake
-    driver
-        .leftTrigger()
-        .and(() -> !climber.isClimbing())
-        .and(() -> !driver.getHID().getLeftBumperButton())
-        .whileTrue(
-            arm.setGoalCommand(Arm.Goal.INTAKE)
-                .alongWith(roller.setGoalCommand(Gripper.Goal.INTAKE)));
 
     // Align
-    driver
-        .leftBumper()
-        .and(() -> !driver.getRT())
-        .whileTrue(
-            arm.setGoalCommand(Arm.Goal.SCORE)
-                .alongWith(
-                    DriveCommands.joystickDriveAtHeading(
-                            drive,
-                            driverX,
-                            driverY,
-                            () -> AllianceFlipUtil.apply(Rotation2d.kCCW_90deg).getRadians())
-                        .unless(() -> disableHeadingAutoAlign)));
 
     // Score
-    driver
-        .leftTrigger()
-        .and(() -> !climber.isClimbing())
-        .and(driver.leftBumper())
-        .whileTrue(roller.setGoalCommand(Gripper.Goal.SCORE));
 
     /***************** Climbing Triggers *****************/
 
-    driver.start().toggleOnTrue(climber.isClimbingCommand());
+    driver
+        .start()
+        .toggleOnTrue(
+            climber.isClimbingCommand().alongWith(hopper.setGoalCommand(Hopper.Goal.CLIMB)));
 
     driver
         .leftTrigger()
