@@ -16,10 +16,9 @@ public class Ports {
   public static final int ELEVATOR_FOLLOWER = 10;
   public static final int ENDEFFECTOR_RIGHT = 11;
   public static final int ENDEFFECTOR_LEFT = 12;
-  public static final int ALGAE_DISPLACER = 15;
 
-  public static final int ALGAE_INTAKE_ARM = 13;
-  public static final int ALGAE_INTAKE_ROLLER = 14;
+  public static final int ALGAEFIER_ARM = 13;
+  public static final int ALGAEFIER_GRIPPER = 14;
 
   public static final int CLIMBER_WENCH = 16;
   public static final int CLIMBER_WHEEL = 17;

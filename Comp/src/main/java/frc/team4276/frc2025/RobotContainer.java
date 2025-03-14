@@ -21,9 +21,12 @@ import frc.team4276.frc2025.commands.DriveToPose;
 import frc.team4276.frc2025.commands.FeedForwardCharacterization;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
 import frc.team4276.frc2025.commands.auto.AutoBuilder;
-import frc.team4276.frc2025.subsystems.arm.Arm;
-import frc.team4276.frc2025.subsystems.arm.ArmIO;
-import frc.team4276.frc2025.subsystems.arm.ArmIOSparkMax;
+import frc.team4276.frc2025.subsystems.algaefier.arm.Arm;
+import frc.team4276.frc2025.subsystems.algaefier.arm.ArmIO;
+import frc.team4276.frc2025.subsystems.algaefier.arm.ArmIOSparkMax;
+import frc.team4276.frc2025.subsystems.algaefier.roller.Gripper;
+import frc.team4276.frc2025.subsystems.algaefier.roller.RollerIO;
+import frc.team4276.frc2025.subsystems.algaefier.roller.RollerIOSparkMax;
 import frc.team4276.frc2025.subsystems.climber.Climber;
 import frc.team4276.frc2025.subsystems.climber.ClimberIO;
 import frc.team4276.frc2025.subsystems.climber.ClimberIOSparkMax;
@@ -33,9 +36,6 @@ import frc.team4276.frc2025.subsystems.drive.GyroIOADIS;
 import frc.team4276.frc2025.subsystems.drive.ModuleIO;
 import frc.team4276.frc2025.subsystems.drive.ModuleIOSim;
 import frc.team4276.frc2025.subsystems.drive.ModuleIOSpark;
-import frc.team4276.frc2025.subsystems.roller.Roller;
-import frc.team4276.frc2025.subsystems.roller.RollerIO;
-import frc.team4276.frc2025.subsystems.roller.RollerIOSparkMax;
 import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIO;
 import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIOHardware;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
@@ -67,7 +67,7 @@ public class RobotContainer {
   private Drive drive;
   private Superstructure superstructure;
   private Arm arm;
-  private Roller roller;
+  private Gripper roller;
   private Climber climber;
   private Vision vision;
 
@@ -121,7 +121,7 @@ public class RobotContainer {
                           Ports.ENDEFFECTOR_LEFT, Ports.ENDEFFECTOR_RIGHT, 40, false, true)),
                   new RollerSensorsIOHardware());
           arm = new Arm(new ArmIOSparkMax());
-          roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40, false, true));
+          roller = new Gripper(new RollerIOSparkMax(Ports.ALGAEFIER_GRIPPER, 40, false, true));
           climber = new Climber(new ClimberIOSparkMax(0, 0, 40, 40));
           vision =
               new Vision(
@@ -145,7 +145,7 @@ public class RobotContainer {
                   new EndEffector(new EndEffectorIO() {}),
                   new RollerSensorsIO() {});
           arm = new Arm(new ArmIO() {});
-          roller = new Roller(new RollerIO() {});
+          roller = new Gripper(new RollerIO() {});
           climber = new Climber(new ClimberIO() {});
           if (disableVisionSim) {
             vision = new Vision(RobotState.getInstance()::addVisionMeasurement);
@@ -190,7 +190,7 @@ public class RobotContainer {
     }
 
     if (roller == null) {
-      roller = new Roller(new RollerIO() {});
+      roller = new Gripper(new RollerIO() {});
     }
 
     if (climber == null) {
@@ -301,11 +301,11 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", () -> drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoSelector.addRoutine(
         "Drive SysId (Dynamic Reverse)", () -> drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    autoSelector.addRoutine(
-        "Arm Simple FF Characterization",
-        () ->
-            new FeedForwardCharacterization(
-                arm, arm::runCharacterization, arm::getFFCharacterizationVelocity));
+    // autoSelector.addRoutine(
+    //     "Arm Simple FF Characterization",
+    //     () ->
+    //         new FeedForwardCharacterization(
+    //             arm, arm::runCharacterization, arm::getFFCharacterizationVelocity));
     autoSelector.addRoutine(
         "Elevator Simple FF Characterization",
         () ->
@@ -313,11 +313,11 @@ public class RobotContainer {
                 superstructure,
                 superstructure::acceptCharacterizationInput,
                 superstructure::getFFCharacterizationVelocity));
-    autoSelector.addRoutine(
-        "(Reverse) Arm Simple FF Characterization",
-        () ->
-            new FeedForwardCharacterization(
-                arm, arm::runCharacterization, arm::getFFCharacterizationVelocity, true));
+    // autoSelector.addRoutine(
+    //     "(Reverse) Arm Simple FF Characterization",
+    //     () ->
+    //         new FeedForwardCharacterization(
+    //             arm, arm::runCharacterization, arm::getFFCharacterizationVelocity, true));
     autoSelector.addRoutine(
         "(Reverse) Elevator Simple FF Characterization",
         () ->
@@ -567,7 +567,7 @@ public class RobotContainer {
         .and(() -> !driver.getHID().getLeftBumperButton())
         .whileTrue(
             arm.setGoalCommand(Arm.Goal.INTAKE)
-                .alongWith(roller.setGoalCommand(Roller.Goal.INTAKE)));
+                .alongWith(roller.setGoalCommand(Gripper.Goal.INTAKE)));
 
     // Align
     driver
@@ -588,7 +588,7 @@ public class RobotContainer {
         .leftTrigger()
         .and(() -> !climber.isClimbing())
         .and(driver.leftBumper())
-        .whileTrue(roller.setGoalCommand(Roller.Goal.SCORE));
+        .whileTrue(roller.setGoalCommand(Gripper.Goal.SCORE));
 
     /***************** Climbing Triggers *****************/
 

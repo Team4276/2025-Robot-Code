@@ -49,8 +49,7 @@ public class Superstructure extends SubsystemBase {
 
   private boolean hasCoral = false;
 
-  public Superstructure(
-      Elevator elevator, EndEffector endeffector, RollerSensorsIO sensorsIO) {
+  public Superstructure(Elevator elevator, EndEffector endeffector, RollerSensorsIO sensorsIO) {
     this.elevator = elevator;
     this.endeffector = endeffector;
     this.sensorsIO = sensorsIO;

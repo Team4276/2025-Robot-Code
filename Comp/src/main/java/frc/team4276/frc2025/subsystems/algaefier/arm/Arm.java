@@ -1,4 +1,4 @@
-package frc.team4276.frc2025.subsystems.arm;
+package frc.team4276.frc2025.subsystems.algaefier.arm;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -6,22 +6,21 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.team4276.frc2025.Constants;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Arm extends SubsystemBase {
+public class Arm {
   public enum Goal {
-    STOW(new LoggedTunableNumber("Arm/StowDegrees", 110.0)),
-    INTAKE(new LoggedTunableNumber("Arm/IntakeDegrees", 65.0)),
-    HOLD(new LoggedTunableNumber("Arm/HoldDegrees", 110.0)),
-    SCORE(new LoggedTunableNumber("Arm/ScoreDegrees", 100.0)),
+    STOW(new LoggedTunableNumber("Algaefier/Arm/StowDegrees", 90.0)),
+    INTAKE(new LoggedTunableNumber("Algaefier/Arm/IntakeDegrees", 90.0)),
+    HOLD(new LoggedTunableNumber("Algaefier/Arm/HoldDegrees", 90.0)),
+    SCORE(new LoggedTunableNumber("Algaefier/Arm/ScoreDegrees", 90.0)),
     CHARACTERIZING(() -> 90.0),
-    CUSTOM(new LoggedTunableNumber("Arm/CustomSetpoint", 90.0));
+    CUSTOM(new LoggedTunableNumber("Algaefier/Arm/CustomSetpoint", 90.0));
 
     private final DoubleSupplier armSetpointSupplier;
 
@@ -40,21 +39,20 @@ public class Arm extends SubsystemBase {
 
   private Goal goal = Goal.STOW;
 
-  private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Arm/maxVelDeg", 80.0);
-  private final LoggedTunableNumber maxAccel = new LoggedTunableNumber("Arm/maxAccelDeg", 100.0);
+  private final LoggedTunableNumber maxVel =
+      new LoggedTunableNumber("Algaefier/Arm/maxVelDeg", 0.0);
+  private final LoggedTunableNumber maxAccel =
+      new LoggedTunableNumber("Algaefier/Arm/maxAccelDeg", 0.0);
 
-  private final LoggedTunableNumber kS = new LoggedTunableNumber("Arm/kS", 0.12);
-  private final LoggedTunableNumber kV = new LoggedTunableNumber("Arm/kV", 1.5);
-  private final LoggedTunableNumber kG = new LoggedTunableNumber("Arm/kG", 0.3);
-  private final LoggedTunableNumber kGLoaded = new LoggedTunableNumber("Arm/kGLoaded", 0.3);
+  private final LoggedTunableNumber kS = new LoggedTunableNumber("Algaefier/Arm/kS", 0.0);
+  private final LoggedTunableNumber kV = new LoggedTunableNumber("Algaefier/Arm/kV", 0.0);
+  private final LoggedTunableNumber kG = new LoggedTunableNumber("Algaefier/Arm/kG", 0.0);
 
   private final ArmIO io;
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
 
   private ArmFeedforward ff =
       new ArmFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), 0.0);
-  private ArmFeedforward ffLoaded =
-      new ArmFeedforward(kS.getAsDouble(), kGLoaded.getAsDouble(), kV.getAsDouble(), 0.0);
   private TrapezoidProfile profile =
       new TrapezoidProfile(
           new TrapezoidProfile.Constraints(
@@ -75,8 +73,6 @@ public class Arm extends SubsystemBase {
 
     goalViz = new ArmViz("Goal", Color.kGreen);
     measuredViz = new ArmViz("Measured", Color.kBlack);
-
-    setDefaultCommand(setGoalCommand(Goal.STOW));
   }
 
   public void setCoastOverride(BooleanSupplier coastOverride) {
@@ -86,10 +82,9 @@ public class Arm extends SubsystemBase {
   private boolean hasFlippedCoast = false;
   private boolean wasDisabled = true;
 
-  @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Arm", inputs);
+    Logger.processInputs("Algaefier/Arm", inputs);
 
     if (DriverStation.isDisabled()) {
       wasDisabled = true;
@@ -106,8 +101,6 @@ public class Arm extends SubsystemBase {
 
       if (Constants.isTuning) {
         ff = new ArmFeedforward(kS.getAsDouble(), kG.getAsDouble(), kV.getAsDouble(), 0.0);
-        ffLoaded =
-            new ArmFeedforward(kS.getAsDouble(), kGLoaded.getAsDouble(), kV.getAsDouble(), 0.0);
         profile =
             new TrapezoidProfile(
                 new TrapezoidProfile.Constraints(
@@ -128,36 +121,32 @@ public class Arm extends SubsystemBase {
         setpointState =
             profile.calculate(0.02, setpointState, new TrapezoidProfile.State(goal.getRads(), 0.0));
         io.runSetpoint(
-            setpointState.position,
-            goal == Goal.HOLD
-                ? ffLoaded.calculate(setpointState.position, setpointState.velocity)
-                : ff.calculate(setpointState.position, setpointState.velocity));
+            setpointState.position, ff.calculate(setpointState.position, setpointState.velocity));
 
-        Logger.recordOutput("Arm/SetpointState/Pos", setpointState.position);
-        Logger.recordOutput("Arm/SetpointState/Vel", setpointState.velocity);
-        Logger.recordOutput("Arm/GoalAngle", goal.getDegs());
+        Logger.recordOutput("Algaefier/Arm/SetpointState/Pos", setpointState.position);
+        Logger.recordOutput("Algaefier/Arm/SetpointState/Vel", setpointState.velocity);
+        Logger.recordOutput("Algaefier/Arm/GoalAngle", goal.getDegs());
       }
     }
 
     goalViz.update(goal.getRads());
     measuredViz.update(Constants.isSim ? goal.getRads() : inputs.positionRads);
-    Logger.recordOutput("Arm/Goal", goal);
-    Logger.recordOutput("Arm/Measured/PositionDeg", Units.radiansToDegrees(inputs.positionRads));
-    Logger.recordOutput("Arm/Measured/PositionRad", inputs.positionRads);
+    Logger.recordOutput("Algaefier/Arm/Goal", goal);
+    Logger.recordOutput(
+        "Algaefier/Arm/Measured/PositionDeg", Units.radiansToDegrees(inputs.positionRads));
+    Logger.recordOutput("Algaefier/Arm/Measured/PositionRad", inputs.positionRads);
   }
 
-  @AutoLogOutput
   public void setGoal(Goal goal) {
     this.goal = goal;
   }
 
-  @AutoLogOutput
   public Goal getGoal() {
     return goal;
   }
 
   public Command setGoalCommand(Goal goal) {
-    return startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW));
+    return Commands.startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW));
   }
 
   public void runCharacterization(double output) {

@@ -1,6 +1,6 @@
-package frc.team4276.frc2025.subsystems.arm;
+package frc.team4276.frc2025.subsystems.algaefier.arm;
 
-import static frc.team4276.frc2025.subsystems.arm.ArmConstants.*;
+import static frc.team4276.frc2025.subsystems.algaefier.arm.ArmConstants.*;
 import static frc.team4276.util.SparkUtil.*;
 
 import com.revrobotics.AbsoluteEncoder;

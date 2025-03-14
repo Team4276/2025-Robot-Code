@@ -1,4 +1,4 @@
-package frc.team4276.frc2025.subsystems.arm;
+package frc.team4276.frc2025.subsystems.algaefier.arm;
 
 import org.littletonrobotics.junction.AutoLog;
 
