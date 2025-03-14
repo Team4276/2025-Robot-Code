@@ -11,10 +11,9 @@ public class Climber extends SubsystemBase {
 
   public enum Goal {
     IDLE(() -> 0.0, () -> 0.0),
-    HOLD(() -> 0.0, new LoggedTunableNumber("Climber/Wheels/HoldVolts", 0.0)),
     CLIMB(
         new LoggedTunableNumber("Climber/ClimbVolts", -5.0),
-        new LoggedTunableNumber("Climber/Wheels/ClimbVolts", 5.0)),
+        new LoggedTunableNumber("Climber/Wheels/ClimbVolts", 0.0)),
     LATCH(() -> 0.0, new LoggedTunableNumber("Climber/Wheels/LatchVolts", 5.0)),
     RAISE(new LoggedTunableNumber("Climber/ReverseVolts", 5.0), () -> 0.0);
 
@@ -35,7 +34,7 @@ public class Climber extends SubsystemBase {
     }
   }
 
-  private Goal goal;
+  private Goal goal = Goal.IDLE;
   private final ClimberIO io;
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
 
@@ -43,18 +42,15 @@ public class Climber extends SubsystemBase {
 
   public Climber(ClimberIO io) {
     this.io = io;
-    goal = goal.IDLE;
+
     setDefaultCommand(setGoalCommand(Goal.IDLE));
   }
 
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    if (isClimbing) {
-      if (goal == Goal.IDLE) {
-        goal = Goal.HOLD;
-      }
 
+    if (isClimbing) {
       io.runWheelsAtVolts(goal.getWheelVolts());
       io.runRunWhenchAtVolts(goal.getWhenchVolts());
 

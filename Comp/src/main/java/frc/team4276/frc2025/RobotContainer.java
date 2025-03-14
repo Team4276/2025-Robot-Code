@@ -39,7 +39,6 @@ import frc.team4276.frc2025.subsystems.roller.RollerIOSparkMax;
 import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIO;
 import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIOHardware;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
-import frc.team4276.frc2025.subsystems.superstructure.displacer.Displacer;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.Elevator;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorIO;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorIOSparkMax;
@@ -120,7 +119,6 @@ public class RobotContainer {
                   new EndEffector(
                       new EndEffectorIOSparkMax(
                           Ports.ENDEFFECTOR_LEFT, Ports.ENDEFFECTOR_RIGHT, 40, false, true)),
-                  new Displacer(new RollerIOSparkMax(Ports.ALGAE_DISPLACER, 20, false, true)),
                   new RollerSensorsIOHardware());
           arm = new Arm(new ArmIOSparkMax());
           roller = new Roller(new RollerIOSparkMax(Ports.ALGAE_INTAKE_ROLLER, 40, false, true));
@@ -145,7 +143,6 @@ public class RobotContainer {
               new Superstructure(
                   new Elevator(new ElevatorIO() {}),
                   new EndEffector(new EndEffectorIO() {}),
-                  new Displacer(new RollerIO() {}),
                   new RollerSensorsIO() {});
           arm = new Arm(new ArmIO() {});
           roller = new Roller(new RollerIO() {});
@@ -185,7 +182,6 @@ public class RobotContainer {
           new Superstructure(
               new Elevator(new ElevatorIO() {}),
               new EndEffector(new EndEffectorIO() {}),
-              new Displacer(new RollerIO() {}),
               new RollerSensorsIO() {});
     }
 

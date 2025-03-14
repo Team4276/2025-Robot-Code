@@ -3,7 +3,6 @@ package frc.team4276.frc2025.subsystems.superstructure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.team4276.frc2025.subsystems.superstructure.displacer.Displacer;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.Elevator;
 import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffector;
 import java.util.function.BooleanSupplier;
@@ -13,7 +12,6 @@ import org.littletonrobotics.junction.Logger;
 public class Superstructure extends SubsystemBase {
   private final Elevator elevator;
   private final EndEffector endeffector;
-  private final Displacer displacer;
 
   private final RollerSensorsIO sensorsIO;
   private final RollerSensorsIOInputsAutoLogged sensorsInputs =
@@ -50,13 +48,11 @@ public class Superstructure extends SubsystemBase {
   private boolean cleared5 = false;
 
   private boolean hasCoral = false;
-  private boolean displace = false;
 
   public Superstructure(
-      Elevator elevator, EndEffector endeffector, Displacer displacer, RollerSensorsIO sensorsIO) {
+      Elevator elevator, EndEffector endeffector, RollerSensorsIO sensorsIO) {
     this.elevator = elevator;
     this.endeffector = endeffector;
-    this.displacer = displacer;
     this.sensorsIO = sensorsIO;
 
     elevator.setCoastOverride(() -> false);
@@ -89,10 +85,6 @@ public class Superstructure extends SubsystemBase {
       endeffector.setGoal(EndEffector.Goal.IDLE);
     }
 
-    if (displace) {
-      displacer.setGoal(Displacer.Goal.VROOOM);
-    }
-
     if (currentGoal != Goal.INTAKE) {
       hasGrasped = false;
       cleared2 = false;
@@ -108,7 +100,6 @@ public class Superstructure extends SubsystemBase {
       case STOW:
         elevator.setGoal(Elevator.Goal.STOW);
         endeffector.setGoal(EndEffector.Goal.IDLE);
-        displacer.setGoal(Displacer.Goal.MOOORV);
 
         break;
 
@@ -128,7 +119,6 @@ public class Superstructure extends SubsystemBase {
       case UNJAM:
         elevator.setGoal(Elevator.Goal.UNJAM);
         endeffector.setGoal(EndEffector.Goal.IDLE);
-        displacer.setGoal(Displacer.Goal.IDLE);
 
         break;
       case INTAKE:
@@ -146,7 +136,6 @@ public class Superstructure extends SubsystemBase {
         } else {
           endeffector.setGoal(EndEffector.Goal.INTAKE);
         }
-        displacer.setGoal(Displacer.Goal.IDLE);
 
         break;
 
@@ -170,13 +159,11 @@ public class Superstructure extends SubsystemBase {
       case LO_ALGAE:
         elevator.setGoal(Elevator.Goal.LO_ALGAE);
         endeffector.setGoal(EndEffector.Goal.IDLE);
-        displacer.setGoal(Displacer.Goal.VROOOM);
 
         break;
       case HI_ALGAE:
         elevator.setGoal(Elevator.Goal.HI_ALGAE);
         endeffector.setGoal(EndEffector.Goal.IDLE);
-        displacer.setGoal(Displacer.Goal.VROOOM);
 
         break;
       case CHARACTERIZING:
@@ -193,12 +180,10 @@ public class Superstructure extends SubsystemBase {
 
     elevator.periodic();
     endeffector.periodic();
-    displacer.periodic();
 
     Logger.recordOutput("Superstructure/DesiredGoal", desiredGoal.get());
     Logger.recordOutput("Superstructure/CurrentGoal", currentGoal);
     Logger.recordOutput("Superstructure/WantScore", wantScore);
-    Logger.recordOutput("Superstructure/Displace", displace);
     Logger.recordOutput("Superstructure/HasCoral", hasCoral);
   }
 
@@ -271,9 +256,5 @@ public class Superstructure extends SubsystemBase {
 
   public void overrideCoral(boolean hasCoral) {
     this.hasCoral = hasCoral;
-  }
-
-  public Command toggleDisplacerCommand() {
-    return Commands.runOnce(() -> displace = !displace);
   }
 }
