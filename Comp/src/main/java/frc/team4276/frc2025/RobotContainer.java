@@ -553,6 +553,25 @@ public class RobotContainer {
     /***************** Algae Triggers *****************/
 
     // Displacing
+    driver
+        .y()
+        .and(() -> !climber.isClimbing())
+        .and(
+            () ->
+                scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L2
+                    || scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L1)
+        .and(() -> superstructure.getGoal() != Superstructure.Goal.L3)
+        .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.LO_ALGAE));
+
+    driver
+        .y()
+        .and(() -> !climber.isClimbing())
+        .and(
+            () ->
+                !(superstructure.getGoal() == Superstructure.Goal.L2
+                    || superstructure.getGoal() == Superstructure.Goal.L1))
+        .and(() -> scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L3)
+        .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.HI_ALGAE));
 
     // Score // Also see coral scoring triggers
     driver
