@@ -1,11 +1,13 @@
 package frc.team4276.frc2025.subsystems.climber;
 
+import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
-import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.Logger;
 
 public class Climber extends SubsystemBase {
 
@@ -52,7 +54,7 @@ public class Climber extends SubsystemBase {
     io.updateInputs(inputs);
 
     if (isClimbing) {
-      if (((inputs.position - offset) < 3) && (goal == goal.CLIMB)) {
+      if (((inputs.position - offset) < 3) && (goal == Goal.CLIMB)) {
         goal = goal.IDLE;
       }
       io.runWheelsAtVolts(goal.getWheelVolts());
