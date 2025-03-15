@@ -131,6 +131,16 @@ public class ScoringHelper extends VirtualSubsystem {
   }
 
   public Pose2d getSelectedAlignPose() {
+    if (goal == Goal.NET) {
+      var trans = RobotState.getInstance().getEstimatedPose().getTranslation();
+      return trans.getDistance(
+                  AllianceFlipUtil.apply(FieldConstants.bargeScoreFar.getTranslation()))
+              < trans.getDistance(
+                  AllianceFlipUtil.apply(FieldConstants.bargeScoreClose.getTranslation()))
+          ? bargeScoreFar
+          : bargeScoreClose;
+    }
+    
     return getSelectedReef().getAlign();
   }
 

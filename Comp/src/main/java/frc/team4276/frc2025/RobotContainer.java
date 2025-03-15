@@ -519,6 +519,7 @@ public class RobotContainer {
                     Commands.waitUntil(
                             () ->
                                 superstructure.getGoal() != Superstructure.Goal.STOW
+                                && superstructure.atGoal()
                                     && DriveToPose.atGoal())
                         .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 0.2, 3))));
 
