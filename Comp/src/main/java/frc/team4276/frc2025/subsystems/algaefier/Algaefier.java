@@ -9,10 +9,12 @@ import java.util.function.BooleanSupplier;
 public class Algaefier extends SubsystemBase {
   public enum Goal {
     STOW,
+    INTAKE,
     CHARACTERIZING
   }
 
   private Goal goal = Goal.STOW;
+  private boolean hasAlgae = false;
 
   private final Arm arm;
   private final Gripper gripper;

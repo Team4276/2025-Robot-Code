@@ -133,7 +133,8 @@ public class RobotContainer {
               new Hopper(
                   new HopperIOSparkMax(Ports.HOPPER_LEFT, false),
                   new HopperIOSparkMax(Ports.HOPPER_RIGHT, true));
-          climber = new Climber(new ClimberIOSparkMax(0, 0, 40, 40));
+          climber =
+              new Climber(new ClimberIOSparkMax(Ports.CLIMBER_WENCH, Ports.CLIMBER_WHEEL, 40, 40));
           vision =
               new Vision(
                   RobotState.getInstance()::addVisionMeasurement,
@@ -561,7 +562,10 @@ public class RobotContainer {
                 scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L2
                     || scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L1)
         .and(() -> superstructure.getGoal() != Superstructure.Goal.L3)
-        .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.LO_ALGAE));
+        .toggleOnTrue(
+            superstructure
+                .setGoalCommand(Superstructure.Goal.LO_ALGAE)
+                .alongWith(algaefier.setGoalCommand(Algaefier.Goal.INTAKE)));
 
     driver
         .y()
@@ -571,7 +575,10 @@ public class RobotContainer {
                 !(superstructure.getGoal() == Superstructure.Goal.L2
                     || superstructure.getGoal() == Superstructure.Goal.L1))
         .and(() -> scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L3)
-        .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.HI_ALGAE));
+        .toggleOnTrue(
+            superstructure
+                .setGoalCommand(Superstructure.Goal.HI_ALGAE)
+                .alongWith(algaefier.setGoalCommand(Algaefier.Goal.INTAKE)));
 
     // Score // Also see coral scoring triggers
     driver
