@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -38,8 +39,9 @@ public class Climber extends SubsystemBase {
   private Goal goal = Goal.IDLE;
   private final ClimberIO io;
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
-
+  private BooleanSupplier override;
   private boolean isClimbing = false;
+  private boolean hasFlippedCoast = false;
 
   public Climber(ClimberIO io) {
     this.io = io;
@@ -47,9 +49,18 @@ public class Climber extends SubsystemBase {
     setDefaultCommand(setGoalCommand(Goal.IDLE));
   }
 
+  public void setCoastOverride(BooleanSupplier override) {
+    this.override = override;
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);
+    if (!override.getAsBoolean()) {
+      hasFlippedCoast = true;
+    }
+
+    io.setBrakeMode(!(override.getAsBoolean() && hasFlippedCoast));
 
     if (isClimbing) {
       if (((inputs.position - offset) < 3) && (goal == Goal.CLIMB)) {

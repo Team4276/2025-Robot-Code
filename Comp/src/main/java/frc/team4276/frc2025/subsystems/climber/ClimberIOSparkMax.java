@@ -4,11 +4,13 @@ import static frc.team4276.util.SparkUtil.ifOk;
 import static frc.team4276.util.SparkUtil.tryUntilOk;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -19,10 +21,15 @@ public class ClimberIOSparkMax implements ClimberIO {
   private SparkFlex wheel;
   private RelativeEncoder relEncoder;
 
+  private SparkMaxConfig whenchConfig;
+  private SparkFlexConfig wheelConfig;
+  private boolean brakeModeEnabled = true;
+  ;
+
   public ClimberIOSparkMax(
       int whenchID, int wheelID, int whenchCurrentLimit, int wheelCurrentLimit) {
-    SparkMaxConfig whenchConfig = new SparkMaxConfig();
-    SparkFlexConfig wheelConfig = new SparkFlexConfig();
+    whenchConfig = new SparkMaxConfig();
+    wheelConfig = new SparkFlexConfig();
 
     wheel = new SparkFlex(wheelID, MotorType.kBrushless);
     wheelConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(wheelID);
@@ -77,5 +84,26 @@ public class ClimberIOSparkMax implements ClimberIO {
   @Override
   public void runRunWhenchAtVolts(double volts) {
     whench.setVoltage(volts);
+  }
+
+  @Override
+  public void setBrakeMode(boolean enabled) {
+    if (brakeModeEnabled == enabled) return;
+    brakeModeEnabled = enabled;
+    new Thread(
+            () -> {
+              tryUntilOk(
+                  whench,
+                  5,
+                  () ->
+                      whench.configure(
+                          whenchConfig.idleMode(
+                              brakeModeEnabled
+                                  ? SparkBaseConfig.IdleMode.kBrake
+                                  : SparkBaseConfig.IdleMode.kCoast),
+                          SparkBase.ResetMode.kNoResetSafeParameters,
+                          SparkBase.PersistMode.kNoPersistParameters));
+            })
+        .start();
   }
 }

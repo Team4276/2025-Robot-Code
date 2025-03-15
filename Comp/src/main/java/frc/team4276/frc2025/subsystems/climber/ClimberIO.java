@@ -23,4 +23,6 @@ public interface ClimberIO {
   default void runWheelsAtVolts(double volts) {}
 
   default void runRunWhenchAtVolts(double volts) {}
+
+  public default void setBrakeMode(boolean enabled) {}
 }
