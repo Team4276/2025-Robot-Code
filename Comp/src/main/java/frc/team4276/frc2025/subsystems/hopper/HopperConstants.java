@@ -1,6 +1,8 @@
 package frc.team4276.frc2025.subsystems.hopper;
 
 import edu.wpi.first.math.geometry.Translation3d;
+import frc.team4276.util.dashboard.LoggedTunableNumber;
+import java.util.function.DoubleSupplier;
 
 public class HopperConstants {
   public static final boolean invertRight = true;
@@ -15,6 +17,13 @@ public class HopperConstants {
   public static final double kp = 0.001;
   public static final double ki = 0.0;
   public static final double kd = 0.0;
+
+  public static final DoubleSupplier kS_left = new LoggedTunableNumber("Hopper/kS_left", 0);
+  public static final DoubleSupplier kS_right = new LoggedTunableNumber("Hopper/kS_right", 0);
+
+  public static final DoubleSupplier kV = new LoggedTunableNumber("Hopper/kV", 0);
+  public static final DoubleSupplier kG = new LoggedTunableNumber("Hopper/kG", 0);
+  public static final DoubleSupplier kA = new LoggedTunableNumber("Hopper/kA", 0);
 
   public static final int readFreq = 50;
 

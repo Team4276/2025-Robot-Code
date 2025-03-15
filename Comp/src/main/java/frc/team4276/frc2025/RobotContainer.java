@@ -94,6 +94,7 @@ public class RobotContainer {
   private final DigitalInput elevatorCoastOverride =
       new DigitalInput(Ports.ELEVATOR_COAST_OVERRIDE);
   private final DigitalInput armCoastOverride = new DigitalInput(Ports.ARM_COAST_OVERRIDE);
+  private final DigitalInput hopperCoastOverride = new DigitalInput(Ports.HOPPER_COAST_OVERRIDE);
 
   // Coral Scoring Logic
   @AutoLogOutput private boolean disableHeadingAutoAlign = true;
@@ -223,6 +224,7 @@ public class RobotContainer {
   private void configureOverrides() {
     superstructure.setCoastOverride(elevatorCoastOverride::get);
     algaefier.setArmCoastOverride(armCoastOverride::get);
+    hopper.setCoastOverride(hopperCoastOverride::get);
   }
 
   private void configureAutos() {

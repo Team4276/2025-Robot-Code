@@ -1,19 +1,22 @@
 package frc.team4276.frc2025.subsystems.hopper;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team4276.frc2025.Constants;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import frc.team4276.util.dashboard.LoggedTunableProfile;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Hopper extends SubsystemBase {
   public enum Goal {
     IDLE(() -> 0.0),
-    CLIMB(new LoggedTunableNumber("Hopper/ClimbPosition", 0.0));
+    CLIMB(new LoggedTunableNumber("Hopper/ClimbPosition", -20.0));
 
     private final DoubleSupplier setpointSupplier;
 
@@ -32,13 +35,25 @@ public class Hopper extends SubsystemBase {
 
   private final HopperIO leftIo;
   private final HopperIO rightIo;
+  private BooleanSupplier override;
 
   private final HopperIOInputsAutoLogged leftInputs = new HopperIOInputsAutoLogged();
   private final HopperIOInputsAutoLogged rightInputs = new HopperIOInputsAutoLogged();
-
+  private ElevatorFeedforward ff_left =
+      new ElevatorFeedforward(
+          HopperConstants.kS_left.getAsDouble(),
+          HopperConstants.kG.getAsDouble(),
+          HopperConstants.kV.getAsDouble());
+  private ElevatorFeedforward ff_right =
+      new ElevatorFeedforward(
+          HopperConstants.kS_right.getAsDouble(),
+          HopperConstants.kG.getAsDouble(),
+          HopperConstants.kV.getAsDouble());
   private final LoggedTunableProfile profile = new LoggedTunableProfile("Hopper", 25.0, 25.0);
   private TrapezoidProfile.State prevLeftState = new TrapezoidProfile.State();
   private TrapezoidProfile.State prevRightState = new TrapezoidProfile.State();
+
+  private boolean hasFlippedCoast = false;
 
   public Hopper(HopperIO leftIo, HopperIO rightIo) {
     this.leftIo = leftIo;
@@ -47,12 +62,31 @@ public class Hopper extends SubsystemBase {
     setDefaultCommand(setGoalCommand(Goal.IDLE));
   }
 
+  public void setCoastOverride(BooleanSupplier coastOverride) {
+    this.override = coastOverride;
+  }
+
   @Override
   public void periodic() {
     leftIo.updateInputs(leftInputs);
     rightIo.updateInputs(rightInputs);
     Logger.processInputs("Hopper/Left", leftInputs);
     Logger.processInputs("Hopper/Right", rightInputs);
+    if (Constants.isTuning) {
+      ff_left.setKg(HopperConstants.kG.getAsDouble());
+      ff_left.setKs(HopperConstants.kS_left.getAsDouble());
+      ff_left.setKv(HopperConstants.kV.getAsDouble());
+
+      ff_right.setKg(HopperConstants.kG.getAsDouble());
+      ff_right.setKs(HopperConstants.kS_right.getAsDouble());
+      ff_right.setKv(HopperConstants.kV.getAsDouble());
+    }
+    if (!override.getAsBoolean()) {
+      hasFlippedCoast = true;
+    }
+
+    leftIo.setBrakeMode(!(override.getAsBoolean() && hasFlippedCoast));
+    rightIo.setBrakeMode(!(override.getAsBoolean() && hasFlippedCoast));
 
     if (DriverStation.isDisabled()) {
       goal = Goal.IDLE;
@@ -68,8 +102,10 @@ public class Hopper extends SubsystemBase {
           profile.calculate(
               0.02, prevRightState, new TrapezoidProfile.State(goal.getPosition(), 0.0));
 
-      leftIo.runSetpoint(prevLeftState.position + leftOffset);
-      rightIo.runSetpoint(prevRightState.position + rightOffset);
+      leftIo.runSetpoint(
+          prevLeftState.position + leftOffset, ff_left.calculate(prevLeftState.velocity));
+      rightIo.runSetpoint(
+          prevRightState.position + rightOffset, ff_right.calculate(prevRightState.velocity));
     }
 
     Logger.recordOutput("Hopper/Goal", goal.toString());
