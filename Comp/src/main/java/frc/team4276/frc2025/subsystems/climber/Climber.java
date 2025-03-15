@@ -63,7 +63,7 @@ public class Climber extends SubsystemBase {
     io.setBrakeMode(!(override.getAsBoolean() && hasFlippedCoast));
 
     if (isClimbing) {
-      if (((inputs.position - offset) < 3) && (goal == Goal.CLIMB)) {
+      if (((inputs.position - offset) < 6) && (goal == Goal.CLIMB)) {
         goal = goal.IDLE;
       }
       io.runWheelsAtVolts(goal.getWheelVolts());
@@ -97,12 +97,5 @@ public class Climber extends SubsystemBase {
 
   public boolean isClimbing() {
     return isClimbing;
-  }
-
-  public Command zeroCommand() {
-    return Commands.runOnce(
-        () -> {
-          offset = inputs.position;
-        });
   }
 }

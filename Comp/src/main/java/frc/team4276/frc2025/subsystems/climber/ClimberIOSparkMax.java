@@ -89,6 +89,9 @@ public class ClimberIOSparkMax implements ClimberIO {
   @Override
   public void setBrakeMode(boolean enabled) {
     if (brakeModeEnabled == enabled) return;
+    if (brakeModeEnabled == false) {
+      relEncoder.setPosition(0);
+    }
     brakeModeEnabled = enabled;
     new Thread(
             () -> {
