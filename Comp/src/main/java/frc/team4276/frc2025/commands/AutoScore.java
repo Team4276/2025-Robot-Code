@@ -3,7 +3,6 @@ package frc.team4276.frc2025.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.team4276.frc2025.Constants;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.ScoringHelper;
 import frc.team4276.frc2025.field.FieldConstants.Reef;
@@ -71,7 +70,7 @@ public class AutoScore {
   }
 
   public static Pose2d getRobotPose(Reef reef, Pose2d finalPose) {
-    return Constants.isSim || cancelTxTy
+    return cancelTxTy
         ? RobotState.getInstance().getEstimatedPose()
         : RobotState.getInstance().getReefPose(reef.ordinal() / 2, finalPose);
   }

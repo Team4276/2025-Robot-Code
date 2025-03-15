@@ -2,6 +2,7 @@ package frc.team4276.frc2025;
 
 import static frc.team4276.frc2025.subsystems.drive.DriveConstants.kinematics;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,6 +18,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.team4276.frc2025.field.FieldConstants;
@@ -34,6 +36,10 @@ import org.littletonrobotics.junction.Logger;
 public class RobotState {
   private LoggedTunableNumber txTyObservationStaleSecs =
       new LoggedTunableNumber("RobotState/TxTyObsStaleSecs", 0.5);
+  private static final LoggedTunableNumber minDistanceTagPoseBlend =
+      new LoggedTunableNumber("RobotState/MinDistanceTagPoseBlend", Units.inchesToMeters(24.0));
+  private static final LoggedTunableNumber maxDistanceTagPoseBlend =
+      new LoggedTunableNumber("RobotState/MaxDistanceTagPoseBlend", Units.inchesToMeters(36.0));
 
   private SwerveModulePosition[] lastWheelPositions =
       new SwerveModulePosition[] {
@@ -119,8 +125,10 @@ public class RobotState {
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
-    var pose = new Pose2d(visionRobotPoseMeters.getTranslation(), getEstimatedPose().getRotation());
-    poseEstimator.addVisionMeasurement(pose, timestampSeconds, visionMeasurementStdDevs);
+    // var pose = new Pose2d(visionRobotPoseMeters.getTranslation(),
+    // getEstimatedPose().getRotation());
+    poseEstimator.addVisionMeasurement(
+        visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
   }
 
   /** Adds a new timestamped vision measurement. */
@@ -207,12 +215,6 @@ public class RobotState {
     // Get odometry based pose at timestamp
     var sample = odomPoseBuffer.getSample(data.timestamp());
 
-    if (sample.isPresent()) {
-      Logger.recordOutput(
-          "RobotState/EstimatedTxTyPose",
-          data.pose()
-              .plus(new Transform2d(sample.get(), poseEstimatorOdom.getEstimatedPosition())));
-    }
     // Latency compensate
     return sample.map(
         pose2d ->
@@ -239,14 +241,14 @@ public class RobotState {
     // Use estimated pose if tag pose is not present
     if (tagPose.isEmpty()) return RobotState.getInstance().getEstimatedPose();
     // Use distance from estimated pose to final pose to get t value
-    // final double t = MathUtil.clamp(
-    // (getEstimatedPose().getTranslation().getDistance(finalPose.getTranslation())
-    // - minDistanceTagPoseBlend.get())
-    // / (maxDistanceTagPoseBlend.get() - minDistanceTagPoseBlend.get()),
-    // 0.0,
-    // 1.0);
-    // return getEstimatedPose().interpolate(tagPose.get(), 1.0 - t);
-    return tagPose.get();
+    final double t =
+        MathUtil.clamp(
+            (getEstimatedPose().getTranslation().getDistance(finalPose.getTranslation())
+                    - minDistanceTagPoseBlend.get())
+                / (maxDistanceTagPoseBlend.get() - minDistanceTagPoseBlend.get()),
+            0.0,
+            1.0);
+    return getEstimatedPose().interpolate(tagPose.get(), 1.0 - t);
   }
 
   private boolean useTrajectorySetpoint() {
@@ -265,7 +267,12 @@ public class RobotState {
   }
 
   public void update() {
-    getReefPose(2, Pose2d.kZero);
+    // Log tx/ty poses
+    Pose2d[] tagPoses = new Pose2d[FieldConstants.aprilTagCount + 1];
+    for (int i = 0; i < FieldConstants.aprilTagCount + 1; i++) {
+      tagPoses[i] = getTxTyPose(i).orElse(Pose2d.kZero);
+    }
+    Logger.recordOutput("RobotState/TxTyPoses", tagPoses);
   }
 
   public record TxTyPoseRecord(Pose2d pose, double distance, double timestamp) {}
