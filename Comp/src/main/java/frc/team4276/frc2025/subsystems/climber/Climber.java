@@ -76,6 +76,7 @@ public class Climber extends SubsystemBase {
 
     Logger.recordOutput("Climber/Goal", goal.toString());
     Logger.recordOutput("Climber/IsClimbing", isClimbing);
+    Logger.recordOutput("Climber/Position", inputs.position);
   }
 
   public void setIsClimbing(boolean isClimbing) {
