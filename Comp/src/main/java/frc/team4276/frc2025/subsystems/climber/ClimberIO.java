@@ -14,6 +14,8 @@ public interface ClimberIO {
     public boolean wheelsConnected = true;
     public double wheelsSupplyCurrentAmps = 0.0;
     public double wheelsTempCelsius = 0.0;
+
+    public double position = 0.0;
   }
 
   default void updateInputs(ClimberIOInputs inputs) {}

@@ -34,6 +34,7 @@ public class Climber extends SubsystemBase {
     }
   }
 
+  private double offset = 0;
   private Goal goal = Goal.IDLE;
   private final ClimberIO io;
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
@@ -51,6 +52,9 @@ public class Climber extends SubsystemBase {
     io.updateInputs(inputs);
 
     if (isClimbing) {
+      if (((inputs.position - offset) < 3) && (goal == goal.CLIMB)) {
+        goal = goal.IDLE;
+      }
       io.runWheelsAtVolts(goal.getWheelVolts());
       io.runRunWhenchAtVolts(goal.getWhenchVolts());
 
@@ -81,5 +85,12 @@ public class Climber extends SubsystemBase {
 
   public boolean isClimbing() {
     return isClimbing;
+  }
+
+  public Command zeroCommand() {
+    return Commands.runOnce(
+        () -> {
+          offset = inputs.position;
+        });
   }
 }

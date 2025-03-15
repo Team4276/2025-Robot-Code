@@ -3,6 +3,7 @@ package frc.team4276.frc2025.subsystems.climber;
 import static frc.team4276.util.SparkUtil.ifOk;
 import static frc.team4276.util.SparkUtil.tryUntilOk;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
@@ -16,6 +17,7 @@ import java.util.function.DoubleSupplier;
 public class ClimberIOSparkMax implements ClimberIO {
   private SparkMax whench;
   private SparkFlex wheel;
+  private RelativeEncoder relEncoder;
 
   public ClimberIOSparkMax(
       int whenchID, int wheelID, int whenchCurrentLimit, int wheelCurrentLimit) {
@@ -43,6 +45,9 @@ public class ClimberIOSparkMax implements ClimberIO {
         () ->
             whench.configure(
                 whenchConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+
+    relEncoder = whench.getEncoder();
+    relEncoder.setPosition(0);
   }
 
   @Override
@@ -60,6 +65,8 @@ public class ClimberIOSparkMax implements ClimberIO {
         new DoubleSupplier[] {wheel::getAppliedOutput, wheel::getBusVoltage},
         (values) -> inputs.appliedVoltageWheels = values[0] * values[1]);
     ifOk(wheel, wheel::getMotorTemperature, (value) -> inputs.wheelsTempCelsius = value);
+
+    ifOk(whench, relEncoder::getPosition, (value) -> inputs.position = value);
   }
 
   @Override
