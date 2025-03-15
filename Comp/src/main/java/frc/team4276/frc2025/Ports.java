@@ -29,7 +29,7 @@ public class Ports {
   /* DIOs */
   public static final int ELEVATOR_COAST_OVERRIDE = 0;
   public static final int ARM_COAST_OVERRIDE = 1;
-  public static final int HOPPER_COAST_OVERRIDE = 9;
+  public static final int HOPPER_COAST_OVERRIDE = 2;
 
   public static final int CORAL_BREAK_FRONT = 7;
   public static final int CORAL_BREAK_BACK = 8;

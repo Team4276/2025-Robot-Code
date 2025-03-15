@@ -131,8 +131,8 @@ public class RobotContainer {
                   new Arm(new ArmIO() {}), new Gripper(new RollerIO() {}));
           hopper =
               new Hopper(
-                  new HopperIOSparkMax(Ports.HOPPER_LEFT, false),
-                  new HopperIOSparkMax(Ports.HOPPER_RIGHT, true));
+                  new HopperIOSparkMax(Ports.HOPPER_LEFT, true),
+                  new HopperIOSparkMax(Ports.HOPPER_RIGHT, false));
           climber =
               new Climber(new ClimberIOSparkMax(Ports.CLIMBER_WENCH, Ports.CLIMBER_WHEEL, 40, 40));
           vision =
@@ -551,7 +551,7 @@ public class RobotContainer {
         .and(() -> !driver.getRT())
         .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE));
 
-    driver.povDown().whileTrue(hopper.zeroCommand());
+    driver.povDown().whileTrue(hopper.zeroCommand().ignoringDisable(true));
 
     // driver.povUp().onTrue(superstructure.toggleUnjamCommand());
 

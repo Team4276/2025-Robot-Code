@@ -16,7 +16,7 @@ import org.littletonrobotics.junction.Logger;
 public class Hopper extends SubsystemBase {
   public enum Goal {
     IDLE(() -> 0.0),
-    CLIMB(new LoggedTunableNumber("Hopper/ClimbPosition", -20.0));
+    CLIMB(new LoggedTunableNumber("Hopper/ClimbPosition", 20.0));
 
     private final DoubleSupplier setpointSupplier;
 
@@ -91,8 +91,8 @@ public class Hopper extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       goal = Goal.IDLE;
 
-      prevLeftState = new TrapezoidProfile.State(leftInputs.position, 0.0);
-      prevRightState = new TrapezoidProfile.State(rightInputs.position, 0.0);
+      prevLeftState = new TrapezoidProfile.State(leftInputs.position - leftOffset, 0.0);
+      prevRightState = new TrapezoidProfile.State(rightInputs.position - rightOffset, 0.0);
 
     } else {
       prevLeftState =

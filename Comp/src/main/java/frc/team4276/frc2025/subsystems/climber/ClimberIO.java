@@ -4,7 +4,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface ClimberIO {
   @AutoLog
-  abstract class ClimberIOInputs {
+  public static class ClimberIOInputs {
     public double appliedVoltageWhench = 0.0;
     public boolean whenchConnected = true;
     public double whenchSupplyCurrentAmps = 0.0;
@@ -18,9 +18,12 @@ public interface ClimberIO {
     public double position = 0.0;
   }
 
-  default void updateInputs(ClimberIOInputs inputs) {}
+  default void updateInputs(ClimberIOInputs inputs) {
+  }
 
-  default void runWheelsAtVolts(double volts) {}
+  default void runWheelsAtVolts(double volts) {
+  }
 
-  default void runRunWhenchAtVolts(double volts) {}
+  default void runRunWhenchAtVolts(double volts) {
+  }
 }
