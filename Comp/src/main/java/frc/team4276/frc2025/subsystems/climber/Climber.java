@@ -12,10 +12,10 @@ public class Climber extends SubsystemBase {
   public enum Goal {
     IDLE(() -> 0.0, () -> 0.0),
     CLIMB(
-        new LoggedTunableNumber("Climber/ClimbVolts", -5.0),
+        new LoggedTunableNumber("Climber/ClimbVolts", -12.0),
         new LoggedTunableNumber("Climber/Wheels/ClimbVolts", 0.0)),
-    LATCH(() -> 0.0, new LoggedTunableNumber("Climber/Wheels/LatchVolts", 5.0)),
-    RAISE(new LoggedTunableNumber("Climber/ReverseVolts", 5.0), () -> 0.0);
+    LATCH(() -> 0.0, new LoggedTunableNumber("Climber/Wheels/LatchVolts", 12.0)),
+    RAISE(new LoggedTunableNumber("Climber/ReverseVolts", 12.0), () -> 0.0);
 
     private final DoubleSupplier wheelVolts;
     private final DoubleSupplier whenchVolts;

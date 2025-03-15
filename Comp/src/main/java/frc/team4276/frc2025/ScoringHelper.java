@@ -44,29 +44,29 @@ public class ScoringHelper extends VirtualSubsystem {
 
   private void updateButtonBoard() {
     // Update Positions
-    if (buttonBoard.getHID().getRawButtonPressed(5)) {
+    if (buttonBoard.getHID().getRawButtonPressed(6)) {
       reef = Reef.A;
-    } else if (buttonBoard.getHID().getRawButtonPressed(6)) {
+    } else if (buttonBoard.getHID().getRawButtonPressed(5)) {
       reef = Reef.B;
-    } else if (buttonBoard.getHID().getRawButtonPressed(7)) {
-      reef = Reef.C;
-    } else if (buttonBoard.getHID().getRawButtonPressed(8)) {
-      reef = Reef.D;
-    } else if (buttonBoard.getHID().getRawButtonPressed(9)) {
-      reef = Reef.E;
-    } else if (buttonBoard.getHID().getRawButtonPressed(10)) {
-      reef = Reef.F;
-    } else if (buttonBoard.getHID().getRawButtonPressed(3)) {
-      reef = Reef.G;
     } else if (buttonBoard.getHID().getRawButtonPressed(4)) {
-      reef = Reef.H;
+      reef = Reef.C;
+    } else if (buttonBoard.getHID().getRawButtonPressed(3)) {
+      reef = Reef.D;
+    } else if (buttonBoard.getHID().getRawButtonPressed(2)) {
+      reef = Reef.E;
+    } else if (buttonBoard.getHID().getRawButtonPressed(1)) {
+      reef = Reef.F;
     } else if (buttonBoard.getHID().getPOV() == 90) {
-      reef = Reef.I;
+      reef = Reef.G;
     } else if (buttonBoard.getHID().getPOV() == 270) {
-      reef = Reef.J;
+      reef = Reef.H;
     } else if (buttonBoard.getHID().getPOV() == 180) {
-      reef = Reef.K;
+      reef = Reef.I;
     } else if (buttonBoard.getHID().getPOV() == 0) {
+      reef = Reef.J;
+    } else if (buttonBoard.getHID().getRawButtonPressed(8)) {
+      reef = Reef.K;
+    } else if (buttonBoard.getHID().getRawButtonPressed(7)) {
       reef = Reef.L;
     }
 
@@ -75,9 +75,9 @@ public class ScoringHelper extends VirtualSubsystem {
       goal = Goal.L1;
     } else if (buttonBoard.getRawAxis(3) == 1) {
       goal = Goal.L2;
-    } else if (buttonBoard.getHID().getRawButtonPressed(2)) {
+    } else if (buttonBoard.getHID().getRawButtonPressed(9)) {
       goal = Goal.L3;
-    } else if (buttonBoard.getHID().getRawButtonPressed(1)) {
+    } else if (buttonBoard.getHID().getRawButtonPressed(10)) {
       goal = Goal.NET;
     }
   }
@@ -86,6 +86,9 @@ public class ScoringHelper extends VirtualSubsystem {
   private int side = 0;
 
   private void updateXbox() {
+    boolean prevRight = isRight;
+    int prevSide = side;
+
     // Update Positions
     if (xbox.getHID().getLeftBumperButton()) {
       isRight = false;
@@ -118,11 +121,13 @@ public class ScoringHelper extends VirtualSubsystem {
       goal = Goal.NET;
     }
 
-    if (side > 1 && side < 5) {
-      reef = Reef.values()[(side * 2) + (isRight ? 0 : 1)];
+    if (prevSide != side || prevRight != isRight) {
+      if (side > 1 && side < 5) {
+        reef = Reef.values()[(side * 2) + (isRight ? 0 : 1)];
 
-    } else {
-      reef = Reef.values()[(side * 2) + (isRight ? 1 : 0)];
+      } else {
+        reef = Reef.values()[(side * 2) + (isRight ? 1 : 0)];
+      }
     }
   }
 
@@ -140,7 +145,7 @@ public class ScoringHelper extends VirtualSubsystem {
           ? bargeScoreFar
           : bargeScoreClose;
     }
-    
+
     return getSelectedReef().getAlign();
   }
 

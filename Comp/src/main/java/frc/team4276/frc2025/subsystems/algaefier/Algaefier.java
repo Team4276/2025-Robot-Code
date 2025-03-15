@@ -30,7 +30,7 @@ public class Algaefier extends SubsystemBase {
   public void periodic() {}
 
   public void setArmCoastOverride(BooleanSupplier override) {
-    arm.setCoastOverride(override);
+    // arm.setCoastOverride(override);
   }
 
   public void setGoal(Goal goal) {

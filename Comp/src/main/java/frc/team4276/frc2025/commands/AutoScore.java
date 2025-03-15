@@ -17,7 +17,7 @@ public class AutoScore {
   private static final LoggedTunableNumber reefNudgeThreshold =
       new LoggedTunableNumber("AutoScore/ReefNudgeThreshold", 0.1);
 
-  private static boolean cancelTxTy = false;
+  private static boolean cancelTxTy = true;
 
   public static Command coralScoreCommand(
       Drive drive,

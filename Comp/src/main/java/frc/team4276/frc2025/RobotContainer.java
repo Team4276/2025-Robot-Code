@@ -25,10 +25,8 @@ import frc.team4276.frc2025.commands.auto.AutoBuilder;
 import frc.team4276.frc2025.subsystems.algaefier.Algaefier;
 import frc.team4276.frc2025.subsystems.algaefier.arm.Arm;
 import frc.team4276.frc2025.subsystems.algaefier.arm.ArmIO;
-import frc.team4276.frc2025.subsystems.algaefier.arm.ArmIOSparkMax;
 import frc.team4276.frc2025.subsystems.algaefier.roller.Gripper;
 import frc.team4276.frc2025.subsystems.algaefier.roller.RollerIO;
-import frc.team4276.frc2025.subsystems.algaefier.roller.RollerIOSparkMax;
 import frc.team4276.frc2025.subsystems.climber.Climber;
 import frc.team4276.frc2025.subsystems.climber.ClimberIO;
 import frc.team4276.frc2025.subsystems.climber.ClimberIOSparkMax;
@@ -127,8 +125,9 @@ public class RobotContainer {
                   new RollerSensorsIOHardware());
           algaefier =
               new Algaefier(
-                  new Arm(new ArmIOSparkMax()),
-                  new Gripper(new RollerIOSparkMax(Ports.ALGAEFIER_GRIPPER, 40, false, true)));
+                  // new Arm(new ArmIOSparkMax()),
+                  // new Gripper(new RollerIOSparkMax(Ports.ALGAEFIER_GRIPPER, 40, false, true))
+                  new Arm(new ArmIO() {}), new Gripper(new RollerIO() {}));
           hopper =
               new Hopper(
                   new HopperIOSparkMax(Ports.HOPPER_LEFT, false),
@@ -519,7 +518,7 @@ public class RobotContainer {
                     Commands.waitUntil(
                             () ->
                                 superstructure.getGoal() != Superstructure.Goal.STOW
-                                && superstructure.atGoal()
+                                    && superstructure.atGoal()
                                     && DriveToPose.atGoal())
                         .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 0.2, 3))));
 
@@ -549,6 +548,8 @@ public class RobotContainer {
         .rightBumper()
         .and(() -> !driver.getRT())
         .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE));
+
+    driver.povDown().whileTrue(hopper.zeroCommand());
 
     // driver.povUp().onTrue(superstructure.toggleUnjamCommand());
 
@@ -603,7 +604,7 @@ public class RobotContainer {
     /***************** Climbing Triggers *****************/
 
     driver
-        .start()
+        .povUp()
         .toggleOnTrue(
             climber.isClimbingCommand().alongWith(hopper.setGoalCommand(Hopper.Goal.CLIMB)));
 

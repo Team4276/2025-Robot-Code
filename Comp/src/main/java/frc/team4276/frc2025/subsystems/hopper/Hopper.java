@@ -36,7 +36,7 @@ public class Hopper extends SubsystemBase {
   private final HopperIOInputsAutoLogged leftInputs = new HopperIOInputsAutoLogged();
   private final HopperIOInputsAutoLogged rightInputs = new HopperIOInputsAutoLogged();
 
-  private final LoggedTunableProfile profile = new LoggedTunableProfile("Hopper", 0.0, 0.0);
+  private final LoggedTunableProfile profile = new LoggedTunableProfile("Hopper", 25.0, 25.0);
   private TrapezoidProfile.State prevLeftState = new TrapezoidProfile.State();
   private TrapezoidProfile.State prevRightState = new TrapezoidProfile.State();
 

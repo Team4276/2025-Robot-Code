@@ -9,10 +9,10 @@ public class HopperConstants {
   public static final int currentLimit = 40;
 
   public static final double encoderPositionFactor = 1.0;
-  public static final double encoderVelocityFactor = 1.0;
+  public static final double encoderVelocityFactor = 1.0 / 60.0;
   public static final boolean invertEncoder = false;
 
-  public static final double kp = 0.0;
+  public static final double kp = 0.001;
   public static final double ki = 0.0;
   public static final double kd = 0.0;
 
