@@ -29,6 +29,14 @@ public class VisionConstants {
                 new Rotation3d(0.0, -1.0 * Math.toRadians(20.0), -1.0 * Math.toRadians(15))),
             1),
         new CameraConfig(
+            "USB_Camera",
+            new Transform3d(
+                Units.inchesToMeters(8.822182),
+                Units.inchesToMeters(7.831371) * -1.0,
+                Units.inchesToMeters(17.288335),
+                new Rotation3d(0.0, Math.toRadians(15), Math.toRadians(15))),
+            0.75),
+        new CameraConfig(
             "Arducam_12MP",
             new Transform3d(
                 Units.inchesToMeters(8.822182),

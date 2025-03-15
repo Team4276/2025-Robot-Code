@@ -17,11 +17,9 @@ import org.littletonrobotics.junction.Logger;
 public class DriveToPose extends Command {
   private static final LoggedTunableProfiledPID driveController =
       new LoggedTunableProfiledPID("DriveToPose/Translation", 3.0, 0.0, 0.0, 0.01, 3.0, 3.0);
-  ;
   private static final LoggedTunableProfiledPID thetaController =
       new LoggedTunableProfiledPID(
-          "DriveToPose/Rotation", 3.0, 0.0, 0.0, Units.degreesToRadians(1.0), 6.0, 3.0);
-  ;
+          "DriveToPose/Rotation", 4.0, 0.1, 0.0, Units.degreesToRadians(1.0), 6.0, 3.0);
 
   private static boolean isRunning = false;
 
