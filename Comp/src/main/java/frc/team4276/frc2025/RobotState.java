@@ -125,8 +125,6 @@ public class RobotState {
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
-    // var pose = new Pose2d(visionRobotPoseMeters.getTranslation(),
-    // getEstimatedPose().getRotation());
     poseEstimator.addVisionMeasurement(
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
   }

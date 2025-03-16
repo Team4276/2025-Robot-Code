@@ -64,7 +64,7 @@ public class Climber extends SubsystemBase {
 
     if (isClimbing) {
       if (((inputs.position - offset) < 6) && (goal == Goal.CLIMB)) {
-        goal = goal.IDLE;
+        goal = Goal.IDLE;
       }
       io.runWheelsAtVolts(goal.getWheelVolts());
       io.runRunWhenchAtVolts(goal.getWhenchVolts());

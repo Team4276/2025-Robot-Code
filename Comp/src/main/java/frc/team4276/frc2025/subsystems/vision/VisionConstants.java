@@ -26,32 +26,39 @@ public class VisionConstants {
                 Units.inchesToMeters(11.475659),
                 Units.inchesToMeters(7.818997),
                 Units.inchesToMeters(7.919400),
-                new Rotation3d(0.0, -1.0 * Math.toRadians(20.0), -1.0 * Math.toRadians(15))),
-            1),
+                new Rotation3d(
+                    Math.toRadians(5.2362),
+                    -1.0 * Math.toRadians(20.0),
+                    -1.0 * Math.toRadians(14.1327))),
+            1.25),
         new CameraConfig(
             "USB_Camera",
             new Transform3d(
                 Units.inchesToMeters(8.822182),
                 Units.inchesToMeters(7.831371) * -1.0,
                 Units.inchesToMeters(17.288335),
-                new Rotation3d(0.0, Math.toRadians(15), Math.toRadians(15))),
-            0.75),
+                new Rotation3d(
+                    Math.toRadians(3.9671) - (Math.PI / 2),
+                    Math.toRadians(15),
+                    Math.toRadians(15.5108))),
+            1.5),
         new CameraConfig(
-            "Arducam_12MP",
+            "Arducam_OV2311_USB_Camera",
             new Transform3d(
-                Units.inchesToMeters(8.822182),
-                Units.inchesToMeters(7.831371) * -1.0,
-                Units.inchesToMeters(17.288335),
-                new Rotation3d(0.0, Math.toRadians(15), Math.toRadians(15))),
-            1),
-        new CameraConfig( // TODO: add LL constants
+                Units.inchesToMeters(8.875327),
+                Units.inchesToMeters(7.816629) * -1.0,
+                Units.inchesToMeters(17.274095),
+                new Rotation3d(
+                    Math.toRadians(3.9671), Math.toRadians(15), Math.toRadians(15.5108))),
+            1.0),
+        new CameraConfig(
             "LL",
             new Transform3d(
                 Units.inchesToMeters(-1.394869),
                 Units.inchesToMeters(8.628504) * -1.0,
                 Units.inchesToMeters(36.999197),
                 new Rotation3d(Math.PI, -1.0 * Math.toRadians(35.0), Math.toRadians(165))),
-            0.75)
+            1.5)
       };
 
   // Basic filtering thresholds
