@@ -7,20 +7,20 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.team4276.frc2025.Constants;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.field.FieldConstants;
+import frc.team4276.frc2025.subsystems.vision.VisionIO.TargetObservation;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
@@ -61,11 +61,9 @@ public class Vision extends SubsystemBase {
     List<Pose3d> allTagPoses = new LinkedList<>();
     List<Pose3d> allRobotPoses = new LinkedList<>();
     List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
-    List<Pose3d> allCameraPosesAccepted = new LinkedList<>();
     List<Pose3d> allRobotPosesRejected = new LinkedList<>();
     List<Pose3d> allRobotPosesCanceled = new LinkedList<>();
-
-    List<Double> camYaws = new LinkedList<>();
+    Map<Integer, TargetObservation> allTxTyObservations = new HashMap<>();
 
     // Loop over cameras
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
@@ -76,7 +74,6 @@ public class Vision extends SubsystemBase {
       List<Pose3d> tagPoses = new LinkedList<>();
       List<Pose3d> robotPoses = new LinkedList<>();
       List<Pose3d> robotPosesAccepted = new LinkedList<>();
-      List<Pose3d> cameraPosesAccepted = new LinkedList<>();
       List<Pose3d> robotPosesRejected = new LinkedList<>();
       List<Pose3d> robotPosesCanceled = new LinkedList<>();
 
@@ -91,10 +88,8 @@ public class Vision extends SubsystemBase {
       // Loop over pose observations
       for (var observation : inputs[cameraIndex].poseObservations) {
         Pose3d robotPose3d = null;
-        Pose3d cameraPose3d = null;
         boolean useVisionRotation = false;
         if (observation.tagCount() > 1) {
-          cameraPose3d = observation.fieldToCam1();
           var fieldToRobot =
               observation.fieldToCam1().plus(configs[cameraIndex].robotToCamera.inverse());
           // Add pose to log
@@ -119,10 +114,8 @@ public class Vision extends SubsystemBase {
             if (Math.abs(currentRotation.minus(visionRotation0).getRadians())
                 < Math.abs(currentRotation.minus(visionRotation1).getRadians())) {
               robotPose3d = fieldToRobot0;
-              cameraPose3d = observation.fieldToCam1();
             } else {
               robotPose3d = fieldToRobot1;
-              cameraPose3d = observation.fieldToCam2();
             }
           }
 
@@ -160,43 +153,6 @@ public class Vision extends SubsystemBase {
           // Send vision observation
           if (camerasEnabled[cameraIndex]) {
             robotPosesAccepted.add(robotPose3d);
-            cameraPosesAccepted.add(cameraPose3d);
-
-            if (Constants.isTuning) {
-              Logger.recordOutput(
-                  "Vision/Camera" + Integer.toString(cameraIndex) + "/CameraPose/Pitch",
-                  Units.radiansToDegrees(cameraPose3d.getRotation().getY()));
-              Logger.recordOutput(
-                  "Vision/Camera" + Integer.toString(cameraIndex) + "/CameraPose/Roll",
-                  Units.radiansToDegrees(cameraPose3d.getRotation().getX()));
-              Logger.recordOutput(
-                  "Vision/Camera" + Integer.toString(cameraIndex) + "/CameraPose/Yaw",
-                  Units.radiansToDegrees(cameraPose3d.getRotation().getZ()));
-              Logger.recordOutput(
-                  "Vision/Camera" + Integer.toString(cameraIndex) + "/CameraPose/YawX",
-                  Units.radiansToDegrees(cameraPose3d.getRotation().toRotation2d().getCos()));
-              Logger.recordOutput(
-                  "Vision/Camera" + Integer.toString(cameraIndex) + "/CameraPose/YawY",
-                  Units.radiansToDegrees(cameraPose3d.getRotation().toRotation2d().getSin()));
-              int offset = cameraIndex * 2;
-              if (camYaws.size() == 4 || (camYaws.size() == 2 && cameraIndex == 0)) { // Replace
-                camYaws.remove(1 + offset);
-                camYaws.remove(0 + offset);
-                camYaws.add(
-                    0 + offset,
-                    Units.radiansToDegrees(cameraPose3d.getRotation().toRotation2d().getCos()));
-                camYaws.add(
-                    1 + offset,
-                    Units.radiansToDegrees(cameraPose3d.getRotation().toRotation2d().getSin()));
-              } else if (camYaws.size() == 0 && cameraIndex == 1) { // Wait for 1st camera input
-
-              } else {
-                camYaws.add(
-                    Units.radiansToDegrees(cameraPose3d.getRotation().toRotation2d().getCos()));
-                camYaws.add(
-                    Units.radiansToDegrees(cameraPose3d.getRotation().toRotation2d().getSin()));
-              }
-            }
 
             consumer.accept(
                 robotPose3d.toPose2d(),
@@ -211,7 +167,10 @@ public class Vision extends SubsystemBase {
       // Send Tx Ty Data
       // TODO: test filtering methods
       for (var tagObs : inputs[cameraIndex].targetObservations) {
-        RobotState.getInstance().addTxTyObservation(tagObs);
+        if (!allTxTyObservations.containsKey(tagObs.tagId())
+            || tagObs.distance() < allTxTyObservations.get(tagObs.tagId()).distance()) {
+          allTxTyObservations.put(tagObs.tagId(), tagObs);
+        }
       }
 
       if (enableInstanceLogging) {
@@ -226,9 +185,6 @@ public class Vision extends SubsystemBase {
             "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesAccepted",
             robotPosesAccepted.toArray(new Pose3d[robotPosesAccepted.size()]));
         Logger.recordOutput(
-            "Vision/Camera" + Integer.toString(cameraIndex) + "/CameraPosesAccepted",
-            cameraPosesAccepted.toArray(new Pose3d[cameraPosesAccepted.size()]));
-        Logger.recordOutput(
             "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesRejected",
             robotPosesRejected.toArray(new Pose3d[robotPosesRejected.size()]));
         Logger.recordOutput(
@@ -241,17 +197,11 @@ public class Vision extends SubsystemBase {
       allTagPoses.addAll(tagPoses);
       allRobotPoses.addAll(robotPoses);
       allRobotPosesAccepted.addAll(robotPosesAccepted);
-      allCameraPosesAccepted.addAll(cameraPosesAccepted);
       allRobotPosesRejected.addAll(robotPosesRejected);
       allRobotPosesCanceled.addAll(robotPosesCanceled);
     }
 
-    new Rotation3d(VecBuilder.fill(linearStdDevBaseline, fieldBorderMargin, angularStdDevBaseline));
-
-    if (Constants.isTuning && camYaws.size() == 4) {
-      Logger.recordOutput("Vision/YawXDiff", camYaws.get(0) - camYaws.get(2));
-      Logger.recordOutput("Vision/YawYDiff", camYaws.get(1) - camYaws.get(3));
-    }
+    allTxTyObservations.values().stream().forEach(RobotState.getInstance()::addTxTyObservation);
 
     // Log summary data
     Logger.recordOutput("Vision/Summary/Enabled", camerasEnabled);
@@ -262,9 +212,6 @@ public class Vision extends SubsystemBase {
     Logger.recordOutput(
         "Vision/Summary/RobotPosesAccepted",
         allRobotPosesAccepted.toArray(new Pose3d[allRobotPosesAccepted.size()]));
-    Logger.recordOutput(
-        "Vision/Summary/CameraPosesAccepted",
-        allCameraPosesAccepted.toArray(new Pose3d[allCameraPosesAccepted.size()]));
     Logger.recordOutput(
         "Vision/Summary/RobotPosesRejected",
         allRobotPosesRejected.toArray(new Pose3d[allRobotPosesRejected.size()]));

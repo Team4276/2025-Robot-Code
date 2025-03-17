@@ -206,6 +206,9 @@ public class RobotState {
       return Optional.empty();
     }
     var data = txTyPoses.get(tagId);
+    Logger.recordOutput(
+        "RobotState/IsTxTyStale",
+        Timer.getTimestamp() - data.timestamp() >= txTyObservationStaleSecs.get());
     // Check if stale
     if (Timer.getTimestamp() - data.timestamp() >= txTyObservationStaleSecs.get()) {
       return Optional.empty();
