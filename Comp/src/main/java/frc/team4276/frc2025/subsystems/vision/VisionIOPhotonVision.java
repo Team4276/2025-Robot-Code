@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 
 /** IO implementation for real PhotonVision hardware. */
@@ -92,14 +91,11 @@ public class VisionIOPhotonVision implements VisionIO {
 
           Pose3d camPose2;
 
-          if (target.altCameraToTarget.getTranslation().getNorm() != 0) {
+          if (Math.abs(target.altCameraToTarget.getTranslation().getNorm()) >= 0.0001) {
             Transform3d fieldToTarget2 =
                 new Transform3d(tagPose.get().getTranslation(), tagPose.get().getRotation());
             Transform3d cameraToTarget2 = target.altCameraToTarget;
-            Logger.recordOutput("Debug/Camera/cameraToTarget2", cameraToTarget2);
-
             Transform3d fieldToCamera2 = fieldToTarget2.plus(cameraToTarget2.inverse());
-            Logger.recordOutput("Debug/Camera/fieldToCamera2", fieldToCamera2);
 
             camPose2 = new Pose3d(fieldToCamera2.getTranslation(), fieldToCamera2.getRotation());
           } else {
@@ -110,9 +106,6 @@ public class VisionIOPhotonVision implements VisionIO {
           tagIds.add((short) target.fiducialId);
 
           // Add observation
-          Logger.recordOutput("Debug/Camera/Pose1", camPose1);
-          Logger.recordOutput("Debug/Camera/Pose2", camPose2);
-
           poseObservations.add(
               new PoseObservation(
                   result.getTimestampSeconds(), // Timestamp

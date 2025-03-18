@@ -107,6 +107,11 @@ public class Vision extends SubsystemBase {
           robotPoses.add(fieldToRobot0);
           robotPoses.add(fieldToRobot1);
 
+          if (Math.abs(fieldToRobot0.minus(fieldToRobot1).getTranslation().getNorm()) <= 0.0001) {
+            robotPosesRejected.add(fieldToRobot0);
+            continue;
+          }
+
           if (observation.ambiguity() < maxAmbiguity) {
             Rotation2d currentRotation = RobotState.getInstance().getEstimatedPose().getRotation();
             Rotation2d visionRotation0 = fieldToRobot0.toPose2d().getRotation();

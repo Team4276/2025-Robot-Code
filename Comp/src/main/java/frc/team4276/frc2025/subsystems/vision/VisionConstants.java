@@ -57,7 +57,7 @@ public class VisionConstants {
                 Units.inchesToMeters(-1.394869),
                 Units.inchesToMeters(8.628504) * -1.0,
                 Units.inchesToMeters(36.999197),
-                new Rotation3d(Math.PI, -1.0 * Math.toRadians(35.0), Math.toRadians(165))),
+                new Rotation3d(0.0, -1.0 * Math.toRadians(35.0), Math.toRadians(165))),
             1.5)
       };
 

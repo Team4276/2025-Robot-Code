@@ -158,6 +158,9 @@ public class RobotState {
             .getTranslation()
             .rotateBy(new Rotation3d(0, cameraPose.getRotation().getY(), 0))
             .toTranslation2d();
+    if (Math.abs(camToTagTranslation.getNorm()) <= 0.01) {
+      return;
+    }
     Rotation2d camToTagRotation =
         robotRotation.plus(
             cameraPose.getRotation().toRotation2d().plus(camToTagTranslation.getAngle()));
