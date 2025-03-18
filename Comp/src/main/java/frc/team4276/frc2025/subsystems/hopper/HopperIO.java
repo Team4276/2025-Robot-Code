@@ -11,6 +11,8 @@ public interface HopperIO {
     public double position = 0.0;
     public double velocity = 0.0;
 
+    public boolean isCoast = false;
+
     public double[] appliedVolts = new double[] {0.0};
     public double[] currentAmps = new double[] {0.0};
     public double[] tempCelcius = new double[] {0.0};

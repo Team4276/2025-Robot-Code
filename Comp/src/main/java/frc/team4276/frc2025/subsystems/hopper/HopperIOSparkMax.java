@@ -1,7 +1,15 @@
 package frc.team4276.frc2025.subsystems.hopper;
 
-import static frc.team4276.frc2025.subsystems.hopper.HopperConstants.*;
-import static frc.team4276.util.SparkUtil.*;
+import static frc.team4276.frc2025.subsystems.hopper.HopperConstants.currentLimit;
+import static frc.team4276.frc2025.subsystems.hopper.HopperConstants.encoderPositionFactor;
+import static frc.team4276.frc2025.subsystems.hopper.HopperConstants.encoderVelocityFactor;
+import static frc.team4276.frc2025.subsystems.hopper.HopperConstants.kd;
+import static frc.team4276.frc2025.subsystems.hopper.HopperConstants.ki;
+import static frc.team4276.frc2025.subsystems.hopper.HopperConstants.kp;
+import static frc.team4276.frc2025.subsystems.hopper.HopperConstants.readFreq;
+import static frc.team4276.util.SparkUtil.ifOk;
+import static frc.team4276.util.SparkUtil.sparkStickyFault;
+import static frc.team4276.util.SparkUtil.tryUntilOk;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -83,6 +91,8 @@ public class HopperIOSparkMax implements HopperIO {
         (values) -> inputs.appliedVolts[0] = values[0] * values[1]);
     ifOk(spark, spark::getOutputCurrent, (value) -> inputs.currentAmps[0] = value);
     ifOk(spark, spark::getMotorTemperature, (value) -> inputs.tempCelcius[0] = value);
+
+    inputs.isCoast = !brakeModeEnabled;
     inputs.leaderMotorConnected = connectedDebounce.calculate(!sparkStickyFault);
   }
 

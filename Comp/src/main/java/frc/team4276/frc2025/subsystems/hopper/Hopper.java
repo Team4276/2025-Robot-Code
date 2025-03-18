@@ -4,7 +4,6 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.frc2025.Constants;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
@@ -85,6 +84,12 @@ public class Hopper extends SubsystemBase {
       hasFlippedCoast = true;
     }
 
+    if (!(override.getAsBoolean() && hasFlippedCoast)
+        && (leftInputs.isCoast && rightInputs.isCoast)) {
+      leftOffset = leftInputs.position;
+      rightOffset = rightInputs.position;
+    }
+
     leftIo.setBrakeMode(!(override.getAsBoolean() && hasFlippedCoast));
     rightIo.setBrakeMode(!(override.getAsBoolean() && hasFlippedCoast));
 
@@ -117,13 +122,5 @@ public class Hopper extends SubsystemBase {
 
   public Command setGoalCommand(Goal goal) {
     return startEnd(() -> this.goal = goal, () -> this.goal = Goal.IDLE);
-  }
-
-  public Command zeroCommand() {
-    return Commands.runOnce(
-        () -> {
-          leftOffset = leftInputs.position;
-          rightOffset = rightInputs.position;
-        });
   }
 }

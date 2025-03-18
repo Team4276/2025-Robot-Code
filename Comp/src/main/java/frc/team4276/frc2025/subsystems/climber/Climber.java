@@ -35,7 +35,6 @@ public class Climber extends SubsystemBase {
     }
   }
 
-  private double offset = 0;
   private Goal goal = Goal.IDLE;
   private final ClimberIO io;
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
@@ -59,11 +58,10 @@ public class Climber extends SubsystemBase {
     if (!override.getAsBoolean()) {
       hasFlippedCoast = true;
     }
-
     io.setBrakeMode(!(override.getAsBoolean() && hasFlippedCoast));
 
     if (isClimbing) {
-      if (((inputs.position - offset) < 6) && (goal == Goal.CLIMB)) {
+      if ((inputs.position < 6) && (goal == Goal.CLIMB)) {
         goal = Goal.IDLE;
       }
       io.runWheelsAtVolts(goal.getWheelVolts());

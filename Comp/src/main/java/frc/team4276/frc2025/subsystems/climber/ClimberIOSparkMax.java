@@ -19,12 +19,11 @@ import java.util.function.DoubleSupplier;
 public class ClimberIOSparkMax implements ClimberIO {
   private SparkMax whench;
   private SparkFlex wheel;
-  private RelativeEncoder relEncoder;
+  private final RelativeEncoder relEncoder;
 
   private SparkMaxConfig whenchConfig;
   private SparkFlexConfig wheelConfig;
   private boolean brakeModeEnabled = true;
-  ;
 
   public ClimberIOSparkMax(
       int whenchID, int wheelID, int whenchCurrentLimit, int wheelCurrentLimit) {
