@@ -73,10 +73,10 @@ public class Climber extends SubsystemBase {
       io.runRunWhenchAtVolts(0.0);
     }
 
-    SimViz.addClimberMeasuredObs(inputs.position - offset);
+    SimViz.addClimberMeasuredObs(inputs.position);
     Logger.recordOutput("Climber/Goal", goal.toString());
     Logger.recordOutput("Climber/IsClimbing", isClimbing);
-    Logger.recordOutput("Climber/Position", inputs.position - offset);
+    Logger.recordOutput("Climber/Position", inputs.position);
   }
 
   public void setIsClimbing(boolean isClimbing) {
