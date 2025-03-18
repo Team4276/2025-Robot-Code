@@ -1,8 +1,10 @@
 package frc.team4276.frc2025;
 
 /**
- * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
- * on a roboRIO. Change the value of "simMode" to switch between "sim" (physics sim) and "replay"
+ * This class defines the runtime mode used by AdvantageKit. The mode is always
+ * "real" when running
+ * on a roboRIO. Change the value of "simMode" to switch between "sim" (physics
+ * sim) and "replay"
  * (log replay from a file).
  */
 @SuppressWarnings("unused")
@@ -27,7 +29,7 @@ public final class Constants {
     SIMBOT
   }
 
-  public static Mode mode = Mode.REPLAY;
+  public static Mode mode = Mode.REAL;
 
   public static RobotType getType() {
     return switch (mode) {
