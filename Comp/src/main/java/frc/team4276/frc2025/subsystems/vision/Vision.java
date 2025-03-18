@@ -29,7 +29,7 @@ public class Vision extends SubsystemBase {
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
-  private boolean[] camerasEnabled = {true, true};
+  private boolean[] camerasEnabled = {true, true, true};
 
   public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;

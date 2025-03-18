@@ -140,7 +140,8 @@ public class RobotContainer {
               new Vision(
                   RobotState.getInstance()::addVisionMeasurement,
                   new VisionIOPhotonVision(0),
-                  new VisionIOPhotonVision(1));
+                  new VisionIOPhotonVision(1),
+                  new VisionIOPhotonVision(2));
         }
 
         case SIMBOT -> {
@@ -187,7 +188,10 @@ public class RobotContainer {
     if (vision == null) {
       vision =
           new Vision(
-              RobotState.getInstance()::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+              RobotState.getInstance()::addVisionMeasurement,
+              new VisionIO() {},
+              new VisionIO() {},
+              new VisionIO() {});
     }
 
     if (superstructure == null) {
@@ -217,6 +221,8 @@ public class RobotContainer {
     }
     configureButtonBindings();
     configureUI();
+
+    new SimViz();
 
     // Peace and quiet
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -657,8 +663,8 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return autoSelector
         .getCommand()
-        .beforeStarting(() -> vision.setCamerasEnabled(false, false))
-        .finallyDo(() -> vision.setCamerasEnabled(true, true));
+        .beforeStarting(() -> vision.setCamerasEnabled(true, true, true))
+        .finallyDo(() -> vision.setCamerasEnabled(true, true, true));
   }
 
   public boolean hasAutoChanged() {
