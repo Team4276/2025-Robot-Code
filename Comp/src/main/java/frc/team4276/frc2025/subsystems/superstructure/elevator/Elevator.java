@@ -8,8 +8,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.util.Color;
 import frc.team4276.frc2025.Constants;
+import frc.team4276.frc2025.SimViz;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -77,17 +77,11 @@ public class Elevator {
   private Timer atGoalTimer = new Timer();
   private final double atGoalTime = 0.2;
 
-  private final ElevatorViz goalViz;
-  private final ElevatorViz measuredViz;
-
   public Elevator(ElevatorIO io) {
     this.io = io;
     io.setBrakeMode(true);
 
     atGoalTimer.restart();
-
-    goalViz = new ElevatorViz("Goal", Color.kGreen);
-    measuredViz = new ElevatorViz("Measured", Color.kBlack);
   }
 
   public void setCoastOverride(BooleanSupplier coastOverride) {
@@ -172,8 +166,8 @@ public class Elevator {
       }
     }
 
-    goalViz.update(goal.getPositionMetres());
-    measuredViz.update(Constants.isSim ? goal.getPositionMetres() : getPositionMetres());
+    SimViz.addElevatorGoalObs(goal.getPositionMetres());
+    SimViz.addElevatorMeasuredObs(Constants.isSim ? goal.getPositionMetres() : getPositionMetres());
     Logger.recordOutput("Elevator/Goal", goal);
     Logger.recordOutput("Elevator/GoalMetres", goal.getPositionMetres());
     Logger.recordOutput("Elevator/GoalRotations", metresToRotations(goal.getPositionMetres()));

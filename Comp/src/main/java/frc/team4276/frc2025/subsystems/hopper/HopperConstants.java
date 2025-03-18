@@ -1,6 +1,5 @@
 package frc.team4276.frc2025.subsystems.hopper;
 
-import edu.wpi.first.math.geometry.Translation3d;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.function.DoubleSupplier;
 
@@ -30,5 +29,5 @@ public class HopperConstants {
   public static final double minInput = Math.toRadians(90.0);
   public static final double maxInput = Math.toRadians(91.0);
 
-  public static final Translation3d origin = Translation3d.kZero;
+  public static final double radsPerMotorRotation = 2 * Math.PI / 16;
 }

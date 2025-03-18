@@ -3,6 +3,7 @@ package frc.team4276.frc2025.subsystems.climber;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team4276.frc2025.SimViz;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -72,9 +73,10 @@ public class Climber extends SubsystemBase {
       io.runRunWhenchAtVolts(0.0);
     }
 
+    SimViz.addClimberMeasuredObs(inputs.position - offset);
     Logger.recordOutput("Climber/Goal", goal.toString());
     Logger.recordOutput("Climber/IsClimbing", isClimbing);
-    Logger.recordOutput("Climber/Position", inputs.position);
+    Logger.recordOutput("Climber/Position", inputs.position - offset);
   }
 
   public void setIsClimbing(boolean isClimbing) {

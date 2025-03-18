@@ -6,7 +6,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.util.Color;
 
 public class ArmIOSim implements ArmIO {
   private final SingleJointedArmSim sim =
@@ -23,12 +22,8 @@ public class ArmIOSim implements ArmIO {
   private final PIDController controller;
   private double appliedVoltage = 0.0;
 
-  private final ArmViz setpointViz;
-
   public ArmIOSim() {
     controller = new PIDController(30.0, 0.0, 0.0);
-
-    setpointViz = new ArmViz("Setpoint", Color.kRed);
   }
 
   @Override
@@ -45,8 +40,6 @@ public class ArmIOSim implements ArmIO {
   /** Run to setpoint angle in radians */
   @Override
   public void runSetpoint(double setpointRads, double ff) {
-    setpointViz.update(setpointRads);
-
     runVolts(controller.calculate(sim.getAngleRads(), setpointRads) + ff);
   }
 

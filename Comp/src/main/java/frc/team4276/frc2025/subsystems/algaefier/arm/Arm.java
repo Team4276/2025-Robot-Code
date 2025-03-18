@@ -4,10 +4,10 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.team4276.frc2025.Constants;
+import frc.team4276.frc2025.SimViz;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -64,15 +64,9 @@ public class Arm {
 
   private double characterizationInput = 0.0;
 
-  private final ArmViz goalViz;
-  private final ArmViz measuredViz;
-
   public Arm(ArmIO io) {
     this.io = io;
     io.setBrakeMode(true);
-
-    goalViz = new ArmViz("Goal", Color.kGreen);
-    measuredViz = new ArmViz("Measured", Color.kBlack);
   }
 
   public void setCoastOverride(BooleanSupplier coastOverride) {
@@ -129,8 +123,8 @@ public class Arm {
       }
     }
 
-    goalViz.update(goal.getRads());
-    measuredViz.update(Constants.isSim ? goal.getRads() : inputs.positionRads);
+    SimViz.addAlgaeArmGoalObs(goal.getRads());
+    SimViz.addAlgaeArmMeasuredObs(Constants.isSim ? goal.getRads() : inputs.positionRads);
     Logger.recordOutput("Algaefier/Arm/Goal", goal);
     Logger.recordOutput(
         "Algaefier/Arm/Measured/PositionDeg", Units.radiansToDegrees(inputs.positionRads));
