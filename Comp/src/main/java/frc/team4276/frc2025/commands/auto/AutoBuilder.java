@@ -62,7 +62,11 @@ public class AutoBuilder {
 
     var scoringCommand = new SequentialCommandGroup();
 
+    String station =
+        autoSelector.getResponses().get(6) == AutoQuestionResponse.YES ? "CLOSE" : "FAR";
+
     PathPlannerTrajectory traj1;
+    PathPlannerTrajectory traj2;
 
     if (autoSelector.getResponses().get(5) == AutoQuestionResponse.YES) {
       traj1 =
@@ -75,15 +79,27 @@ public class AutoBuilder {
               "c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise);
     }
 
+    if (autoSelector.getResponses().get(6) == AutoQuestionResponse.YES) {
+      traj2 =
+          getPathPlannerTrajectoryFromChoreo("c_kn_" + reefs.get(0).toString(), mirrorLengthwise);
+
+    } else {
+      traj2 =
+          getPathPlannerTrajectoryFromChoreo(
+              "c_sc_" + station + "_" + reefs.get(0).toString(), mirrorLengthwise, 1);
+    }
+
     for (int i = 0; i < reefs.size(); i++) {
       var scTraj =
           i == 0
               ? traj1
               : getPathPlannerTrajectoryFromChoreo(
-                  "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 0);
+                  "c_sc_" + station + "_" + reefs.get(i).toString(), mirrorLengthwise, 0);
       var intTraj =
-          getPathPlannerTrajectoryFromChoreo(
-              "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 1);
+          i == 0
+              ? traj2
+              : getPathPlannerTrajectoryFromChoreo(
+                  "c_sc_" + station + "_" + reefs.get(i).toString(), mirrorLengthwise, 1);
 
       scoringCommand.addCommands(shrimpleCoral(scTraj, intTraj, toGoal(levels.get(i))));
     }

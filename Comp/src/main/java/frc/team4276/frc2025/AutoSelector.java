@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.team4276.util.AllianceFlipUtil;
+import frc.team4276.util.dashboard.Elastic;
+import frc.team4276.util.dashboard.Elastic.Notification;
+import frc.team4276.util.dashboard.Elastic.Notification.NotificationLevel;
 import frc.team4276.util.drivers.VirtualSubsystem;
 import java.util.ArrayList;
 import java.util.List;
@@ -214,15 +217,19 @@ public class AutoSelector extends VirtualSubsystem {
 
     String errorText = checkLogic();
 
-    if (errorText
-        != "We_Happy") { // Scream, whine, complain, b*tch, basically be a baby until they make it a
-      // valid auto
-      if (prevErrorMsg == "We_Happy") {} // TODO: finish auto safety
+    // Scream, whine, complain, b*tch, basically be a baby until valid
+    if (errorText != "We_Happy") {
+      if (prevErrorMsg == "We_Happy" || errorNotificationTimer.get() > 4.0) {
+        errorNotificationTimer.restart();
+        Elastic.sendNotification(
+            new Notification(NotificationLevel.WARNING, "Invalid Auto", errorText, 3000));
+      } // TODO: finish auto safety
 
-      // Elastic.sendNotification(new Notification(NotificationLevel.WARNING, "Invalid
-      // Auto", errorText, 3000));
     } else {
-
+      if (autoChanged) {
+        Elastic.sendNotification(
+            new Notification(NotificationLevel.INFO, "Auto Confirm", "Auto Is Valid", 3000));
+      }
     }
 
     prevErrorMsg = errorText;
