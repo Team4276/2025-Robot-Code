@@ -3,6 +3,7 @@ package frc.team4276.frc2025;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -43,7 +44,7 @@ public class AutoSelector extends VirtualSubsystem {
     PROCESSOR
   }
 
-  private static final int maxQuestions = 5;
+  private static final int maxQuestions = 10;
 
   private static final AutoRoutine defaultRoutine =
       new AutoRoutine("Do Nothing", List.of(), () -> Commands.none());
@@ -54,6 +55,9 @@ public class AutoSelector extends VirtualSubsystem {
 
   private boolean autoChanged = true;
 
+  private Timer errorNotificationTimer = new Timer();
+  private String prevErrorMsg = "We_Happy";
+
   private final LoggedNetworkNumber coralInput;
   private final LoggedNetworkNumber delayInput;
   private int prevCoralInput = 1;
@@ -62,6 +66,11 @@ public class AutoSelector extends VirtualSubsystem {
   private AutoRoutine lastRoutine;
   private List<AutoQuestionResponse> lastResponses =
       List.of(
+          AutoQuestionResponse.EMPTY,
+          AutoQuestionResponse.EMPTY,
+          AutoQuestionResponse.EMPTY,
+          AutoQuestionResponse.EMPTY,
+          AutoQuestionResponse.EMPTY,
           AutoQuestionResponse.EMPTY,
           AutoQuestionResponse.EMPTY,
           AutoQuestionResponse.EMPTY,
@@ -170,6 +179,11 @@ public class AutoSelector extends VirtualSubsystem {
                 AutoQuestionResponse.EMPTY,
                 AutoQuestionResponse.EMPTY,
                 AutoQuestionResponse.EMPTY,
+                AutoQuestionResponse.EMPTY,
+                AutoQuestionResponse.EMPTY,
+                AutoQuestionResponse.EMPTY,
+                AutoQuestionResponse.EMPTY,
+                AutoQuestionResponse.EMPTY,
                 AutoQuestionResponse.EMPTY)
             : lastResponses;
     lastResponses = new ArrayList<>();
@@ -197,6 +211,32 @@ public class AutoSelector extends VirtualSubsystem {
     }
 
     wasRed = AllianceFlipUtil.shouldFlip();
+
+    String errorText = checkLogic();
+
+    if (errorText
+        != "We_Happy") { // Scream, whine, complain, b*tch, basically be a baby until they make it a
+      // valid auto
+      if (prevErrorMsg == "We_Happy") {} // TODO: finish auto safety
+
+      // Elastic.sendNotification(new Notification(NotificationLevel.WARNING, "Invalid
+      // Auto", errorText, 3000));
+    } else {
+
+    }
+
+    prevErrorMsg = errorText;
+  }
+
+  private String checkLogic() {
+    if (getSelectedName() == "Sandy Eggos Auto") {
+      if (getResponses().get(1) == AutoQuestionResponse.G
+          && getResponses().get(5) == AutoQuestionResponse.YES) {
+        return "Using CLOSE Intake with G Start";
+      }
+    }
+
+    return "We_Happy";
   }
 
   public boolean hasAutoChanged() {

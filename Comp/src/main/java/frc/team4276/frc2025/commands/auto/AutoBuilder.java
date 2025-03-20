@@ -47,6 +47,54 @@ public class AutoBuilder {
         new DriveTrajectory(drive, traj));
   }
 
+  public Command sandyEggosAuto(
+      List<AutoQuestionResponse> reefs, List<AutoQuestionResponse> levels) {
+
+    if (reefs.isEmpty() || levels.isEmpty()) {
+      CommandScheduler.getInstance()
+          .schedule(notificationCommand("Error invalid Coral Auto List is Empty"));
+
+      return Commands.none();
+    }
+
+    // Check if need to flip paths to barge side
+    boolean mirrorLengthwise = autoSelector.getResponses().get(0) == AutoQuestionResponse.NO;
+
+    var scoringCommand = new SequentialCommandGroup();
+
+    PathPlannerTrajectory traj1;
+
+    if (autoSelector.getResponses().get(5) == AutoQuestionResponse.YES) {
+      traj1 =
+          getPathPlannerTrajectoryFromChoreo(
+              "c_sw_sc_" + reefs.get(0).toString(), mirrorLengthwise);
+
+    } else {
+      traj1 =
+          getPathPlannerTrajectoryFromChoreo(
+              "c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise);
+    }
+
+    for (int i = 0; i < reefs.size(); i++) {
+      var scTraj =
+          i == 0
+              ? traj1
+              : getPathPlannerTrajectoryFromChoreo(
+                  "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 0);
+      var intTraj =
+          getPathPlannerTrajectoryFromChoreo(
+              "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 1);
+
+      scoringCommand.addCommands(shrimpleCoral(scTraj, intTraj, toGoal(levels.get(i))));
+    }
+
+    return Commands.sequence(
+        resetPose(traj1.getInitialPose()),
+        Commands.waitSeconds(autoSelector.getDelayInput()),
+        Commands.runOnce(() -> superstructure.overrideCoral(true)),
+        scoringCommand);
+  }
+
   public Command speedyIntakeAuto(
       List<AutoQuestionResponse> reefs, List<AutoQuestionResponse> levels) {
 
@@ -180,24 +228,10 @@ public class AutoBuilder {
                 () -> !superstructure.hasCoral() && superstructure.getGoal() == Goal.INTAKE));
   }
 
-  public Command FEBAshrimpleOcrAuto() {
-    return shrimpleOcrAuto(
-        List.of(
-            AutoQuestionResponse.F,
-            AutoQuestionResponse.E,
-            AutoQuestionResponse.B,
-            AutoQuestionResponse.A),
-        List.of(
-            AutoQuestionResponse.L2,
-            AutoQuestionResponse.L2,
-            AutoQuestionResponse.L2,
-            AutoQuestionResponse.L2));
-  }
-
   public Command shrimpleOcrAuto() {
     List<AutoQuestionResponse> reefs = new ArrayList<>();
 
-    for (int i = 1; i < autoSelector.getResponses().size(); i++) {
+    for (int i = 1; i < 5; i++) {
       int ordinal = autoSelector.getResponses().get(i).ordinal() - AutoQuestionResponse.A.ordinal();
       if (ordinal >= 0 && ordinal < 12) {
         reefs.add(autoSelector.getResponses().get(i));

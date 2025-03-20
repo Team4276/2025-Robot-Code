@@ -237,7 +237,6 @@ public class RobotContainer {
 
   private void configureAutos() {
     autoBuilder = new AutoBuilder(drive, superstructure, autoSelector);
-
     // Set up auto routines
     autoSelector.addRoutine(
         "RP Shrimple OCR Auto",
@@ -246,11 +245,64 @@ public class RobotContainer {
                 "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO))),
         () -> autoBuilder.rpShrimpleOcrAuto());
     autoSelector.addRoutine(
-        "(FEBA) Shrimple OCR Auto",
+        "(FBAE) Shrimple OCR Auto",
         List.of(
             new AutoQuestion(
                 "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO))),
-        () -> autoBuilder.FEBAshrimpleOcrAuto());
+        () ->
+            autoBuilder.shrimpleOcrAuto(
+                List.of(
+                    AutoQuestionResponse.F,
+                    AutoQuestionResponse.B,
+                    AutoQuestionResponse.A,
+                    AutoQuestionResponse.E)));
+    autoSelector.addRoutine(
+        "Sandy Eggos Auto",
+        List.of(
+            new AutoQuestion(
+                "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO)),
+            new AutoQuestion(
+                "1st Reef?",
+                List.of(
+                    AutoQuestionResponse.EMPTY,
+                    AutoQuestionResponse.E,
+                    AutoQuestionResponse.F,
+                    AutoQuestionResponse.G)),
+            new AutoQuestion(
+                "2nd Reef?",
+                List.of(
+                    AutoQuestionResponse.EMPTY,
+                    AutoQuestionResponse.A,
+                    AutoQuestionResponse.B,
+                    AutoQuestionResponse.C,
+                    AutoQuestionResponse.D,
+                    AutoQuestionResponse.E,
+                    AutoQuestionResponse.F)),
+            new AutoQuestion(
+                "3rd Reef?",
+                List.of(
+                    AutoQuestionResponse.EMPTY,
+                    AutoQuestionResponse.A,
+                    AutoQuestionResponse.B,
+                    AutoQuestionResponse.C,
+                    AutoQuestionResponse.D,
+                    AutoQuestionResponse.E,
+                    AutoQuestionResponse.F)),
+            new AutoQuestion(
+                "4th Reef?",
+                List.of(
+                    AutoQuestionResponse.EMPTY,
+                    AutoQuestionResponse.A,
+                    AutoQuestionResponse.B,
+                    AutoQuestionResponse.C,
+                    AutoQuestionResponse.D,
+                    AutoQuestionResponse.E,
+                    AutoQuestionResponse.F)),
+            new AutoQuestion(
+                "Is Sweaty Start?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO)),
+            new AutoQuestion(
+                "Is Close Intake?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO))),
+        () -> autoBuilder.shrimpleOcrAuto());
     autoSelector.addRoutine(
         "Shrimple OCR Auto",
         List.of(
