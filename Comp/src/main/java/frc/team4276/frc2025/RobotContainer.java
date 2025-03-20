@@ -27,6 +27,7 @@ import frc.team4276.frc2025.subsystems.algaefier.arm.Arm;
 import frc.team4276.frc2025.subsystems.algaefier.arm.ArmIO;
 import frc.team4276.frc2025.subsystems.algaefier.roller.Gripper;
 import frc.team4276.frc2025.subsystems.algaefier.roller.RollerIO;
+import frc.team4276.frc2025.subsystems.algaefier.roller.RollerIOSparkMax;
 import frc.team4276.frc2025.subsystems.climber.Climber;
 import frc.team4276.frc2025.subsystems.climber.ClimberIO;
 import frc.team4276.frc2025.subsystems.climber.ClimberIOSparkMax;
@@ -42,6 +43,7 @@ import frc.team4276.frc2025.subsystems.hopper.HopperIOSparkMax;
 import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIO;
 import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIOHardware;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
+import frc.team4276.frc2025.subsystems.superstructure.displacer.Displacer;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.Elevator;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorIO;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorIOSparkMax;
@@ -124,6 +126,7 @@ public class RobotContainer {
                   new EndEffector(
                       new EndEffectorIOSparkMax(
                           Ports.ENDEFFECTOR_LEFT, Ports.ENDEFFECTOR_RIGHT, 40, false, true)),
+                  new Displacer(new RollerIOSparkMax(Ports.ALGAE_DISPLACER, 20, false, true)),
                   new RollerSensorsIOHardware());
           algaefier =
               new Algaefier(
@@ -157,6 +160,7 @@ public class RobotContainer {
               new Superstructure(
                   new Elevator(new ElevatorIO() {}),
                   new EndEffector(new EndEffectorIO() {}),
+                  new Displacer(new RollerIO() {}),
                   new RollerSensorsIO() {});
           algaefier = new Algaefier(new Arm(new ArmIO() {}), new Gripper(new RollerIO() {}));
           hopper = new Hopper(new HopperIO() {}, new HopperIO() {});
@@ -199,6 +203,7 @@ public class RobotContainer {
           new Superstructure(
               new Elevator(new ElevatorIO() {}),
               new EndEffector(new EndEffectorIO() {}),
+              new Displacer(new RollerIO() {}),
               new RollerSensorsIO() {});
     }
 
