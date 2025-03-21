@@ -44,7 +44,7 @@ public final class Constants {
         : "Robot must be in REAL mode when SysIdMode is enabled.";
   }
 
-  public static final boolean isTuning = true;
+  public static final boolean isTuning = false;
 
   public static final boolean isSim = (mode == Mode.SIM);
 
