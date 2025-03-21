@@ -10,6 +10,7 @@ public class Algaefier extends SubsystemBase {
   public enum Goal {
     STOW,
     INTAKE,
+    PREPARE_SCORE,
     CHARACTERIZING
   }
 

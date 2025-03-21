@@ -64,7 +64,7 @@ public class Climber extends SubsystemBase {
     io.setBrakeMode(!(override.getAsBoolean() && hasFlippedCoast));
 
     if (isClimbing) {
-      if ((inputs.position < 6) && (goal == Goal.CLIMB)) {
+      if ((inputs.position < 0) && (goal == Goal.CLIMB)) {
         goal = Goal.IDLE;
       }
       io.runWheelsAtVolts(goal.getWheelVolts());
