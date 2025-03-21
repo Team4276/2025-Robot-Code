@@ -267,6 +267,12 @@ public class RobotContainer {
             new AutoQuestion(
                 "Is Processor Side?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO)),
             new AutoQuestion(
+                "Is Sweaty Start?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO)),
+            new AutoQuestion(
+                "Is Close Intake?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO)),
+            new AutoQuestion("[Empty Question]", List.of(AutoQuestionResponse.EMPTY)),
+            new AutoQuestion("[Empty Question]", List.of(AutoQuestionResponse.EMPTY)),
+            new AutoQuestion(
                 "1st Reef?",
                 List.of(
                     AutoQuestionResponse.EMPTY,
@@ -302,12 +308,8 @@ public class RobotContainer {
                     AutoQuestionResponse.C,
                     AutoQuestionResponse.D,
                     AutoQuestionResponse.E,
-                    AutoQuestionResponse.F)),
-            new AutoQuestion(
-                "Is Sweaty Start?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO)),
-            new AutoQuestion(
-                "Is Close Intake?", List.of(AutoQuestionResponse.YES, AutoQuestionResponse.NO))),
-        () -> autoBuilder.shrimpleOcrAuto());
+                    AutoQuestionResponse.F))),
+        () -> autoBuilder.sandyEggosAuto());
     autoSelector.addRoutine(
         "Shrimple OCR Auto",
         List.of(

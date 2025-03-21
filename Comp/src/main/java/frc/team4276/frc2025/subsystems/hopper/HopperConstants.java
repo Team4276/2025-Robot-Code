@@ -17,8 +17,8 @@ public class HopperConstants {
   public static final double ki = 0.0;
   public static final double kd = 0.0;
 
-  public static final DoubleSupplier kS_left = new LoggedTunableNumber("Hopper/kS_left", 0);
-  public static final DoubleSupplier kS_right = new LoggedTunableNumber("Hopper/kS_right", 0);
+  public static final DoubleSupplier kS_left = new LoggedTunableNumber("Hopper/kS_left", 0.5);
+  public static final DoubleSupplier kS_right = new LoggedTunableNumber("Hopper/kS_right", 0.5);
 
   public static final DoubleSupplier kV = new LoggedTunableNumber("Hopper/kV", 0.0020808);
   public static final DoubleSupplier kG = new LoggedTunableNumber("Hopper/kG", 0);

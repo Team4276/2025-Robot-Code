@@ -18,7 +18,7 @@
             "title": "Question #1 Chooser",
             "x": 288.0,
             "y": 0.0,
-            "width": 256.0,
+            "width": 224.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -31,7 +31,7 @@
             "title": "Question #2 Chooser",
             "x": 288.0,
             "y": 128.0,
-            "width": 256.0,
+            "width": 224.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -44,7 +44,7 @@
             "title": "Question #3 Chooser",
             "x": 288.0,
             "y": 256.0,
-            "width": 256.0,
+            "width": 224.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -57,7 +57,7 @@
             "title": "Question #4 Chooser",
             "x": 288.0,
             "y": 384.0,
-            "width": 256.0,
+            "width": 224.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -67,24 +67,10 @@
             }
           },
           {
-            "title": "Coral Input",
-            "x": 1152.0,
-            "y": 320.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "Comp/Auto/Coral Input",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
             "title": "Delay",
-            "x": 1280.0,
-            "y": 320.0,
-            "width": 128.0,
+            "x": 1088.0,
+            "y": 512.0,
+            "width": 192.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -96,9 +82,9 @@
           },
           {
             "title": "RoutineChooser",
-            "x": 1152.0,
-            "y": 160.0,
-            "width": 256.0,
+            "x": 1088.0,
+            "y": 256.0,
+            "width": 416.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -163,35 +149,20 @@
             "title": "Delay Input Submitted ",
             "x": 1280.0,
             "y": 512.0,
-            "width": 128.0,
+            "width": 224.0,
             "height": 128.0,
-            "type": "Text Display",
+            "type": "Large Text Display",
             "properties": {
               "topic": "/SmartDashboard/Comp/Auto/Delay Input Submitted ",
               "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "Num Coral Submitted ",
-            "x": 1152.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/SmartDashboard/Comp/Auto/Num Coral Submitted ",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
+              "data_type": "double"
             }
           },
           {
             "title": "Question #5 Chooser",
             "x": 288.0,
             "y": 512.0,
-            "width": 256.0,
+            "width": 224.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -215,9 +186,9 @@
           },
           {
             "title": "FMSInfo",
-            "x": 1152.0,
-            "y": 0.0,
-            "width": 384.0,
+            "x": 1088.0,
+            "y": 384.0,
+            "width": 416.0,
             "height": 128.0,
             "type": "FMSInfo",
             "properties": {
@@ -227,7 +198,7 @@
           },
           {
             "title": "Question #6",
-            "x": 576.0,
+            "x": 544.0,
             "y": 0.0,
             "width": 256.0,
             "height": 128.0,
@@ -240,7 +211,7 @@
           },
           {
             "title": "Question #7",
-            "x": 576.0,
+            "x": 544.0,
             "y": 128.0,
             "width": 256.0,
             "height": 128.0,
@@ -253,7 +224,7 @@
           },
           {
             "title": "Question #8",
-            "x": 576.0,
+            "x": 544.0,
             "y": 256.0,
             "width": 256.0,
             "height": 128.0,
@@ -266,7 +237,7 @@
           },
           {
             "title": "Question #9",
-            "x": 576.0,
+            "x": 544.0,
             "y": 384.0,
             "width": 256.0,
             "height": 128.0,
@@ -279,7 +250,7 @@
           },
           {
             "title": "Question #10",
-            "x": 576.0,
+            "x": 544.0,
             "y": 512.0,
             "width": 256.0,
             "height": 128.0,
@@ -292,9 +263,9 @@
           },
           {
             "title": "Question #6 Chooser",
-            "x": 864.0,
+            "x": 832.0,
             "y": 0.0,
-            "width": 256.0,
+            "width": 224.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -305,9 +276,9 @@
           },
           {
             "title": "Question #7 Chooser",
-            "x": 864.0,
+            "x": 832.0,
             "y": 128.0,
-            "width": 256.0,
+            "width": 224.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -318,9 +289,9 @@
           },
           {
             "title": "Question #8 Chooser",
-            "x": 864.0,
+            "x": 832.0,
             "y": 256.0,
-            "width": 256.0,
+            "width": 224.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -331,9 +302,9 @@
           },
           {
             "title": "Question #9 Chooser",
-            "x": 864.0,
+            "x": 832.0,
             "y": 384.0,
-            "width": 256.0,
+            "width": 224.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -344,15 +315,62 @@
           },
           {
             "title": "Question #10 Chooser",
-            "x": 864.0,
+            "x": 832.0,
             "y": 512.0,
-            "width": 256.0,
+            "width": 224.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
               "topic": "/SmartDashboard/Comp/Auto/Question #10 Chooser",
               "period": 0.06,
               "sort_options": false
+            }
+          },
+          {
+            "title": "ErrorMsg",
+            "x": 1216.0,
+            "y": 0.0,
+            "width": 320.0,
+            "height": 256.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "Comp/Auto/ErrorMsg",
+              "period": 0.06,
+              "data_type": "string"
+            }
+          },
+          {
+            "title": "ErrorStatus",
+            "x": 1056.0,
+            "y": 0.0,
+            "width": 160.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/Auto/ErrorStatus",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "Checkmark",
+              "false_icon": "X"
+            }
+          },
+          {
+            "title": "ErrorStatus",
+            "x": 0.0,
+            "y": 640.0,
+            "width": 1536.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Comp/Auto/ErrorStatus",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4278255360,
+              "false_color": 4294901760,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           }
         ]
@@ -365,10 +383,10 @@
         "containers": [
           {
             "title": "Swerve Drive",
-            "x": 960.0,
+            "x": 1120.0,
             "y": 0.0,
             "width": 416.0,
-            "height": 448.0,
+            "height": 512.0,
             "type": "SwerveDrive",
             "properties": {
               "topic": "/SmartDashboard/Swerve Drive",
@@ -381,8 +399,8 @@
             "title": "Field",
             "x": 0.0,
             "y": 0.0,
-            "width": 960.0,
-            "height": 448.0,
+            "width": 1120.0,
+            "height": 512.0,
             "type": "Field",
             "properties": {
               "topic": "/SmartDashboard/Field",
@@ -396,6 +414,19 @@
               "robot_color": 4294198070,
               "trajectory_color": 4294967295
             }
+          },
+          {
+            "title": "Rainbow",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 1536.0,
+            "height": 192.0,
+            "type": "Multi Color View",
+            "properties": {
+              "topic": "/SmartDashboard/Rainbow",
+              "period": 0.06,
+              "data_type": "string[]"
+            }
           }
         ]
       }
@@ -408,9 +439,9 @@
           {
             "title": "DriveMode",
             "x": 384.0,
-            "y": 512.0,
+            "y": 544.0,
             "width": 192.0,
-            "height": 192.0,
+            "height": 160.0,
             "type": "Large Text Display",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Drive/DriveMode",
@@ -435,9 +466,9 @@
           {
             "title": "CurrentGoal (S)",
             "x": 192.0,
-            "y": 512.0,
+            "y": 544.0,
             "width": 192.0,
-            "height": 192.0,
+            "height": 160.0,
             "type": "Large Text Display",
             "properties": {
               "topic": "/AdvantageKit/RealOutputs/Superstructure/CurrentGoal",
@@ -532,9 +563,9 @@
           {
             "title": "Heading Align Enabled",
             "x": 0.0,
-            "y": 512.0,
+            "y": 544.0,
             "width": 192.0,
-            "height": 192.0,
+            "height": 160.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Heading Align Enabled",
@@ -549,9 +580,9 @@
           {
             "title": "Drive Align Enabled",
             "x": 576.0,
-            "y": 512.0,
+            "y": 544.0,
             "width": 192.0,
-            "height": 192.0,
+            "height": 160.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/Drive Align Enabled",
@@ -588,7 +619,7 @@
             "x": 0.0,
             "y": 0.0,
             "width": 768.0,
-            "height": 512.0,
+            "height": 544.0,
             "type": "Camera Stream",
             "properties": {
               "topic": "/CameraPublisher/USB Camera 0",

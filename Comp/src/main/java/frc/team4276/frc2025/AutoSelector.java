@@ -53,13 +53,15 @@ public class AutoSelector extends VirtualSubsystem {
       new AutoRoutine("Do Nothing", List.of(), () -> Commands.none());
 
   private final LoggedDashboardChooser<AutoRoutine> routineChooser;
+  private final StringPublisher errorPublisher;
   private final List<StringPublisher> questionPublishers;
   private final List<LoggedDashboardChooser<AutoQuestionResponse>> questionChoosers;
 
   private boolean autoChanged = true;
 
-  private Timer errorNotificationTimer = new Timer();
-  private String prevErrorMsg = "We_Happy";
+  private final Timer errorNotificationTimer = new Timer();
+  private final String validAutoText = "We Happy";
+  private String prevErrorMsg = validAutoText;
 
   private final LoggedNetworkNumber coralInput;
   private final LoggedNetworkNumber delayInput;
@@ -85,6 +87,8 @@ public class AutoSelector extends VirtualSubsystem {
     routineChooser.addDefaultOption(defaultRoutine.name(), defaultRoutine);
     lastRoutine = defaultRoutine;
 
+    errorPublisher =
+        NetworkTableInstance.getDefault().getStringTopic("Comp/Auto/ErrorMsg").publish();
     questionPublishers = new ArrayList<>();
     questionChoosers = new ArrayList<>();
     for (int i = 0; i < maxQuestions; i++) {
@@ -101,6 +105,8 @@ public class AutoSelector extends VirtualSubsystem {
 
     coralInput = new LoggedNetworkNumber("Comp/Auto/Coral Input", 1);
     delayInput = new LoggedNetworkNumber("Comp/Auto/Delay", 0.0);
+
+    errorNotificationTimer.restart();
   }
 
   /** Registers a new auto routine that can be selected. */
@@ -115,7 +121,7 @@ public class AutoSelector extends VirtualSubsystem {
 
   /** Returns the selected auto command. */
   public Command getCommand() {
-    return lastRoutine.command().get();
+    return prevErrorMsg == validAutoText ? lastRoutine.command().get() : Commands.none();
   }
 
   /** Returns the name of the selected routine. */
@@ -193,7 +199,7 @@ public class AutoSelector extends VirtualSubsystem {
     for (int i = 0; i < lastRoutine.questions().size(); i++) {
       questionChoosers.get(i).periodic();
       var responseString = questionChoosers.get(i).get();
-      if (cachedResponses.get(i) != responseString) {
+      if (cachedResponses.get(i) != responseString && responseString != null) {
         autoChanged = true;
       }
       lastResponses.add(
@@ -218,32 +224,35 @@ public class AutoSelector extends VirtualSubsystem {
     String errorText = checkLogic();
 
     // Scream, whine, complain, b*tch, basically be a baby until valid
-    if (errorText != "We_Happy") {
-      if (prevErrorMsg == "We_Happy" || errorNotificationTimer.get() > 4.0) {
-        errorNotificationTimer.restart();
+    if (errorText != validAutoText) {
+      if (prevErrorMsg == validAutoText || errorNotificationTimer.advanceIfElapsed(11.0)) {
         Elastic.sendNotification(
-            new Notification(NotificationLevel.WARNING, "Invalid Auto", errorText, 3000));
-      } // TODO: finish auto safety
+            new Notification(NotificationLevel.WARNING, "Invalid Auto", errorText, 10000));
+      }
 
     } else {
       if (autoChanged) {
         Elastic.sendNotification(
             new Notification(NotificationLevel.INFO, "Auto Confirm", "Auto Is Valid", 3000));
       }
+
+      errorNotificationTimer.restart();
     }
 
     prevErrorMsg = errorText;
+    errorPublisher.set(prevErrorMsg);
+    SmartDashboard.putBoolean("Comp/Auto/ErrorStatus", prevErrorMsg == validAutoText);
   }
 
   private String checkLogic() {
     if (getSelectedName() == "Sandy Eggos Auto") {
-      if (getResponses().get(1) == AutoQuestionResponse.G
-          && getResponses().get(5) == AutoQuestionResponse.YES) {
+      if (getResponses().get(5) == AutoQuestionResponse.G
+          && getResponses().get(2) == AutoQuestionResponse.YES) {
         return "Using CLOSE Intake with G Start";
       }
     }
 
-    return "We_Happy";
+    return validAutoText;
   }
 
   public boolean hasAutoChanged() {

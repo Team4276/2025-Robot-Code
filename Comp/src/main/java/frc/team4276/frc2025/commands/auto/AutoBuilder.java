@@ -62,37 +62,44 @@ public class AutoBuilder {
 
     var scoringCommand = new SequentialCommandGroup();
 
-    String station = autoSelector.getResponses().get(2) == AutoQuestionResponse.YES ? "CLOSE" : "FAR";
+    String station =
+        autoSelector.getResponses().get(2) == AutoQuestionResponse.YES ? "CLOSE" : "FAR";
 
     PathPlannerTrajectory traj1;
     PathPlannerTrajectory traj2;
 
     if (autoSelector.getResponses().get(1) == AutoQuestionResponse.YES) {
-      traj1 = getPathPlannerTrajectoryFromChoreo(
-          "c_sw_sc_" + reefs.get(0).toString(), mirrorLengthwise);
+      traj1 =
+          getPathPlannerTrajectoryFromChoreo(
+              "c_sw_sc_" + reefs.get(0).toString(), mirrorLengthwise);
 
     } else {
-      traj1 = getPathPlannerTrajectoryFromChoreo(
-          "c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise);
+      traj1 =
+          getPathPlannerTrajectoryFromChoreo(
+              "c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise);
     }
 
     if (autoSelector.getResponses().get(2) == AutoQuestionResponse.YES) {
-      traj2 = getPathPlannerTrajectoryFromChoreo("c_kn_" + reefs.get(0).toString(), mirrorLengthwise);
+      traj2 =
+          getPathPlannerTrajectoryFromChoreo("c_kn_" + reefs.get(0).toString(), mirrorLengthwise);
 
     } else {
-      traj2 = getPathPlannerTrajectoryFromChoreo(
-          "c_sc_" + station + "_" + reefs.get(0).toString(), mirrorLengthwise, 1);
+      traj2 =
+          getPathPlannerTrajectoryFromChoreo(
+              "c_sc_" + station + "_" + reefs.get(0).toString(), mirrorLengthwise, 1);
     }
 
     for (int i = 0; i < reefs.size(); i++) {
-      var scTraj = i == 0
-          ? traj1
-          : getPathPlannerTrajectoryFromChoreo(
-              "c_sc_" + station + "_" + reefs.get(i).toString(), mirrorLengthwise, 0);
-      var intTraj = i == 0
-          ? traj2
-          : getPathPlannerTrajectoryFromChoreo(
-              "c_sc_" + station + "_" + reefs.get(i).toString(), mirrorLengthwise, 1);
+      var scTraj =
+          i == 0
+              ? traj1
+              : getPathPlannerTrajectoryFromChoreo(
+                  "c_sc_" + station + "_" + reefs.get(i).toString(), mirrorLengthwise, 0);
+      var intTraj =
+          i == 0
+              ? traj2
+              : getPathPlannerTrajectoryFromChoreo(
+                  "c_sc_" + station + "_" + reefs.get(i).toString(), mirrorLengthwise, 1);
 
       scoringCommand.addCommands(shrimpleCoral(scTraj, intTraj, toGoal(levels.get(i))));
     }
@@ -132,21 +139,23 @@ public class AutoBuilder {
 
     var scoringCommand = new SequentialCommandGroup();
 
-    var traj1 = getPathPlannerTrajectoryFromChoreo("c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise);
+    var traj1 =
+        getPathPlannerTrajectoryFromChoreo("c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise);
 
     scoringCommand.addCommands(
         Commands.sequence(
-            new DriveTrajectory(drive, traj1),
-            Commands.waitUntil(
-                () -> superstructure.atGoal() && superstructure.getGoal() != Goal.STOW),
-            scoreCommand(superstructure))
+                new DriveTrajectory(drive, traj1),
+                Commands.waitUntil(
+                    () -> superstructure.atGoal() && superstructure.getGoal() != Goal.STOW),
+                scoreCommand(superstructure))
             .deadlineFor(
                 Commands.waitSeconds(traj1.getTotalTimeSeconds() - 0.75)
                     .andThen(superstructure.setGoalCommand(toGoal(levels.get(0))))));
 
     for (int i = 1; i < reefs.size(); i++) {
-      var traj = getPathPlannerTrajectoryFromChoreo(
-          "c_sp_FAR_" + reefs.get(i).toString(), mirrorLengthwise);
+      var traj =
+          getPathPlannerTrajectoryFromChoreo(
+              "c_sp_FAR_" + reefs.get(i).toString(), mirrorLengthwise);
 
       scoringCommand.addCommands(speedyCoral(traj, toGoal(levels.get(i))));
     }
@@ -160,11 +169,11 @@ public class AutoBuilder {
 
   private Command speedyCoral(PathPlannerTrajectory traj, Goal goal) {
     return Commands.sequence(
-        new DriveTrajectory(drive, traj)
-            .andThen(
-                Commands.waitUntil(
-                    () -> superstructure.atGoal() && superstructure.getGoal() != Goal.STOW),
-                scoreCommand(superstructure)))
+            new DriveTrajectory(drive, traj)
+                .andThen(
+                    Commands.waitUntil(
+                        () -> superstructure.atGoal() && superstructure.getGoal() != Goal.STOW),
+                    scoreCommand(superstructure)))
         .deadlineFor(
             superstructure
                 .setGoalCommand(Goal.INTAKE)
@@ -193,15 +202,18 @@ public class AutoBuilder {
 
     var scoringCommand = new SequentialCommandGroup();
 
-    var traj1 = getPathPlannerTrajectoryFromChoreo("c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise);
+    var traj1 =
+        getPathPlannerTrajectoryFromChoreo("c_st_sc_" + reefs.get(0).toString(), mirrorLengthwise);
 
     for (int i = 0; i < reefs.size(); i++) {
-      var scTraj = i == 0
-          ? traj1
-          : getPathPlannerTrajectoryFromChoreo(
-              "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 0);
-      var intTraj = getPathPlannerTrajectoryFromChoreo(
-          "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 1);
+      var scTraj =
+          i == 0
+              ? traj1
+              : getPathPlannerTrajectoryFromChoreo(
+                  "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 0);
+      var intTraj =
+          getPathPlannerTrajectoryFromChoreo(
+              "c_sc_FAR_" + reefs.get(i).toString(), mirrorLengthwise, 1);
 
       scoringCommand.addCommands(shrimpleCoral(scTraj, intTraj, toGoal(levels.get(i))));
     }
@@ -217,10 +229,10 @@ public class AutoBuilder {
       PathPlannerTrajectory scTraj, PathPlannerTrajectory intTraj, Goal goal) {
     return Commands.sequence(
         Commands.sequence(
-            new DriveTrajectory(drive, scTraj),
-            Commands.waitUntil(
-                () -> superstructure.atGoal() && superstructure.getGoal() != Goal.STOW),
-            scoreCommand(superstructure))
+                new DriveTrajectory(drive, scTraj),
+                Commands.waitUntil(
+                    () -> superstructure.atGoal() && superstructure.getGoal() != Goal.STOW),
+                scoreCommand(superstructure))
             .deadlineFor(
                 Commands.waitSeconds(scTraj.getTotalTimeSeconds() - 0.75)
                     .andThen(superstructure.setGoalCommand(goal))),
@@ -285,7 +297,7 @@ public class AutoBuilder {
     List<AutoQuestionResponse> levels = new ArrayList<>();
 
     /** fms convention (A-L) */
-    int[] totalAvailable = new int[] { 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1 };
+    int[] totalAvailable = new int[] {2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1};
 
     for (var reef : reefs) {
       int currentReef = reef.ordinal() - AutoQuestionResponse.A.ordinal();
