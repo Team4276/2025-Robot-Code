@@ -4,6 +4,7 @@ import static frc.team4276.frc2025.subsystems.drive.DriveConstants.kinematics;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -15,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -51,9 +53,15 @@ public class RobotState {
   private Rotation2d lastGyroAngle = Rotation2d.kZero;
 
   private SwerveDrivePoseEstimator poseEstimator =
-      new SwerveDrivePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions, Pose2d.kZero);
-  private SwerveDrivePoseEstimator poseEstimatorOdom =
-      new SwerveDrivePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions, Pose2d.kZero);
+      new SwerveDrivePoseEstimator(
+          kinematics,
+          lastGyroAngle,
+          lastWheelPositions,
+          Pose2d.kZero,
+          VecBuilder.fill(0.003, 0.003, 0.002),
+          VecBuilder.fill(0.02, 0.02, 0.06));
+  private final SwerveDriveOdometry odometry =
+      new SwerveDriveOdometry(kinematics, lastGyroAngle, lastWheelPositions, Pose2d.kZero);
   private TimeInterpolatableBuffer<Pose2d> odomPoseBuffer =
       TimeInterpolatableBuffer.createBuffer(2.0);
 
@@ -86,11 +94,15 @@ public class RobotState {
 
   private RobotState() {
     ElasticUI.putPoseEstimate(() -> getEstimatedPose());
+
+    for (int i = 1; i <= FieldConstants.aprilTagCount; i++) {
+      txTyPoses.put(i, new TxTyPoseRecord(Pose2d.kZero, Double.POSITIVE_INFINITY, -1.0));
+    }
   }
 
   /** Resets the current odometry pose. */
   public void resetPose(Pose2d pose) {
-    poseEstimatorOdom.resetPose(pose);
+    odometry.resetPose(pose);
     poseEstimator.resetPose(pose);
   }
 
@@ -115,9 +127,9 @@ public class RobotState {
 
     lastWheelPositions = wheelPositions;
 
-    poseEstimatorOdom.updateWithTime(timestamp, yaw, wheelPositions);
     poseEstimator.updateWithTime(timestamp, yaw, wheelPositions);
-    odomPoseBuffer.addSample(timestamp, poseEstimatorOdom.getEstimatedPosition());
+    var odomPose = odometry.update(yaw, wheelPositions);
+    odomPoseBuffer.addSample(timestamp, odomPose);
   }
 
   /** Adds a new timestamped vision measurement. */
@@ -125,9 +137,13 @@ public class RobotState {
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
-    Pose2d pose =
-        new Pose2d(visionRobotPoseMeters.getTranslation(), getEstimatedPose().getRotation());
-    poseEstimator.addVisionMeasurement(pose, timestampSeconds, visionMeasurementStdDevs);
+    if (odomPoseBuffer.getSample(timestampSeconds).isPresent()) {
+      Pose2d pose =
+          new Pose2d(
+              visionRobotPoseMeters.getTranslation(),
+              odomPoseBuffer.getSample(timestampSeconds).get().getRotation());
+      poseEstimator.addVisionMeasurement(pose, timestampSeconds, visionMeasurementStdDevs);
+    }
   }
 
   /** Adds a new timestamped vision measurement. */
@@ -146,7 +162,9 @@ public class RobotState {
     Rotation2d robotRotation =
         poseEstimator
             .getEstimatedPosition()
-            .transformBy(new Transform2d(poseEstimatorOdom.getEstimatedPosition(), sample.get()))
+            .transformBy(
+                new Transform2d(
+                    odomPoseBuffer.getInternalBuffer().lastEntry().getValue(), sample.get()))
             .getRotation();
 
     Transform3d cameraPose = VisionConstants.configs[targetObs.camera()].robotToCamera;
@@ -197,7 +215,7 @@ public class RobotState {
 
   @AutoLogOutput(key = "RobotState/EstimatedOdomPose")
   public Pose2d getEstimatedOdomPose() {
-    return poseEstimatorOdom.getEstimatedPosition();
+    return odomPoseBuffer.getInternalBuffer().lastEntry().getValue();
   }
 
   @AutoLogOutput(key = "RobotState/EstimatedVisionPose")
@@ -223,7 +241,10 @@ public class RobotState {
     // Latency compensate
     return sample.map(
         pose2d ->
-            data.pose().plus(new Transform2d(pose2d, poseEstimatorOdom.getEstimatedPosition())));
+            data.pose()
+                .plus(
+                    new Transform2d(
+                        pose2d, odomPoseBuffer.getInternalBuffer().lastEntry().getValue())));
   }
 
   /**
