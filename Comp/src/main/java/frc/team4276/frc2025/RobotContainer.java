@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -233,6 +234,8 @@ public class RobotContainer {
 
     // Peace and quiet
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    calibrationBuffer.reset();
   }
 
   private void configureOverrides() {
@@ -703,6 +706,9 @@ public class RobotContainer {
     this.disableTranslationAutoAlign = disableTranslationAutoAlign;
   }
 
+  private boolean prevArmCoastState = false;
+  private Timer calibrationBuffer = new Timer();
+
   public void updateAlerts() {
     // Controller disconnected alerts
     driverDisconnected.set(
@@ -714,6 +720,18 @@ public class RobotContainer {
         Constants.isSim
             ? false
             : !DriverStation.isJoystickConnected(buttonBoard.getHID().getPort()));
+
+    if (armCoastOverride.get() == false && armCoastOverride.get() != prevArmCoastState) {
+      calibrationBuffer.restart();
+    }
+
+    if (calibrationBuffer.isRunning() && calibrationBuffer.advanceIfElapsed(1.0)) {
+      drive.calibrate();
+      calibrationBuffer.stop();
+      calibrationBuffer.reset();
+    }
+
+    prevArmCoastState = armCoastOverride.get();
   }
 
   /**
@@ -727,7 +745,7 @@ public class RobotContainer {
         .beforeStarting(
             () -> {
               vision.setCamerasEnabled(true, true, true);
-              drive.calibrate();
+              // drive.calibrate();
             })
         .finallyDo(() -> vision.setCamerasEnabled(true, true, true));
   }

@@ -55,7 +55,7 @@ public class GyroIOADIS implements GyroIO {
     gyro.calibrate();
 
     // try {
-    // Thread.sleep(1500);
+    // Thread.sleep(260);
 
     // } catch (Exception e) {
     // System.err.println(e.toString());
