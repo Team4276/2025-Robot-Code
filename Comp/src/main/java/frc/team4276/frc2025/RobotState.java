@@ -34,25 +34,28 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotState {
-  private LoggedTunableNumber txTyObservationStaleSecs = new LoggedTunableNumber("RobotState/TxTyObsStaleSecs", 0.5);
-  private static final LoggedTunableNumber minDistanceTagPoseBlend = new LoggedTunableNumber(
-      "RobotState/MinDistanceTagPoseBlend", Units.inchesToMeters(24.0));
-  private static final LoggedTunableNumber maxDistanceTagPoseBlend = new LoggedTunableNumber(
-      "RobotState/MaxDistanceTagPoseBlend", Units.inchesToMeters(36.0));
+  private LoggedTunableNumber txTyObservationStaleSecs =
+      new LoggedTunableNumber("RobotState/TxTyObsStaleSecs", 0.5);
+  private static final LoggedTunableNumber minDistanceTagPoseBlend =
+      new LoggedTunableNumber("RobotState/MinDistanceTagPoseBlend", Units.inchesToMeters(24.0));
+  private static final LoggedTunableNumber maxDistanceTagPoseBlend =
+      new LoggedTunableNumber("RobotState/MaxDistanceTagPoseBlend", Units.inchesToMeters(36.0));
 
-  private SwerveModulePosition[] lastWheelPositions = new SwerveModulePosition[] {
-      new SwerveModulePosition(),
-      new SwerveModulePosition(),
-      new SwerveModulePosition(),
-      new SwerveModulePosition()
-  };
+  private SwerveModulePosition[] lastWheelPositions =
+      new SwerveModulePosition[] {
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition()
+      };
   private Rotation2d lastGyroAngle = Rotation2d.kZero;
 
-  private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kinematics, lastGyroAngle,
-      lastWheelPositions, Pose2d.kZero);
-  private SwerveDrivePoseEstimator poseEstimatorOdom = new SwerveDrivePoseEstimator(kinematics, lastGyroAngle,
-      lastWheelPositions, Pose2d.kZero);
-  private TimeInterpolatableBuffer<Pose2d> odomPoseBuffer = TimeInterpolatableBuffer.createBuffer(2.0);
+  private SwerveDrivePoseEstimator poseEstimator =
+      new SwerveDrivePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions, Pose2d.kZero);
+  private SwerveDrivePoseEstimator poseEstimatorOdom =
+      new SwerveDrivePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions, Pose2d.kZero);
+  private TimeInterpolatableBuffer<Pose2d> odomPoseBuffer =
+      TimeInterpolatableBuffer.createBuffer(2.0);
 
   private static final Map<Integer, Pose2d> tagPoses2d = new HashMap<>();
 
@@ -104,8 +107,9 @@ public class RobotState {
     // Update gyro angle
     if (yaw == null) {
       // Derive from kinematics
-      yaw = lastGyroAngle.rotateBy(
-          new Rotation2d(kinematics.toTwist2d(lastWheelPositions, wheelPositions).dtheta));
+      yaw =
+          lastGyroAngle.rotateBy(
+              new Rotation2d(kinematics.toTwist2d(lastWheelPositions, wheelPositions).dtheta));
       lastGyroAngle = yaw;
     }
 
@@ -123,7 +127,8 @@ public class RobotState {
       Matrix<N3, N1> visionMeasurementStdDevs) {
     // Pose2d pos new Pose2d(visionRobotPoseMeters.getTranslation(),
     // getEstimatedPose().getRotation());
-    poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+    poseEstimator.addVisionMeasurement(
+        visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
   }
 
   /** Adds a new timestamped vision measurement. */
@@ -139,42 +144,44 @@ public class RobotState {
       // exit if not there
       return;
     }
-    Rotation2d robotRotation = poseEstimator
-        .getEstimatedPosition()
-        .transformBy(new Transform2d(poseEstimatorOdom.getEstimatedPosition(), sample.get()))
-        .getRotation();
+    Rotation2d robotRotation =
+        poseEstimator
+            .getEstimatedPosition()
+            .transformBy(new Transform2d(poseEstimatorOdom.getEstimatedPosition(), sample.get()))
+            .getRotation();
 
     Transform3d cameraPose = VisionConstants.configs[targetObs.camera()].robotToCamera;
 
     // Use 3D distance and tag angles to find robot pose
-    Translation2d camToTagTranslation = new Pose3d(Translation3d.kZero,
-        new Rotation3d(0, targetObs.ty(), -targetObs.tx()))
-        .transformBy(
-            new Transform3d(new Translation3d(targetObs.distance(), 0, 0), Rotation3d.kZero))
-        .getTranslation()
-        .rotateBy(new Rotation3d(0, cameraPose.getRotation().getY(), 0))
-        .toTranslation2d();
+    Translation2d camToTagTranslation =
+        new Pose3d(Translation3d.kZero, new Rotation3d(0, targetObs.ty(), -targetObs.tx()))
+            .transformBy(
+                new Transform3d(new Translation3d(targetObs.distance(), 0, 0), Rotation3d.kZero))
+            .getTranslation()
+            .rotateBy(new Rotation3d(0, cameraPose.getRotation().getY(), 0))
+            .toTranslation2d();
     if (Math.abs(camToTagTranslation.getNorm()) <= 0.01) {
       return;
     }
-    Rotation2d camToTagRotation = robotRotation.plus(
-        cameraPose.getRotation().toRotation2d().plus(camToTagTranslation.getAngle()));
+    Rotation2d camToTagRotation =
+        robotRotation.plus(
+            cameraPose.getRotation().toRotation2d().plus(camToTagTranslation.getAngle()));
     var tagPose2d = tagPoses2d.get(targetObs.tagId());
-    if (tagPose2d == null)
-      return;
-    Translation2d fieldToCameraTranslation = new Pose2d(tagPose2d.getTranslation(),
-        camToTagRotation.plus(Rotation2d.kPi))
-        .transformBy(new Transform2d(camToTagTranslation.getNorm(), 0.0, new Rotation2d()))
-        .getTranslation();
-    Pose2d robotPose = new Pose2d(
-        fieldToCameraTranslation,
-        robotRotation.plus(cameraPose.getRotation().toRotation2d()))
-        .transformBy(
-            new Transform2d(
-                new Pose2d(
-                    cameraPose.getTranslation().toTranslation2d(),
-                    cameraPose.getRotation().toRotation2d()),
-                Pose2d.kZero));
+    if (tagPose2d == null) return;
+    Translation2d fieldToCameraTranslation =
+        new Pose2d(tagPose2d.getTranslation(), camToTagRotation.plus(Rotation2d.kPi))
+            .transformBy(new Transform2d(camToTagTranslation.getNorm(), 0.0, new Rotation2d()))
+            .getTranslation();
+    Pose2d robotPose =
+        new Pose2d(
+                fieldToCameraTranslation,
+                robotRotation.plus(cameraPose.getRotation().toRotation2d()))
+            .transformBy(
+                new Transform2d(
+                    new Pose2d(
+                        cameraPose.getTranslation().toTranslation2d(),
+                        cameraPose.getRotation().toRotation2d()),
+                    Pose2d.kZero));
     // Use gyro angle at time for robot rotation
     robotPose = new Pose2d(robotPose.getTranslation(), robotRotation);
 
@@ -216,36 +223,37 @@ public class RobotState {
 
     // Latency compensate
     return sample.map(
-        pose2d -> data.pose().plus(new Transform2d(pose2d, poseEstimatorOdom.getEstimatedPosition())));
+        pose2d ->
+            data.pose().plus(new Transform2d(pose2d, poseEstimatorOdom.getEstimatedPosition())));
   }
 
   /**
-   * Get estimated pose using txty data given tagId on reef and aligned pose on
-   * reef. Used for algae
+   * Get estimated pose using txty data given tagId on reef and aligned pose on reef. Used for algae
    * intaking and coral scoring.
    */
   public Pose2d getReefPose(int face, Pose2d finalPose) {
     final boolean isRed = AllianceFlipUtil.shouldFlip();
-    var tagPose = getTxTyPose(
-        switch (face) {
-          case 1 -> isRed ? 8 : 17;
-          case 2 -> isRed ? 9 : 22;
-          case 3 -> isRed ? 10 : 21;
-          case 4 -> isRed ? 11 : 20;
-          case 5 -> isRed ? 6 : 19;
-          // 0
-          default -> isRed ? 7 : 18;
-        });
+    var tagPose =
+        getTxTyPose(
+            switch (face) {
+              case 1 -> isRed ? 8 : 17;
+              case 2 -> isRed ? 9 : 22;
+              case 3 -> isRed ? 10 : 21;
+              case 4 -> isRed ? 11 : 20;
+              case 5 -> isRed ? 6 : 19;
+                // 0
+              default -> isRed ? 7 : 18;
+            });
     // Use estimated pose if tag pose is not present
-    if (tagPose.isEmpty())
-      return RobotState.getInstance().getEstimatedPose();
+    if (tagPose.isEmpty()) return RobotState.getInstance().getEstimatedPose();
     // Use distance from estimated pose to final pose to get t value
-    final double t = MathUtil.clamp(
-        (getEstimatedPose().getTranslation().getDistance(finalPose.getTranslation())
-            - minDistanceTagPoseBlend.get())
-            / (maxDistanceTagPoseBlend.get() - minDistanceTagPoseBlend.get()),
-        0.0,
-        1.0);
+    final double t =
+        MathUtil.clamp(
+            (getEstimatedPose().getTranslation().getDistance(finalPose.getTranslation())
+                    - minDistanceTagPoseBlend.get())
+                / (maxDistanceTagPoseBlend.get() - minDistanceTagPoseBlend.get()),
+            0.0,
+            1.0);
     return getEstimatedPose().interpolate(tagPose.get(), 1.0 - t);
   }
 
@@ -273,6 +281,5 @@ public class RobotState {
     Logger.recordOutput("RobotState/TxTyPoses", tagPoses);
   }
 
-  public record TxTyPoseRecord(Pose2d pose, double distance, double timestamp) {
-  }
+  public record TxTyPoseRecord(Pose2d pose, double distance, double timestamp) {}
 }

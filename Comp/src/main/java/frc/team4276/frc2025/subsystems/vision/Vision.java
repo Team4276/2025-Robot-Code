@@ -144,7 +144,7 @@ public class Vision extends SubsystemBase {
             continue;
           }
 
-          useVisionRotation = false;
+          // useVisionRotation = false;
           // Calculate standard deviations
           double stdDevFactor =
               Math.pow(observation.avgTagDistance(), 2.0) / observation.tagCount();
