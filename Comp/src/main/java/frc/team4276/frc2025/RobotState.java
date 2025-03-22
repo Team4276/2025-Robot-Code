@@ -1,10 +1,9 @@
 package frc.team4276.frc2025;
 
-import static frc.team4276.frc2025.subsystems.drive.DriveConstants.kinematics;
+import static frc.team4276.frc2025.subsystems.drive.DriveConstants.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,6 +24,7 @@ import frc.team4276.frc2025.field.FieldConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO.TargetObservation;
 import frc.team4276.util.AllianceFlipUtil;
+import frc.team4276.util.VikSwervePoseEstimator;
 import frc.team4276.util.dashboard.ElasticUI;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.HashMap;
@@ -50,10 +50,10 @@ public class RobotState {
       };
   private Rotation2d lastGyroAngle = Rotation2d.kZero;
 
-  private SwerveDrivePoseEstimator poseEstimator =
-      new SwerveDrivePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions, Pose2d.kZero);
-  private SwerveDrivePoseEstimator poseEstimatorOdom =
-      new SwerveDrivePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions, Pose2d.kZero);
+  private VikSwervePoseEstimator poseEstimator =
+      new VikSwervePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions, Pose2d.kZero);
+  private VikSwervePoseEstimator poseEstimatorOdom =
+      new VikSwervePoseEstimator(kinematics, lastGyroAngle, lastWheelPositions, Pose2d.kZero);
   private TimeInterpolatableBuffer<Pose2d> odomPoseBuffer =
       TimeInterpolatableBuffer.createBuffer(2.0);
 
