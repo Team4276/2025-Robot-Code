@@ -35,7 +35,7 @@ import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class RobotState {
+public class RobotState { // NOTE: copy over 6328s
   private LoggedTunableNumber txTyObservationStaleSecs =
       new LoggedTunableNumber("RobotState/TxTyObsStaleSecs", 0.5);
   private static final LoggedTunableNumber minDistanceTagPoseBlend =
