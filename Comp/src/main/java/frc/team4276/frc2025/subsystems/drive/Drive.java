@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.team4276.frc2025.Constants;
@@ -160,16 +161,21 @@ public class Drive extends SubsystemBase {
             break;
           }
           // TODO: figure out more methods for filtering if still needed after vision
-          // Scrap pitch and roll checks for now. Due to questionable designs in the wpi lib driver
-          // for the adis gyro pitch and roll readings will be very inaccurate while the robot is
+          // Scrap pitch and roll checks for now. Due to questionable designs in the wpi
+          // lib driver
+          // for the adis gyro pitch and roll readings will be very inaccurate while the
+          // robot is
           // accelerating
 
-          /*double magAngle = Math.hypot(gyroInputs.rollPosition, gyroInputs.pitchPosition);
-
-          Logger.recordOutput("Drive/magAngle", magAngle);
-          if (magAngle > 5) {
-            includeMeasurement = false;
-          }*/
+          /*
+           * double magAngle = Math.hypot(gyroInputs.rollPosition,
+           * gyroInputs.pitchPosition);
+           *
+           * Logger.recordOutput("Drive/magAngle", magAngle);
+           * if (magAngle > 5) {
+           * includeMeasurement = false;
+           * }
+           */
         }
       }
       // If delta isn't too large we can include the measurement.
@@ -288,6 +294,14 @@ public class Drive extends SubsystemBase {
         modules[i].runSetpoint(setpointStates[i], forces.get(i));
       }
     }
+  }
+
+  public void calibrate() {
+    gyroIO.calibrate();
+  }
+
+  public Command calibrateCommand() {
+    return Commands.runOnce(() -> gyroIO.calibrate()).andThen(Commands.waitSeconds(0.04));
   }
 
   /** Stops the drive. */

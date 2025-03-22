@@ -108,8 +108,8 @@ public class Vision extends SubsystemBase {
           robotPoses.add(fieldToRobot1);
 
           if (Math.abs(fieldToRobot0.minus(fieldToRobot1).getTranslation().getNorm()) <= 0.0001) {
-            robotPosesRejected.add(fieldToRobot0);
-            continue;
+            // robotPosesRejected.add(fieldToRobot0);
+            // continue;
           }
 
           if (observation.ambiguity() < maxAmbiguity) {

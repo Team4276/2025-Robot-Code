@@ -724,7 +724,11 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return autoSelector
         .getCommand()
-        .beforeStarting(() -> vision.setCamerasEnabled(true, true, true))
+        .beforeStarting(
+            () -> {
+              vision.setCamerasEnabled(true, true, true);
+              drive.calibrate();
+            })
         .finallyDo(() -> vision.setCamerasEnabled(true, true, true));
   }
 

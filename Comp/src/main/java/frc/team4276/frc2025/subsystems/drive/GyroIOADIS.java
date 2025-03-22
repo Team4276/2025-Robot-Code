@@ -3,6 +3,7 @@ package frc.team4276.frc2025.subsystems.drive;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.ADIS16470_IMU.CalibrationTime;
 import java.util.Queue;
 
 public class GyroIOADIS implements GyroIO {
@@ -24,14 +25,17 @@ public class GyroIOADIS implements GyroIO {
     inputs.yawPosition = Rotation2d.fromDegrees(gyro.getAngle());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(gyro.getRate());
 
-    /*if (timeSinceLastReset > 60 && Math.hypot(inputs.pitchPosition, inputs.rollPosition) < 2) {
-      gyro.setGyroAngle(gyro.getPitchAxis(), 0);
-      gyro.setGyroAngle(gyro.getRollAxis(), 0);
-      timeSinceLastReset = 0;
-      iter++;
-    } else {
-      timeSinceLastReset = (Timer.getFPGATimestamp() - (60 * iter));
-    }*/
+    /*
+     * if (timeSinceLastReset > 60 && Math.hypot(inputs.pitchPosition,
+     * inputs.rollPosition) < 2) {
+     * gyro.setGyroAngle(gyro.getPitchAxis(), 0);
+     * gyro.setGyroAngle(gyro.getRollAxis(), 0);
+     * timeSinceLastReset = 0;
+     * iter++;
+     * } else {
+     * timeSinceLastReset = (Timer.getFPGATimestamp() - (60 * iter));
+     * }
+     */
     // inputs.pitchPosition = gyro.getAngle(gyro.getPitchAxis());
     // inputs.rollPosition = gyro.getAngle(gyro.getRollAxis());
 
@@ -43,5 +47,11 @@ public class GyroIOADIS implements GyroIO {
             .toArray(Rotation2d[]::new);
     yawTimestampQueue.clear();
     yawPositionQueue.clear();
+  }
+
+  @Override
+  public void calibrate() {
+    gyro.configCalTime(CalibrationTime._32ms);
+    gyro.calibrate();
   }
 }
