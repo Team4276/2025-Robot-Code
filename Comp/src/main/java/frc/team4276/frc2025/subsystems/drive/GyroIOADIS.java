@@ -51,7 +51,15 @@ public class GyroIOADIS implements GyroIO {
 
   @Override
   public void calibrate() {
-    gyro.configCalTime(CalibrationTime._32ms);
+    gyro.configCalTime(CalibrationTime._1s);
     gyro.calibrate();
+
+    // try {
+    // Thread.sleep(1500);
+
+    // } catch (Exception e) {
+    // System.err.println(e.toString());
+    // System.exit(1);
+    // }
   }
 }

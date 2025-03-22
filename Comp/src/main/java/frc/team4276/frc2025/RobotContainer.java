@@ -727,7 +727,7 @@ public class RobotContainer {
         .beforeStarting(
             () -> {
               vision.setCamerasEnabled(true, true, true);
-              // drive.calibrate();
+              drive.calibrate();
             })
         .finallyDo(() -> vision.setCamerasEnabled(true, true, true));
   }
