@@ -133,7 +133,7 @@ public class RobotState {
   /** Adds a new timestamped vision measurement. */
   public void addTxTyObservation(TargetObservation targetObs) {
     if (txTyPoses.containsKey(targetObs.tagId())
-        && targetObs.timestamp() >= txTyPoses.get(targetObs.tagId()).timestamp()) {
+        && targetObs.timestamp() <= txTyPoses.get(targetObs.tagId()).timestamp()) {
       return;
     }
 
