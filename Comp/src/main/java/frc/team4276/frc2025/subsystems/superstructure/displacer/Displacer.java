@@ -4,7 +4,6 @@ import frc.team4276.frc2025.subsystems.algaefier.roller.RollerIO;
 import frc.team4276.frc2025.subsystems.algaefier.roller.RollerIOInputsAutoLogged;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Displacer {
@@ -29,8 +28,6 @@ public class Displacer {
   private final RollerIO io;
   private final RollerIOInputsAutoLogged inputs = new RollerIOInputsAutoLogged();
 
-  private boolean hasSpiked = false;
-
   public Displacer(RollerIO io) {
     this.io = io;
   }
@@ -39,26 +36,16 @@ public class Displacer {
     io.updateInputs(inputs);
     Logger.processInputs("Displacer", inputs);
 
-    if (goal != Goal.VROOOM) {
-      hasSpiked = false;
-
-    } else if (inputs.supplyCurrentAmps > 20.0) {
-      // hasSpiked = true;
-    }
-
-    io.runVolts(hasSpiked ? 0.0 : goal.getVolts());
+    io.runVolts(goal.getVolts());
 
     Logger.recordOutput("Displacer/Goal", goal);
     Logger.recordOutput("Displacer/GoalVolts", goal);
-    Logger.recordOutput("Displacer/HasSpiked", hasSpiked);
   }
 
-  @AutoLogOutput
   public Goal getGoal() {
     return goal;
   }
 
-  @AutoLogOutput
   public void setGoal(Goal goal) {
     this.goal = goal;
   }

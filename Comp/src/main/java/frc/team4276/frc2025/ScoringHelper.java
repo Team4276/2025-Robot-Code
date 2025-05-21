@@ -1,7 +1,6 @@
 package frc.team4276.frc2025;
 
-import static frc.team4276.frc2025.field.FieldConstants.bargeScoreClose;
-import static frc.team4276.frc2025.field.FieldConstants.bargeScoreFar;
+import static frc.team4276.frc2025.field.FieldConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

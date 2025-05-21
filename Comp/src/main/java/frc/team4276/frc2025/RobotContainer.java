@@ -426,82 +426,22 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     if (isDemo) {
-      // configureDemoBindings();
+      configureDemoBindings();
 
     } else {
       configureControllerBindings();
     }
   }
 
-  // private void configureDemoBindings() {
-  // drive.setDefaultCommand(
-  // drive.run(
-  // () -> drive.feedTeleopInput(
-  // -driver.getLeftWithDeadband().y,
-  // -driver.getLeftWithDeadband().x,
-  // -driver.getRightWithDeadband().x)));
+  private void configureDemoBindings() {
+    /***************** Drive Triggers *****************/
+    // Drive suppliers
+    DoubleSupplier driverX = () -> -driver.getLeftWithDeadband().y;
+    DoubleSupplier driverY = () -> -driver.getLeftWithDeadband().x;
+    DoubleSupplier driverOmega = () -> -driver.getRightWithDeadband().x;
 
-  // // drive.setDefaultCommand(
-  // // drive.run(
-  // // () -> drive.feedTeleopInput(
-  // // 0.0,
-  // // 0.0,
-  // // 0.0)));
-
-  // // Reset gyro to 0° when A button is pressed
-  // driver
-  // .a()
-  // .onTrue(
-  // Commands.runOnce(
-  // () -> RobotState.getInstance()
-  // .resetPose(
-  // new Pose2d(
-  // RobotState.getInstance().getEstimatedPose().getTranslation(),
-  // AllianceFlipUtil.apply(Rotation2d.kZero))),
-  // drive)
-  // .ignoringDisable(false));
-
-  // driver
-  // .povDown()
-  // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L1));
-
-  // driver
-  // .povLeft()
-  // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L2));
-
-  // driver
-  // .povUp()
-  // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.L3));
-
-  // driver
-  // .rightBumper()
-  // .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.INTAKE));
-
-  // // driver
-  // // .rightTrigger()
-  // // .whileTrue(superstructure.scoreCommand());
-
-  // // superstructure.setDefaultCommand(
-  // // superstructure.run(() -> superstructure.acceptCharacterizationInput(
-  // // 3.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
-  // // // 0.0
-  // // )));
-
-  // // arm.setDefaultCommand(
-  // // arm.run(() -> arm.runCharacterization(
-  // // // 4.0 * (driver.getRightTriggerAxis() - driver.getLeftTriggerAxis())
-  // // 0.0)));
-
-  // // driver
-  // // .povDown()
-  // //
-  // .whileTrue(arm.setGoalCommand(Arm.Goal.INTAKE).alongWith(roller.setGoalCommand(Roller.Goal.INTAKE)));
-
-  // // driver
-  // // .povUp()
-  // //
-  // .whileTrue(arm.setGoalCommand(Arm.Goal.SCORE).alongWith(roller.setGoalCommand(Roller.Goal.SCORE)));
-  // }
+    drive.setDefaultCommand(DriveCommands.joystickDrive(drive, driverX, driverY, driverOmega));
+  }
 
   private void configureControllerBindings() {
     /***************** Drive Triggers *****************/

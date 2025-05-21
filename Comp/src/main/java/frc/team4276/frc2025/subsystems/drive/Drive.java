@@ -1,9 +1,7 @@
 package frc.team4276.frc2025.subsystems.drive;
 
 import static edu.wpi.first.units.Units.Volts;
-import static frc.team4276.frc2025.subsystems.drive.DriveConstants.driveConfig;
-import static frc.team4276.frc2025.subsystems.drive.DriveConstants.kinematics;
-import static frc.team4276.frc2025.subsystems.drive.DriveConstants.maxSteerVelocity;
+import static frc.team4276.frc2025.subsystems.drive.DriveConstants.*;
 
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
@@ -69,8 +67,6 @@ public class Drive extends SubsystemBase {
   private SwerveSetpoint prevSetpoint;
   private boolean disableTrajFF = true;
   private final double[] dummyForces = {0.0, 0.0, 0.0, 0.0};
-
-  private DriveMode mode = DriveMode.TELEOP;
 
   public Drive(
       GyroIO gyroIO,
@@ -203,13 +199,10 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && !Constants.isSim);
-
-    Logger.recordOutput("Drive/DriveMode", mode);
   }
 
   public void runVelocity(ChassisSpeeds speeds, DriveMode mode) {
     velocityMode = true;
-    this.mode = mode;
 
     // Calculate setpoints
     ChassisSpeeds setpointSpeeds;
@@ -233,25 +226,24 @@ public class Drive extends SubsystemBase {
           new SwerveModuleState(),
           new SwerveModuleState()
         };
-
-    // Log optimized setpoints (runSetpoint mutates each state)
-    Logger.recordOutput("Drive/SetpointSpeeds", setpointSpeeds);
-    Logger.recordOutput("Drive/SwerveStates/OptimizedSetpoints", setpointStates);
-    Logger.recordOutput("Drive/SwerveStates/Torques", setpointTorques);
-    Logger.recordOutput(
-        "Drive/SwerveStates/UnoptimizedSetpoints",
-        kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(speeds, 0.02)));
-    Logger.recordOutput("Drive/DesiredSpeeds", speeds);
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
       modules[i].runSetpoint(setpointStates[i]);
     }
+
+    // Log optimized setpoints (runSetpoint mutates each state)
+    Logger.recordOutput("Drive/SetpointSpeeds", setpointSpeeds);
+    Logger.recordOutput("Drive/SwerveStates/OptimizedSetpoints", setpointStates);
+    Logger.recordOutput("Drive/SwerveStates/Torques", setpointTorques);
+    Logger.recordOutput(
+        "Drive/SwerveStates/UnoptimizedSetpoints",
+        kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(speeds, 0.02)));
+    Logger.recordOutput("Drive/DesiredSpeeds", speeds);
   }
 
   public void runVelocity(ChassisSpeeds speeds, List<Vector<N2>> forces, DriveMode mode) {
     velocityMode = true;
-    this.mode = mode;
 
     // Calculate setpoints
     ChassisSpeeds setpointSpeeds;
@@ -275,15 +267,6 @@ public class Drive extends SubsystemBase {
           new SwerveModuleState(),
           new SwerveModuleState()
         };
-
-    // Log optimized setpoints (runSetpoint mutates each state)
-    Logger.recordOutput("Drive/SetpointSpeeds", setpointSpeeds);
-    Logger.recordOutput("Drive/SwerveStates/OptimizedSetpoints", setpointStates);
-    Logger.recordOutput("Drive/SwerveStates/Torques", setpointTorques);
-    Logger.recordOutput(
-        "Drive/SwerveStates/UnoptimizedSetpoints",
-        kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(speeds, 0.02)));
-    Logger.recordOutput("Drive/DesiredSpeeds", speeds);
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
@@ -294,6 +277,15 @@ public class Drive extends SubsystemBase {
         modules[i].runSetpoint(setpointStates[i], forces.get(i));
       }
     }
+
+    // Log optimized setpoints (runSetpoint mutates each state)
+    Logger.recordOutput("Drive/SetpointSpeeds", setpointSpeeds);
+    Logger.recordOutput("Drive/SwerveStates/OptimizedSetpoints", setpointStates);
+    Logger.recordOutput("Drive/SwerveStates/Torques", setpointTorques);
+    Logger.recordOutput(
+        "Drive/SwerveStates/UnoptimizedSetpoints",
+        kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(speeds, 0.02)));
+    Logger.recordOutput("Drive/DesiredSpeeds", speeds);
   }
 
   public void calibrate() {
@@ -312,7 +304,6 @@ public class Drive extends SubsystemBase {
   /** Runs the drive in a straight line with the specified drive output. */
   public void runCharacterization(double output) {
     velocityMode = false;
-    mode = DriveMode.CHARACTERIZATION;
     for (int i = 0; i < 4; i++) {
       modules[i].runCharacterization(output);
     }
@@ -328,8 +319,7 @@ public class Drive extends SubsystemBase {
   }
 
   public void runWheelRadiusCharacterization(double omegaSpeed) {
-    mode = DriveMode.WHEEL_RADIUS_CHARACTERIZATION;
-    runVelocity(new ChassisSpeeds(0.0, 0.0, omegaSpeed), mode);
+    runVelocity(new ChassisSpeeds(0.0, 0.0, omegaSpeed), DriveMode.WHEEL_RADIUS_CHARACTERIZATION);
   }
 
   /** Returns the position of each module in radians. */
@@ -367,9 +357,5 @@ public class Drive extends SubsystemBase {
   @AutoLogOutput(key = "Drive/MeasuredSpeeds")
   private ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
-  }
-
-  public DriveMode getMode() {
-    return mode;
   }
 }
