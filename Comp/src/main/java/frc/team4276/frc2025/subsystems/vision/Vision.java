@@ -11,12 +11,14 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.field.FieldConstants;
 import frc.team4276.frc2025.subsystems.vision.VisionIO.TargetObservation;
+import frc.team4276.util.AllianceFlipUtil;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +30,10 @@ public class Vision extends SubsystemBase {
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
+
+  private List<TargetObservation> priorityTags = new LinkedList<>();
+  private final double priorityStaleTime = 0.5;
+  private final double maxPriorityDist = 1.5;
 
   private boolean[] camerasEnabled = {true, true, true};
 
@@ -175,6 +181,17 @@ public class Vision extends SubsystemBase {
             || tagObs.distance() < allTxTyObservations.get(tagObs.tagId()).distance()) {
           allTxTyObservations.put(tagObs.tagId(), tagObs);
         }
+
+        boolean isPriorityStale =
+            Timer.getTimestamp() - priorityTags.get(cameraIndex).timestamp() > priorityStaleTime;
+        boolean isPriorityFurther = tagObs.distance() < priorityTags.get(cameraIndex).distance();
+
+        if (priorityTags.size() <= cameraIndex) {
+          priorityTags.add(tagObs);
+
+        } else if (isPriorityFurther || isPriorityStale) {
+          priorityTags.set(cameraIndex, tagObs);
+        }
       }
 
       if (enableInstanceLogging) {
@@ -250,5 +267,20 @@ public class Vision extends SubsystemBase {
 
   public Command setCamerasEnabledCommand(boolean... enabled) {
     return Commands.runOnce(() -> setCamerasEnabled(enabled));
+  }
+
+  public List<TargetObservation> getPriorityTargObs() {
+    List<TargetObservation> output = new LinkedList<>();
+
+    for (TargetObservation obs : priorityTags) {
+      if (Timer.getTimestamp() - obs.timestamp() < priorityStaleTime
+          && obs.distance() < maxPriorityDist
+          && (obs.tagId() >= (AllianceFlipUtil.shouldFlip() ? 6 : 17)
+              || obs.tagId() <= (AllianceFlipUtil.shouldFlip() ? 11 : 22))) {
+        output.add(obs);
+      }
+    }
+
+    return output;
   }
 }
