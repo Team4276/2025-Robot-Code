@@ -23,12 +23,6 @@ import frc.team4276.frc2025.commands.FeedForwardCharacterization;
 import frc.team4276.frc2025.commands.IntakeCommands;
 import frc.team4276.frc2025.commands.WheelRadiusCharacterization;
 import frc.team4276.frc2025.commands.auto.AutoBuilder;
-import frc.team4276.frc2025.subsystems.algaefier.Algaefier;
-import frc.team4276.frc2025.subsystems.algaefier.arm.Arm;
-import frc.team4276.frc2025.subsystems.algaefier.arm.ArmIO;
-import frc.team4276.frc2025.subsystems.algaefier.roller.Gripper;
-import frc.team4276.frc2025.subsystems.algaefier.roller.RollerIO;
-import frc.team4276.frc2025.subsystems.algaefier.roller.RollerIOSparkMax;
 import frc.team4276.frc2025.subsystems.climber.Climber;
 import frc.team4276.frc2025.subsystems.climber.ClimberIO;
 import frc.team4276.frc2025.subsystems.climber.ClimberIOSparkMax;
@@ -45,6 +39,8 @@ import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIO;
 import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIOHardware;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
 import frc.team4276.frc2025.subsystems.superstructure.displacer.Displacer;
+import frc.team4276.frc2025.subsystems.superstructure.displacer.RollerIO;
+import frc.team4276.frc2025.subsystems.superstructure.displacer.RollerIOSparkMax;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.Elevator;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorIO;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorIOSparkMax;
@@ -72,7 +68,6 @@ public class RobotContainer {
   // Subsystems
   private Drive drive;
   private Superstructure superstructure;
-  private Algaefier algaefier;
   private Hopper hopper;
   private Climber climber;
   private Vision vision;
@@ -129,11 +124,6 @@ public class RobotContainer {
                           Ports.ENDEFFECTOR_LEFT, Ports.ENDEFFECTOR_RIGHT, 40, false, true),
                       new RollerSensorsIOHardware()),
                   new Displacer(new RollerIOSparkMax(Ports.ALGAE_DISPLACER, 20, false, true)));
-          algaefier =
-              new Algaefier(
-                  // new Arm(new ArmIOSparkMax()),
-                  // new Gripper(new RollerIOSparkMax(Ports.ALGAEFIER_GRIPPER, 40, false, true))
-                  new Arm(new ArmIO() {}), new Gripper(new RollerIO() {}));
           hopper =
               new Hopper(
                   new HopperIOSparkMax(Ports.HOPPER_LEFT, true),
@@ -164,7 +154,6 @@ public class RobotContainer {
                   new Elevator(new ElevatorIO() {}),
                   new EndEffector(new EndEffectorIO() {}, new RollerSensorsIO() {}),
                   new Displacer(new RollerIO() {}));
-          algaefier = new Algaefier(new Arm(new ArmIO() {}), new Gripper(new RollerIO() {}));
           hopper = new Hopper(new HopperIO() {}, new HopperIO() {});
           climber = new Climber(new ClimberIO() {});
           if (disableVisionSim) {
@@ -208,10 +197,6 @@ public class RobotContainer {
               new Displacer(new RollerIO() {}));
     }
 
-    if (algaefier == null) {
-      algaefier = new Algaefier(new Arm(new ArmIO() {}), new Gripper(new RollerIO() {}));
-    }
-
     if (hopper == null) {
       hopper = new Hopper(new HopperIO() {}, new HopperIO() {});
     }
@@ -240,7 +225,6 @@ public class RobotContainer {
     superstructure.setCoastOverride(elevatorCoastOverride::get);
     climber.setCoastOverride(climberCoastOverride::get);
     hopper.setCoastOverride(hopperCoastOverride::get);
-    algaefier.setArmCoastOverride(armCoastOverride::get);
   }
 
   private void configureAutos() {
@@ -384,21 +368,6 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", () -> drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoSelector.addRoutine(
         "Drive SysId (Dynamic Reverse)", () -> drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    autoSelector.addRoutine(
-        "Arm Simple FF Characterization",
-        () ->
-            new FeedForwardCharacterization(
-                algaefier,
-                algaefier::acceptCharacterizationInput,
-                algaefier::getFFCharacterizationVelocity));
-    autoSelector.addRoutine(
-        "(Reverse) Arm Simple FF Characterization",
-        () ->
-            new FeedForwardCharacterization(
-                algaefier,
-                algaefier::acceptCharacterizationInput,
-                algaefier::getFFCharacterizationVelocity,
-                true));
     autoSelector.addRoutine(
         "Elevator Simple FF Characterization",
         () ->
@@ -573,10 +542,7 @@ public class RobotContainer {
                 scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L2
                     || scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L1)
         .and(() -> superstructure.getGoal() != Superstructure.Goal.L3)
-        .toggleOnTrue(
-            superstructure
-                .setGoalCommand(Superstructure.Goal.LO_ALGAE)
-                .alongWith(algaefier.setGoalCommand(Algaefier.Goal.INTAKE)));
+        .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.LO_ALGAE));
 
     driver
         .y()
@@ -586,10 +552,7 @@ public class RobotContainer {
                 !(superstructure.getGoal() == Superstructure.Goal.L2
                     || superstructure.getGoal() == Superstructure.Goal.L1))
         .and(() -> scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L3)
-        .toggleOnTrue(
-            superstructure
-                .setGoalCommand(Superstructure.Goal.HI_ALGAE)
-                .alongWith(algaefier.setGoalCommand(Algaefier.Goal.INTAKE)));
+        .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.HI_ALGAE));
 
     /***************** Climbing Triggers *****************/
 
