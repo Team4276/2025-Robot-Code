@@ -1,9 +1,10 @@
 package frc.team4276.frc2025.subsystems.superstructure.endeffector;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIO;
+import frc.team4276.frc2025.subsystems.superstructure.RollerSensorsIOInputsAutoLogged;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class EndEffector {
@@ -44,32 +45,64 @@ public class EndEffector {
   }
 
   private Goal goal = Goal.IDLE;
+  private Goal currGoal = Goal.IDLE;
 
   private final EndEffectorIO io;
   private final EndEffectorIOInputsAutoLogged inputs = new EndEffectorIOInputsAutoLogged();
 
-  public EndEffector(EndEffectorIO io) {
+  private final RollerSensorsIO sensorsIO;
+  private final RollerSensorsIOInputsAutoLogged sensorsInputs =
+      new RollerSensorsIOInputsAutoLogged();
+
+  private boolean hasCoral = false;
+
+  public EndEffector(EndEffectorIO io, RollerSensorsIO sensorsIO) {
     this.io = io;
+    this.sensorsIO = sensorsIO;
   }
 
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("EndEffector", inputs);
 
+    sensorsIO.updateInputs(sensorsInputs);
+    Logger.processInputs("EndEffector/BeamBreak", sensorsInputs);
+
     if (DriverStation.isDisabled()) {
-      goal = Goal.IDLE;
+      currGoal = Goal.IDLE;
     }
-    io.runVolts(goal.getLeftVolts(), goal.getRightVolts());
+
+    if (currGoal == Goal.INTAKE && sensorsInputs.backRead) {
+      currGoal = Goal.SLOINTAKE;
+
+    } else if (currGoal == Goal.SLOINTAKE && !sensorsInputs.backRead) {
+      currGoal = Goal.REVERSE;
+
+    } else if (currGoal == Goal.REVERSE && sensorsInputs.backRead) {
+      currGoal = Goal.IDLE;
+
+    } else if ((goal == Goal.INTAKE || goal == Goal.SLOINTAKE) && currGoal != Goal.IDLE) {
+      // Continue staging process
+
+    } else {
+      currGoal = goal;
+      hasCoral = sensorsInputs.frontRead;
+    }
+
+    io.runVolts(currGoal.getLeftVolts(), currGoal.getRightVolts());
     Logger.recordOutput("EndEffector/Goal", goal);
+    Logger.recordOutput("EndEffector/CurrentGoal", currGoal);
   }
 
-  @AutoLogOutput
   public Goal getGoal() {
     return goal;
   }
 
-  @AutoLogOutput
   public void setGoal(Goal goal) {
     this.goal = goal;
+  }
+
+  public boolean hasCoral() {
+    return hasCoral;
   }
 }

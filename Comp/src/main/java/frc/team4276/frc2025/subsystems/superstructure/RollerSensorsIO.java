@@ -4,14 +4,14 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface RollerSensorsIO {
   @AutoLog
-  class RollerSensorsIOInputs {
-    boolean frontRead = false;
-    boolean frontTripped = false;
-    boolean frontCleared = false;
+  abstract class RollerSensorsIOInputs {
+    public boolean frontRead = false;
+    public boolean frontTripped = false;
+    public boolean frontCleared = false;
 
-    boolean backRead = false;
-    boolean backTripped = false;
-    boolean backCleared = false;
+    public boolean backRead = false;
+    public boolean backTripped = false;
+    public boolean backCleared = false;
   }
 
   default void updateInputs(RollerSensorsIOInputs inputs) {}

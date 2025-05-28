@@ -1,14 +1,10 @@
 package frc.team4276.frc2025;
 
-import static frc.team4276.frc2025.field.FieldConstants.*;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
-import frc.team4276.frc2025.field.FieldConstants;
 import frc.team4276.frc2025.field.FieldConstants.Reef;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
-import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.VikXboxController;
 import frc.team4276.util.drivers.VirtualSubsystem;
 import org.littletonrobotics.junction.Logger;
@@ -30,7 +26,6 @@ public class ScoringHelper extends VirtualSubsystem {
     updateXbox(); // redundancy
     updateButtonBoard();
 
-    SmartDashboard.putBoolean("Comp/ScoringHelper/Net", goal == Goal.NET);
     SmartDashboard.putBoolean("Comp/ScoringHelper/L3", goal == Goal.L3);
     SmartDashboard.putBoolean("Comp/ScoringHelper/L2", goal == Goal.L2);
     SmartDashboard.putBoolean("Comp/ScoringHelper/L1", goal == Goal.L1);
@@ -76,8 +71,6 @@ public class ScoringHelper extends VirtualSubsystem {
       goal = Goal.L2;
     } else if (buttonBoard.getHID().getRawButtonPressed(9)) {
       goal = Goal.L3;
-    } else if (buttonBoard.getHID().getRawButtonPressed(10)) {
-      goal = Goal.NET;
     }
   }
 
@@ -116,8 +109,6 @@ public class ScoringHelper extends VirtualSubsystem {
       goal = Goal.L2;
     } else if (xbox.getHID().getYButton()) {
       goal = Goal.L3;
-    } else if (xbox.getHID().getPOV() == 0) {
-      goal = Goal.NET;
     }
 
     if (prevSide != side || prevRight != isRight) {
@@ -135,30 +126,10 @@ public class ScoringHelper extends VirtualSubsystem {
   }
 
   public Pose2d getSelectedAlignPose() {
-    if (goal == Goal.NET) {
-      var trans = RobotState.getInstance().getEstimatedPose().getTranslation();
-      return trans.getDistance(
-                  AllianceFlipUtil.apply(FieldConstants.bargeScoreFar.getTranslation()))
-              < trans.getDistance(
-                  AllianceFlipUtil.apply(FieldConstants.bargeScoreClose.getTranslation()))
-          ? bargeScoreFar
-          : bargeScoreClose;
-    }
-
     return getSelectedReef().getAlign();
   }
 
   public Pose2d getSelectedScorePose() {
-    if (goal == Goal.NET) {
-      var trans = RobotState.getInstance().getEstimatedPose().getTranslation();
-      return trans.getDistance(
-                  AllianceFlipUtil.apply(FieldConstants.bargeScoreFar.getTranslation()))
-              < trans.getDistance(
-                  AllianceFlipUtil.apply(FieldConstants.bargeScoreClose.getTranslation()))
-          ? bargeScoreFar
-          : bargeScoreClose;
-    }
-
     return getSelectedReef().getScore();
   }
 

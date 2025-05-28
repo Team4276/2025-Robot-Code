@@ -10,22 +10,13 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-public class Superstructure
-    extends SubsystemBase { // TODO: decide if we want a statemachine or not...
+public class Superstructure extends SubsystemBase {
   private final Elevator elevator;
   private final EndEffector endeffector;
   private final Displacer displacer;
 
-  private final RollerSensorsIO sensorsIO;
-  private final RollerSensorsIOInputsAutoLogged sensorsInputs =
-      new RollerSensorsIOInputsAutoLogged();
-
   private boolean wantScore = false;
   private boolean leftL1 = false;
-
-  private boolean wantFling = false;
-
-  private boolean wantUnjam = false;
 
   public enum Goal {
     STOW,
@@ -33,10 +24,8 @@ public class Superstructure
     L1,
     L2,
     L3,
-    NET,
     LO_ALGAE,
     HI_ALGAE,
-    UNJAM,
     SHUFFLE,
     CHARACTERIZING,
     CUSTOM
@@ -47,21 +36,10 @@ public class Superstructure
 
   private double elevatorCharacterizationInput = 0.0;
 
-  private boolean hasGrasped = false; // clean up this mess
-  private boolean cleared2 = false;
-  private boolean cleared3 = false;
-  private boolean cleared4 = false;
-  private boolean cleared5 = false;
-
-  private boolean hasCoral = false;
-  private boolean displace = false;
-
-  public Superstructure(
-      Elevator elevator, EndEffector endeffector, Displacer displacer, RollerSensorsIO sensorsIO) {
+  public Superstructure(Elevator elevator, EndEffector endeffector, Displacer displacer) {
     this.elevator = elevator;
     this.endeffector = endeffector;
     this.displacer = displacer;
-    this.sensorsIO = sensorsIO;
 
     elevator.setCoastOverride(() -> false);
 
@@ -70,18 +48,14 @@ public class Superstructure
 
   @Override
   public void periodic() {
-    sensorsIO.updateInputs(sensorsInputs);
-    Logger.processInputs("RollersSensors", sensorsInputs);
-
-    if (desiredGoal.get() == Goal.STOW && currentGoal == Goal.INTAKE && hasGrasped && !cleared3) {
+    if (desiredGoal.get() == Goal.STOW
+        && currentGoal == Goal.INTAKE
+        && (endeffector.getGoal() == EndEffector.Goal.SLOINTAKE
+            || endeffector.getGoal() == EndEffector.Goal.REVERSE)) {
       // Continue intaking
 
     } else {
       currentGoal = desiredGoal.get();
-    }
-
-    if (wantUnjam) {
-      currentGoal = Goal.UNJAM;
     }
 
     if (wantScore) {
@@ -93,21 +67,6 @@ public class Superstructure
       endeffector.setGoal(EndEffector.Goal.IDLE);
     }
 
-    if (displace) {
-      displacer.setGoal(Displacer.Goal.VROOOM);
-    }
-
-    if (currentGoal != Goal.INTAKE) {
-      hasGrasped = false;
-      cleared2 = false;
-      cleared3 = false;
-    }
-
-    if (currentGoal != Goal.SHUFFLE) {
-      cleared4 = false;
-      cleared5 = false;
-    }
-
     switch (currentGoal) {
       case STOW:
         elevator.setGoal(Elevator.Goal.STOW);
@@ -117,39 +76,13 @@ public class Superstructure
         break;
 
       case SHUFFLE:
-        if (sensorsInputs.backTripped || cleared5) {
-          cleared5 = true;
-          endeffector.setGoal(EndEffector.Goal.IDLE);
-        } else if (sensorsInputs.backCleared || cleared4) {
-          cleared4 = true;
-          endeffector.setGoal(EndEffector.Goal.REVERSE);
-        } else {
-          endeffector.setGoal(EndEffector.Goal.SLOINTAKE);
-        }
+        endeffector.setGoal(EndEffector.Goal.SLOINTAKE);
 
         break;
 
-      case UNJAM:
-        elevator.setGoal(Elevator.Goal.UNJAM);
-        endeffector.setGoal(EndEffector.Goal.IDLE);
-        displacer.setGoal(Displacer.Goal.IDLE);
-
-        break;
       case INTAKE:
         elevator.setGoal(Elevator.Goal.INTAKE);
-        if ((sensorsInputs.backTripped && cleared2) || cleared3) {
-          cleared3 = true;
-          hasCoral = sensorsInputs.frontRead;
-          endeffector.setGoal(EndEffector.Goal.IDLE);
-        } else if (sensorsInputs.backCleared || cleared2) {
-          cleared2 = true;
-          endeffector.setGoal(EndEffector.Goal.REVERSE);
-        } else if (sensorsInputs.backTripped || hasGrasped) {
-          hasGrasped = true;
-          endeffector.setGoal(EndEffector.Goal.SLOINTAKE);
-        } else {
-          endeffector.setGoal(EndEffector.Goal.INTAKE);
-        }
+        endeffector.setGoal(EndEffector.Goal.INTAKE);
         displacer.setGoal(Displacer.Goal.IDLE);
 
         break;
@@ -168,15 +101,6 @@ public class Superstructure
       case L3:
         elevator.setGoal(Elevator.Goal.L3);
         elevator.requestHome();
-
-        break;
-
-      case NET:
-        if (wantFling) {
-          elevator.setGoal(Elevator.Goal.NET_SCORE);
-        }
-        elevator.setGoal(Elevator.Goal.NET_PREP);
-        endeffector.setGoal(EndEffector.Goal.IDLE);
 
         break;
 
@@ -211,8 +135,7 @@ public class Superstructure
     Logger.recordOutput("Superstructure/DesiredGoal", desiredGoal.get());
     Logger.recordOutput("Superstructure/CurrentGoal", currentGoal);
     Logger.recordOutput("Superstructure/WantScore", wantScore);
-    Logger.recordOutput("Superstructure/Displace", displace);
-    Logger.recordOutput("Superstructure/HasCoral", hasCoral);
+    Logger.recordOutput("Superstructure/HasCoral", endeffector.hasCoral());
   }
 
   public boolean atGoal() {
@@ -223,24 +146,20 @@ public class Superstructure
     return Math.abs(elevator.getGoal().getPositionMetres() - elevator.getPositionMetres()) < tol;
   }
 
-  public void setGoal(Goal goal) {
-    desiredGoal = () -> goal;
+  public Goal getGoal() {
+    return currentGoal;
   }
 
   public void setGoal(Supplier<Goal> goal) {
     desiredGoal = goal;
   }
 
-  public Goal getGoal() {
-    return currentGoal;
+  public Command setGoalCommand(Supplier<Goal> goal) {
+    return startEnd(() -> setGoal(goal), () -> setGoal(() -> Goal.STOW));
   }
 
   public Command setGoalCommand(Goal goal) {
     return setGoalCommand(() -> goal);
-  }
-
-  public Command setGoalCommand(Supplier<Goal> goal) {
-    return startEnd(() -> setGoal(goal), () -> setGoal(Goal.STOW));
   }
 
   public Command scoreCommand(boolean isLeftL1) {
@@ -251,23 +170,12 @@ public class Superstructure
         },
         () -> {
           wantScore = false;
-          hasCoral = false;
-        });
-  }
-
-  public Command flingCommand() {
-    return Commands.startEnd(
-        () -> {
-          wantFling = true;
-        },
-        () -> {
-          wantFling = false;
         });
   }
 
   public void acceptCharacterizationInput(double input) {
     elevatorCharacterizationInput = input;
-    setGoal(Goal.CHARACTERIZING);
+    setGoal(() -> Goal.CHARACTERIZING);
   }
 
   public double getFFCharacterizationVelocity() {
@@ -288,19 +196,7 @@ public class Superstructure
     elevator.setCoastOverride(override);
   }
 
-  public Command toggleUnjamCommand() {
-    return Commands.runOnce(() -> wantUnjam = !wantUnjam);
-  }
-
-  public Command toggleDisplacerCommand() {
-    return Commands.runOnce(() -> displace = !displace);
-  }
-
   public boolean hasCoral() {
-    return hasCoral;
-  }
-
-  public void overrideCoral(boolean hasCoral) {
-    this.hasCoral = hasCoral;
+    return endeffector.hasCoral();
   }
 }

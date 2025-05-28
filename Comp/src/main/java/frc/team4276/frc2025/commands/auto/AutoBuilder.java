@@ -107,7 +107,6 @@ public class AutoBuilder {
     return Commands.sequence(
         resetPose(traj1.getInitialPose()),
         Commands.waitSeconds(autoSelector.getDelayInput()),
-        Commands.runOnce(() -> superstructure.overrideCoral(true)),
         scoringCommand);
   }
 
@@ -163,7 +162,6 @@ public class AutoBuilder {
     return Commands.sequence(
         resetPose(traj1.getInitialPose()),
         Commands.waitSeconds(autoSelector.getDelayInput()),
-        Commands.runOnce(() -> superstructure.overrideCoral(true)),
         scoringCommand);
   }
 
@@ -221,7 +219,6 @@ public class AutoBuilder {
     return Commands.sequence(
         resetPose(traj1.getInitialPose()),
         Commands.waitSeconds(autoSelector.getDelayInput()),
-        Commands.runOnce(() -> superstructure.overrideCoral(true)),
         scoringCommand);
   }
 

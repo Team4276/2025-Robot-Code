@@ -210,11 +210,13 @@ public class RobotState {
       return Optional.empty();
     }
     var data = txTyPoses.get(tagId);
-    Logger.recordOutput(
-        "RobotState/IsTxTyStale",
-        Timer.getTimestamp() - data.timestamp() >= txTyObservationStaleSecs.get());
+
+    boolean isStale = Timer.getTimestamp() - data.timestamp() >= txTyObservationStaleSecs.get();
+
+    Logger.recordOutput("RobotState/IsTxTyStale", isStale);
+
     // Check if stale
-    if (Timer.getTimestamp() - data.timestamp() >= txTyObservationStaleSecs.get()) {
+    if (isStale) {
       return Optional.empty();
     }
     // Get odometry based pose at timestamp

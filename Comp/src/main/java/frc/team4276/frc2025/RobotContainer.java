@@ -126,9 +126,9 @@ public class RobotContainer {
                   new Elevator(new ElevatorIOSparkMax()),
                   new EndEffector(
                       new EndEffectorIOSparkMax(
-                          Ports.ENDEFFECTOR_LEFT, Ports.ENDEFFECTOR_RIGHT, 40, false, true)),
-                  new Displacer(new RollerIOSparkMax(Ports.ALGAE_DISPLACER, 20, false, true)),
-                  new RollerSensorsIOHardware());
+                          Ports.ENDEFFECTOR_LEFT, Ports.ENDEFFECTOR_RIGHT, 40, false, true),
+                      new RollerSensorsIOHardware()),
+                  new Displacer(new RollerIOSparkMax(Ports.ALGAE_DISPLACER, 20, false, true)));
           algaefier =
               new Algaefier(
                   // new Arm(new ArmIOSparkMax()),
@@ -162,9 +162,8 @@ public class RobotContainer {
           superstructure =
               new Superstructure(
                   new Elevator(new ElevatorIO() {}),
-                  new EndEffector(new EndEffectorIO() {}),
-                  new Displacer(new RollerIO() {}),
-                  new RollerSensorsIO() {});
+                  new EndEffector(new EndEffectorIO() {}, new RollerSensorsIO() {}),
+                  new Displacer(new RollerIO() {}));
           algaefier = new Algaefier(new Arm(new ArmIO() {}), new Gripper(new RollerIO() {}));
           hopper = new Hopper(new HopperIO() {}, new HopperIO() {});
           climber = new Climber(new ClimberIO() {});
@@ -205,9 +204,8 @@ public class RobotContainer {
       superstructure =
           new Superstructure(
               new Elevator(new ElevatorIO() {}),
-              new EndEffector(new EndEffectorIO() {}),
-              new Displacer(new RollerIO() {}),
-              new RollerSensorsIO() {});
+              new EndEffector(new EndEffectorIO() {}, new RollerSensorsIO() {}),
+              new Displacer(new RollerIO() {}));
     }
 
     if (algaefier == null) {
@@ -524,8 +522,7 @@ public class RobotContainer {
             () ->
                 !disableTranslationAutoAlign
                     && !disableHeadingAutoAlign
-                    && scoringHelper.getSuperstructureGoal() != Superstructure.Goal.L1
-                    && scoringHelper.getSuperstructureGoal() != Superstructure.Goal.NET)
+                    && scoringHelper.getSuperstructureGoal() != Superstructure.Goal.L1)
         .whileTrue(
             AutoScore.coralScoreCommand(drive, driverX, driverY, superstructure, scoringHelper)
                 .alongWith(
@@ -593,25 +590,6 @@ public class RobotContainer {
             superstructure
                 .setGoalCommand(Superstructure.Goal.HI_ALGAE)
                 .alongWith(algaefier.setGoalCommand(Algaefier.Goal.INTAKE)));
-
-    // Score // Also see coral scoring triggers
-    driver
-        .rightTrigger()
-        .and(() -> !climber.isClimbing())
-        .and(() -> !(driver.getHID().getXButton() || driver.getHID().getBButton()))
-        .and(
-            () ->
-                !disableTranslationAutoAlign
-                    && !disableHeadingAutoAlign
-                    && scoringHelper.getSuperstructureGoal() == Superstructure.Goal.NET)
-        .whileTrue(
-            AutoScore.bargeScoreCommand()
-                .alongWith(
-                    Commands.waitUntil(
-                            () ->
-                                superstructure.getGoal() != Superstructure.Goal.STOW
-                                    && DriveToPose.atGoal())
-                        .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 0.2, 3))));
 
     /***************** Climbing Triggers *****************/
 
