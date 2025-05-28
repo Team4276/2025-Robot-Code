@@ -1,9 +1,10 @@
-package frc.team4276.frc2025.subsystems.drive;
+package frc.team4276.util.ios;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
-import edu.wpi.first.wpilibj.ADIS16470_IMU.CalibrationTime;
+import frc.team4276.frc2025.subsystems.drive.SparkOdometryThread;
+
 import java.util.Queue;
 
 public class GyroIOADIS implements GyroIO {
@@ -51,8 +52,8 @@ public class GyroIOADIS implements GyroIO {
 
   @Override
   public void calibrate() {
-    gyro.configCalTime(CalibrationTime._1s);
-    gyro.calibrate();
+    // gyro.configCalTime(CalibrationTime._1s);
+    // gyro.calibrate();
 
     // try {
     // Thread.sleep(260);
