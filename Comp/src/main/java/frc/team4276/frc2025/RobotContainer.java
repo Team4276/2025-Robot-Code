@@ -44,7 +44,6 @@ import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffectorIOS
 import frc.team4276.frc2025.subsystems.vision.Vision;
 import frc.team4276.frc2025.subsystems.vision.VisionIO;
 import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVision;
-import frc.team4276.frc2025.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.VikXboxController;
 import frc.team4276.util.dashboard.ElasticUI;
@@ -55,6 +54,7 @@ import frc.team4276.util.ios.ModuleIOSim;
 import frc.team4276.util.ios.ModuleIOSpark;
 import frc.team4276.util.ios.RollerIO;
 import frc.team4276.util.ios.RollerIOSparkMax;
+import frc.team4276.util.ios.VisionIOPhotonVisionSim;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -213,8 +213,6 @@ public class RobotContainer {
     }
     configureButtonBindings();
     configureUI();
-
-    new SimViz();
 
     // Peace and quiet
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -460,7 +458,7 @@ public class RobotContainer {
         .and(() -> disableHeadingAutoAlign)
         .whileTrue(IntakeCommands.intake(superstructure, driver));
 
-    // Scoring // TODO: check requirement scope to see if covers whole coomposite command
+    // Scoring
     driver
         .rightTrigger()
         .and(() -> disableHeadingAutoAlign)
@@ -488,15 +486,14 @@ public class RobotContainer {
                     && !disableHeadingAutoAlign
                     && scoringHelper.getSuperstructureGoal() != Superstructure.Goal.L1)
         .whileTrue(
-            Commands.parallel(
-                AutoScore.coralScoreCommand(drive, driverX, driverY, superstructure, scoringHelper)
-                    .alongWith(
-                        Commands.waitUntil(
-                                () ->
-                                    superstructure.getGoal() != Superstructure.Goal.STOW
-                                        && superstructure.atGoal()
-                                        && DriveToPose.atGoal())
-                            .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 0.2, 3)))));
+            AutoScore.coralScoreCommand(drive, driverX, driverY, superstructure, scoringHelper)
+                .alongWith(
+                    Commands.waitUntil(
+                            () ->
+                                superstructure.getGoal() != Superstructure.Goal.STOW
+                                    && superstructure.atGoal()
+                                    && DriveToPose.atGoal())
+                        .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 0.2, 3))));
 
     driver.rightBumper().and(driver.rightTrigger()).whileTrue(superstructure.scoreCommand(false));
 

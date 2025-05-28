@@ -16,7 +16,10 @@ import frc.team4276.util.dashboard.LoggedTunablePID;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
-public class DriveCommands {
+public
+class DriveCommands { // TODO: Check how the drive is overridden when using manual vs drive at
+  // heading
+  // or drive to point
   private static final double LINEAR_VELOCITY_SCALAR = 1.0;
   private static final double ANGULAR_VELOCITY_SCALAR = 0.65;
 
