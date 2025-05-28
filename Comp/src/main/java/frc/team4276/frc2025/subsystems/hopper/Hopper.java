@@ -128,4 +128,8 @@ public class Hopper extends SubsystemBase {
   public Command setGoalCommand(Goal goal) {
     return startEnd(() -> this.goal = goal, () -> this.goal = Goal.IDLE);
   }
+
+  public Goal getGoal() {
+    return goal;
+  }
 }

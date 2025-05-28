@@ -3,6 +3,7 @@ package frc.team4276.frc2025.commands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.field.FieldConstants;
@@ -46,10 +47,10 @@ public class IntakeCommands {
   }
 
   public static Command intake(Superstructure superstructure, VikXboxController driver) {
-    return superstructure
-        .setGoalCommand(Superstructure.Goal.INTAKE)
-        .alongWith(
+    return Commands.parallel(
+            superstructure.setGoalCommand(Superstructure.Goal.INTAKE),
             Commands.waitUntil(superstructure::hasCoral)
-                .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 1.0)));
+                .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 1.0)))
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 }

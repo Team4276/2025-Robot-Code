@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -459,18 +460,14 @@ public class RobotContainer {
         .and(() -> disableHeadingAutoAlign)
         .whileTrue(IntakeCommands.intake(superstructure, driver));
 
-    // Scoring // TODO: impl rumbles
+    // Scoring // TODO: check requirement scope to see if covers whole coomposite command
     driver
         .rightTrigger()
-        .and(() -> !climber.isClimbing())
-        .and(() -> !(driver.getHID().getXButton() || driver.getHID().getBButton()))
         .and(() -> disableHeadingAutoAlign)
         .whileTrue(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal));
 
     driver
         .rightTrigger()
-        .and(() -> !climber.isClimbing())
-        .and(() -> !(driver.getHID().getXButton() || driver.getHID().getBButton()))
         .and(
             () ->
                 (disableTranslationAutoAlign && !disableHeadingAutoAlign)
@@ -485,34 +482,25 @@ public class RobotContainer {
 
     driver
         .rightTrigger()
-        .and(() -> !climber.isClimbing())
-        .and(() -> !(driver.getHID().getXButton() || driver.getHID().getBButton()))
         .and(
             () ->
                 !disableTranslationAutoAlign
                     && !disableHeadingAutoAlign
                     && scoringHelper.getSuperstructureGoal() != Superstructure.Goal.L1)
         .whileTrue(
-            AutoScore.coralScoreCommand(drive, driverX, driverY, superstructure, scoringHelper)
-                .alongWith(
-                    Commands.waitUntil(
-                            () ->
-                                superstructure.getGoal() != Superstructure.Goal.STOW
-                                    && superstructure.atGoal()
-                                    && DriveToPose.atGoal())
-                        .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 0.2, 3))));
+            Commands.parallel(
+                AutoScore.coralScoreCommand(drive, driverX, driverY, superstructure, scoringHelper)
+                    .alongWith(
+                        Commands.waitUntil(
+                                () ->
+                                    superstructure.getGoal() != Superstructure.Goal.STOW
+                                        && superstructure.atGoal()
+                                        && DriveToPose.atGoal())
+                            .andThen(driver.rumbleCommand(RumbleType.kBothRumble, 1.0, 0.2, 3)))));
 
-    driver
-        .rightBumper()
-        .and(() -> !climber.isClimbing())
-        .and(driver.rightTrigger())
-        .whileTrue(superstructure.scoreCommand(false));
+    driver.rightBumper().and(driver.rightTrigger()).whileTrue(superstructure.scoreCommand(false));
 
-    driver
-        .leftBumper()
-        .and(() -> !climber.isClimbing())
-        .and(driver.rightTrigger())
-        .whileTrue(superstructure.scoreCommand(true));
+    driver.leftBumper().and(driver.rightTrigger()).whileTrue(superstructure.scoreCommand(true));
 
     // Modal
     driver
@@ -529,14 +517,11 @@ public class RobotContainer {
         .and(() -> !driver.getRT())
         .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE));
 
-    // driver.povUp().onTrue(superstructure.toggleUnjamCommand());
-
     /***************** Algae Triggers *****************/
 
     // Displacing
     driver
         .y()
-        .and(() -> !climber.isClimbing())
         .and(
             () ->
                 scoringHelper.getSuperstructureGoal() == Superstructure.Goal.L2
@@ -546,7 +531,6 @@ public class RobotContainer {
 
     driver
         .y()
-        .and(() -> !climber.isClimbing())
         .and(
             () ->
                 !(superstructure.getGoal() == Superstructure.Goal.L2
@@ -559,7 +543,13 @@ public class RobotContainer {
     driver
         .povUp()
         .toggleOnTrue(
-            climber.isClimbingCommand().alongWith(hopper.setGoalCommand(Hopper.Goal.CLIMB)));
+            climber
+                .climbCommand()
+                .alongWith(hopper.setGoalCommand(Hopper.Goal.CLIMB))
+                .alongWith(
+                    superstructure
+                        .setGoalCommand(Superstructure.Goal.CLIMB)
+                        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)));
 
     driver
         .leftTrigger()
@@ -568,11 +558,6 @@ public class RobotContainer {
 
     driver
         .rightTrigger()
-        .and(() -> climber.isClimbing())
-        .whileTrue(climber.setGoalCommand(Climber.Goal.LATCH));
-
-    driver
-        .y()
         .and(() -> climber.isClimbing())
         .whileTrue(climber.setGoalCommand(Climber.Goal.CLIMB));
   }
@@ -590,17 +575,8 @@ public class RobotContainer {
   private boolean prevArmCoastState = false;
   private Timer calibrationBuffer = new Timer();
 
-  public void updateAlerts() {
-    // Controller disconnected alerts
-    driverDisconnected.set(
-        Constants.isSim
-            ? false
-            : !DriverStation.isJoystickConnected(driver.getHID().getPort())
-                || !DriverStation.getJoystickIsXbox(driver.getHID().getPort()));
-    operatorDisconnected.set(
-        Constants.isSim
-            ? false
-            : !DriverStation.isJoystickConnected(buttonBoard.getHID().getPort()));
+  public void update() {
+    updateAlerts();
 
     if (armCoastOverride.get() == false && armCoastOverride.get() != prevArmCoastState) {
       calibrationBuffer.restart();
@@ -613,6 +589,19 @@ public class RobotContainer {
     }
 
     prevArmCoastState = armCoastOverride.get();
+  }
+
+  private void updateAlerts() {
+    // Controller disconnected alerts
+    driverDisconnected.set(
+        Constants.isSim
+            ? false
+            : !DriverStation.isJoystickConnected(driver.getHID().getPort())
+                || !DriverStation.getJoystickIsXbox(driver.getHID().getPort()));
+    operatorDisconnected.set(
+        Constants.isSim
+            ? false
+            : !DriverStation.isJoystickConnected(buttonBoard.getHID().getPort()));
   }
 
   /**
@@ -629,9 +618,5 @@ public class RobotContainer {
               // drive.calibrate();
             })
         .finallyDo(() -> vision.setCamerasEnabled(true, true, true));
-  }
-
-  public boolean hasAutoChanged() {
-    return autoSelector.hasAutoChanged();
   }
 }

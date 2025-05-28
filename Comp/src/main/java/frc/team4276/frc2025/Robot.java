@@ -156,7 +156,7 @@ public class Robot extends LoggedRobot {
     }
 
     // Robot container periodic methods
-    robotContainer.updateAlerts();
+    robotContainer.update();
     RobotState.getInstance().update();
 
     // Check CAN status
@@ -176,7 +176,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    if (robotContainer.hasAutoChanged()) {
+    if (AutoSelector.hasAutoChanged()) {
       autonomousCommand = robotContainer.getAutonomousCommand();
     }
   }

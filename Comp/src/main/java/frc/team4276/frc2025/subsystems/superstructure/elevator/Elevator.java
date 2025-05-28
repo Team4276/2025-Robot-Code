@@ -41,9 +41,6 @@ public class Elevator {
     }
   }
 
-  private final LoggedTunableNumber homingVolts =
-      new LoggedTunableNumber("Elevator/HomingVolts", 0.0);
-
   private Goal goal = Goal.STOW;
 
   private final LoggedTunableNumber maxVel = new LoggedTunableNumber("Elevator/maxVel", 2.75);
@@ -69,8 +66,6 @@ public class Elevator {
 
   private double characterizationInput = 0.0;
 
-  private boolean wantHome = false;
-  private boolean isHoming = false;
   /** position that reads zero on the elevator */
   private double homedPosition = 0.0;
 
@@ -97,7 +92,6 @@ public class Elevator {
 
     if (inputs.botLimit) {
       homedPosition = inputs.position;
-      isHoming = false;
     }
 
     if (DriverStation.isDisabled()) {
@@ -133,19 +127,8 @@ public class Elevator {
         atGoalTimer.reset();
       }
 
-      if (goal != Goal.STOW) {
-        isHoming = false;
-      }
-
       if (goal == Goal.CHARACTERIZING) {
         io.runVolts(characterizationInput);
-
-      } else if (wantHome && goal == Goal.STOW && atGoal()) {
-        wantHome = false;
-        isHoming = true;
-
-      } else if (isHoming && goal == Goal.STOW) {
-        io.runVolts(homingVolts.getAsDouble());
 
       } else {
         setpointState =
@@ -205,10 +188,6 @@ public class Elevator {
 
   public void endCharacterizaton() {
     characterizationInput = 0.0;
-  }
-
-  public void requestHome() {
-    // wantHome = true;
   }
 
   public static double metresToRotations(double metres) {

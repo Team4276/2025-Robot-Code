@@ -10,31 +10,24 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Climber extends SubsystemBase {
-
   public enum Goal {
-    IDLE(() -> 0.0, () -> 0.0),
-    CLIMB(
-        new LoggedTunableNumber("Climber/ClimbVolts", -12.0),
-        new LoggedTunableNumber("Climber/Wheels/ClimbVolts", 0.0)),
-    LATCH(() -> 0.0, new LoggedTunableNumber("Climber/Wheels/LatchVolts", 12.0)),
-    RAISE(new LoggedTunableNumber("Climber/ReverseVolts", 12.0), () -> 0.0);
+    IDLE(() -> 0.0),
+    CLIMB(new LoggedTunableNumber("Climber/ClimbVolts", -12.0)),
+    RAISE(new LoggedTunableNumber("Climber/ReverseVolts", 12.0));
 
-    private final DoubleSupplier wheelVolts;
     private final DoubleSupplier whenchVolts;
 
-    private Goal(DoubleSupplier whenchVolts, DoubleSupplier wheelVolts) {
+    private Goal(DoubleSupplier whenchVolts) {
       this.whenchVolts = whenchVolts;
-      this.wheelVolts = wheelVolts;
     }
 
     public double getWhenchVolts() {
       return whenchVolts.getAsDouble();
     }
-
-    public double getWheelVolts() {
-      return wheelVolts.getAsDouble();
-    }
   }
+
+  private final LoggedTunableNumber latchVolts =
+      new LoggedTunableNumber("Climber/Wheels/LatchVolts", 12.0);
 
   private Goal goal = Goal.IDLE;
   private final ClimberIO io;
@@ -67,7 +60,7 @@ public class Climber extends SubsystemBase {
       if ((inputs.position < 0) && (goal == Goal.CLIMB)) {
         goal = Goal.IDLE;
       }
-      io.runWheelsAtVolts(goal.getWheelVolts());
+      io.runWheelsAtVolts(latchVolts.getAsDouble());
       io.runRunWhenchAtVolts(goal.getWhenchVolts());
 
     } else {
@@ -81,12 +74,8 @@ public class Climber extends SubsystemBase {
     Logger.recordOutput("Climber/Position", inputs.position);
   }
 
-  public void setIsClimbing(boolean isClimbing) {
-    this.isClimbing = isClimbing;
-  }
-
-  public Command isClimbingCommand() {
-    return Commands.startEnd(() -> setIsClimbing(true), () -> setIsClimbing(false));
+  public Command climbCommand() {
+    return Commands.startEnd(() -> isClimbing = true, () -> isClimbing = false);
   }
 
   public void setClimbState(Goal goal) {

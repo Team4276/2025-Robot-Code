@@ -27,6 +27,7 @@ public class Superstructure extends SubsystemBase {
     LO_ALGAE,
     HI_ALGAE,
     SHUFFLE,
+    CLIMB,
     CHARACTERIZING,
     CUSTOM
   }
@@ -94,13 +95,11 @@ public class Superstructure extends SubsystemBase {
 
       case L2:
         elevator.setGoal(Elevator.Goal.L2);
-        elevator.requestHome();
 
         break;
 
       case L3:
         elevator.setGoal(Elevator.Goal.L3);
-        elevator.requestHome();
 
         break;
 
@@ -114,6 +113,13 @@ public class Superstructure extends SubsystemBase {
         elevator.setGoal(Elevator.Goal.HI_ALGAE);
         endeffector.setGoal(EndEffector.Goal.IDLE);
         displacer.setGoal(Displacer.Goal.VROOOM);
+
+        break;
+
+      case CLIMB:
+        elevator.setGoal(Elevator.Goal.STOW);
+        endeffector.setGoal(EndEffector.Goal.IDLE);
+        displacer.setGoal(Displacer.Goal.IDLE);
 
         break;
       case CHARACTERIZING:
