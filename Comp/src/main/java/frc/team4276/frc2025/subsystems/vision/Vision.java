@@ -170,7 +170,6 @@ public class Vision extends SubsystemBase {
       }
 
       // Send Tx Ty Data
-      // TODO: test filtering methods
       for (var tagObs : inputs[cameraIndex].targetObservations) {
         if (!allTxTyObservations.containsKey(tagObs.tagId())
             || tagObs.distance() < allTxTyObservations.get(tagObs.tagId()).distance()) {

@@ -1,6 +1,8 @@
 package frc.team4276.frc2025.subsystems.superstructure.displacer;
 
 import frc.team4276.util.dashboard.LoggedTunableNumber;
+import frc.team4276.util.ios.RollerIO;
+import frc.team4276.util.ios.RollerIOInputsAutoLogged;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
