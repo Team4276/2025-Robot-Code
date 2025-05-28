@@ -1,6 +1,5 @@
 package frc.team4276.frc2025;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import frc.team4276.frc2025.field.FieldConstants.Reef;
@@ -30,8 +29,8 @@ public class ScoringHelper extends VirtualSubsystem {
     SmartDashboard.putBoolean("Comp/ScoringHelper/L2", goal == Goal.L2);
     SmartDashboard.putBoolean("Comp/ScoringHelper/L1", goal == Goal.L1);
 
-    Logger.recordOutput("ScoringHelper/SelectedAlignPose", getSelectedAlignPose());
-    Logger.recordOutput("ScoringHelper/SelectedScorePose", getSelectedScorePose());
+    Logger.recordOutput("ScoringHelper/SelectedAlignPose", getSelectedReef().getAlign());
+    Logger.recordOutput("ScoringHelper/SelectedScorePose", getSelectedReef().getScore());
     Logger.recordOutput("ScoringHelper/Goal", goal);
     Logger.recordOutput("ScoringHelper/SelectedReef", getSelectedReef());
   }
@@ -123,14 +122,6 @@ public class ScoringHelper extends VirtualSubsystem {
 
   public Goal getSuperstructureGoal() {
     return goal;
-  }
-
-  public Pose2d getSelectedAlignPose() {
-    return getSelectedReef().getAlign();
-  }
-
-  public Pose2d getSelectedScorePose() {
-    return getSelectedReef().getScore();
   }
 
   public Reef getSelectedReef() {

@@ -76,7 +76,13 @@ public class RobotContainer {
   private AutoBuilder autoBuilder;
 
   // Controller
-  private final boolean isDemo = false;
+  private enum BindSetting {
+    DEFAULT,
+    DEMO,
+    EXPERIMENTAL
+  }
+
+  private final BindSetting bindSetting = BindSetting.EXPERIMENTAL;
 
   private final VikXboxController driver = new VikXboxController(0);
   private final CommandGenericHID buttonBoard = new CommandGenericHID(1);
@@ -391,11 +397,21 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    if (isDemo) {
-      configureDemoBindings();
+    switch (bindSetting) {
+      case DEFAULT:
+        configureControllerBindings();
+        break;
 
-    } else {
-      configureControllerBindings();
+      case DEMO:
+        configureDemoBindings();
+        break;
+
+      case EXPERIMENTAL:
+        configureExperimentalBindings();
+        break;
+
+      default:
+        break;
     }
   }
 
@@ -475,7 +491,7 @@ public class RobotContainer {
                     drive,
                     driverX,
                     driverY,
-                    () -> scoringHelper.getSelectedScorePose().getRotation().getRadians())
+                    () -> scoringHelper.getSelectedReef().getScore().getRotation().getRadians())
                 .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
 
     driver
@@ -486,7 +502,7 @@ public class RobotContainer {
                     && !disableHeadingAutoAlign
                     && scoringHelper.getSuperstructureGoal() != Superstructure.Goal.L1)
         .whileTrue(
-            AutoScore.coralScoreCommand(drive, driverX, driverY, superstructure, scoringHelper)
+            AutoScore.coralAlignCommand(drive, driverX, driverY, superstructure, scoringHelper)
                 .alongWith(
                     Commands.waitUntil(
                             () ->
@@ -537,6 +553,114 @@ public class RobotContainer {
 
     /***************** Climbing Triggers *****************/
 
+    driver
+        .povUp()
+        .toggleOnTrue(
+            climber
+                .climbCommand()
+                .alongWith(hopper.setGoalCommand(Hopper.Goal.CLIMB))
+                .alongWith(
+                    superstructure
+                        .setGoalCommand(Superstructure.Goal.CLIMB)
+                        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)));
+
+    driver
+        .leftTrigger()
+        .and(() -> climber.isClimbing())
+        .whileTrue(climber.setGoalCommand(Climber.Goal.RAISE));
+
+    driver
+        .rightTrigger()
+        .and(() -> climber.isClimbing())
+        .whileTrue(climber.setGoalCommand(Climber.Goal.CLIMB));
+  }
+
+  public void configureExperimentalBindings() {
+    /***************** Drive Triggers *****************/
+    // Drive suppliers
+    DoubleSupplier driverX = () -> -driver.getLeftWithDeadband().y;
+    DoubleSupplier driverY = () -> -driver.getLeftWithDeadband().x;
+    DoubleSupplier driverOmega = () -> -driver.getRightWithDeadband().x;
+
+    drive.setDefaultCommand(DriveCommands.joystickDrive(drive, driverX, driverY, driverOmega));
+
+    // Reset gyro to 0° when A button is pressed
+    driver
+        .a()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        RobotState.getInstance()
+                            .resetPose(
+                                new Pose2d(
+                                    RobotState.getInstance().getEstimatedPose().getTranslation(),
+                                    AllianceFlipUtil.apply(Rotation2d.kZero))))
+                .ignoringDisable(true));
+
+    /***************** Coral Triggers *****************/
+    // Intake
+    driver
+        .b()
+        .and(() -> !superstructure.hasCoral())
+        .whileTrue(IntakeCommands.gamerIntake(superstructure, drive, driver, driverX, driverY));
+
+    // Align and Score / Lock
+    driver
+        .leftBumper()
+        .toggleOnTrue(
+            AutoScore.coralLockCommand(
+                drive, driverX, driverY, superstructure, Superstructure.Goal.L1, vision));
+
+    driver
+        .rightBumper()
+        .whileTrue(
+            AutoScore.coralAlignCommand(
+                    drive,
+                    driverX,
+                    driverY,
+                    superstructure,
+                    Superstructure.Goal.L2,
+                    driver.leftTrigger(),
+                    vision)
+                .alongWith(AutoScore.autoScoreCommand(superstructure)));
+
+    driver
+        .rightTrigger()
+        .whileTrue(
+            AutoScore.coralAlignCommand(
+                    drive,
+                    driverX,
+                    driverY,
+                    superstructure,
+                    Superstructure.Goal.L3,
+                    driver.leftTrigger(),
+                    vision)
+                .alongWith(AutoScore.autoScoreCommand(superstructure)));
+
+    // Scoring for L1
+    driver
+        .rightTrigger()
+        .and(() -> superstructure.getGoal() == Superstructure.Goal.L1)
+        .whileTrue(superstructure.scoreCommand(false));
+
+    driver
+        .leftTrigger()
+        .and(() -> superstructure.getGoal() == Superstructure.Goal.L1)
+        .whileTrue(superstructure.scoreCommand(true));
+
+    // Misc
+    driver
+        .b()
+        .and(() -> superstructure.hasCoral())
+        .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE));
+
+    /***************** Algae Triggers *****************/
+    // Displacing
+    driver.x().toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.LO_ALGAE));
+
+    driver.y().toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.HI_ALGAE));
+
+    /***************** Climbing Triggers *****************/
     driver
         .povUp()
         .toggleOnTrue(

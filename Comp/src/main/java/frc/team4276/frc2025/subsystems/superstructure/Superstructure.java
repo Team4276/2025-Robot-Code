@@ -168,6 +168,10 @@ public class Superstructure extends SubsystemBase {
     return setGoalCommand(() -> goal);
   }
 
+  public Command scoreCommand(BooleanSupplier isLeftL1) {
+    return scoreCommand(isLeftL1.getAsBoolean());
+  }
+
   public Command scoreCommand(boolean isLeftL1) {
     return Commands.startEnd(
         () -> {

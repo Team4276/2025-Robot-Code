@@ -8,7 +8,9 @@ import frc.team4276.frc2025.ScoringHelper;
 import frc.team4276.frc2025.field.FieldConstants.Reef;
 import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
+import frc.team4276.frc2025.subsystems.vision.Vision;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 public class AutoScore {
@@ -19,63 +21,102 @@ public class AutoScore {
 
   private static boolean cancelTxTy = false;
 
-  public static Command coralScoreCommand(
+  /** Append as a parrallel command group to coral align commands */
+  public static Command autoScoreCommand(Superstructure superstructure) {
+    return Commands.waitUntil(
+            () ->
+                superstructure.getGoal() != Superstructure.Goal.STOW
+                    && superstructure.atGoal()
+                    && DriveToPose.atGoal())
+        .andThen(superstructure.scoreCommand(false));
+  }
+
+  public static Command coralAlignCommand(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Superstructure superstructure,
+      Superstructure.Goal goal,
+      BooleanSupplier isLeft,
+      Vision vision) {
+    // TODO: impl
+    return coralAlignCommand(drive, xSupplier, ySupplier, superstructure, null, goal);
+  }
+
+  public static Command coralAlignCommand(
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       Superstructure superstructure,
       ScoringHelper scoringHelper) {
+    return coralAlignCommand(
+        drive,
+        xSupplier,
+        ySupplier,
+        superstructure,
+        scoringHelper.getSelectedReef(),
+        scoringHelper.getSuperstructureGoal());
+  }
+
+  public static Command coralAlignCommand(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Superstructure superstructure,
+      Reef reef,
+      Superstructure.Goal goal) {
     return Commands.sequence(
         Commands.waitUntil(
                 () ->
-                    scoringHelper
-                            .getSelectedAlignPose()
+                    reef.getAlign()
                             .getTranslation()
-                            .getDistance(
-                                getRobotPose(
-                                        scoringHelper.getSelectedReef(),
-                                        scoringHelper.getSelectedAlignPose())
-                                    .getTranslation())
+                            .getDistance(getRobotPose(reef, reef.getAlign()).getTranslation())
                         < reefAlignThreshold.getAsDouble())
             .deadlineFor(
                 DriveCommands.joystickDriveAtHeading(
-                    drive,
-                    xSupplier,
-                    ySupplier,
-                    () -> scoringHelper.getSelectedScorePose().getRotation().getRadians())),
-        new DriveToPose(
-                drive,
-                scoringHelper::getSelectedAlignPose,
-                () ->
-                    getRobotPose(
-                        scoringHelper.getSelectedReef(), scoringHelper.getSelectedAlignPose()))
+                    drive, xSupplier, ySupplier, () -> reef.getScore().getRotation().getRadians())),
+        new DriveToPose(drive, () -> reef.getAlign(), () -> getRobotPose(reef, reef.getAlign()))
             .until(
                 () ->
-                    (scoringHelper
-                            .getSelectedAlignPose()
+                    (reef.getAlign()
                             .getTranslation()
-                            .getDistance(
-                                getRobotPose(
-                                        scoringHelper.getSelectedReef(),
-                                        scoringHelper.getSelectedScorePose())
-                                    .getTranslation())
+                            .getDistance(getRobotPose(reef, reef.getScore()).getTranslation())
                         < reefNudgeThreshold.getAsDouble())),
-        new DriveToPose(
-                drive,
-                scoringHelper::getSelectedScorePose,
-                () ->
-                    getRobotPose(
-                        scoringHelper.getSelectedReef(), scoringHelper.getSelectedScorePose()))
-            .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
+        new DriveToPose(drive, () -> reef.getScore(), () -> getRobotPose(reef, reef.getScore()))
+            .alongWith(superstructure.setGoalCommand(goal)));
   }
 
-  public static Pose2d getRobotPose(Reef reef, Pose2d finalPose) {
-    return cancelTxTy
-        ? RobotState.getInstance().getEstimatedPose()
-        : RobotState.getInstance().getReefPose(reef.ordinal() / 2, finalPose);
+  public static Command coralLockCommand(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Superstructure superstructure,
+      Superstructure.Goal goal,
+      Vision vision) {
+
+    // TODO: impl
+    return coralLockCommand(drive, xSupplier, ySupplier, superstructure, null, goal);
+  }
+
+  public static Command coralLockCommand(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Superstructure superstructure,
+      Reef reef,
+      Superstructure.Goal goal) {
+    return DriveCommands.joystickDriveAtHeading(
+            drive, xSupplier, ySupplier, () -> reef.getScore().getRotation().getRadians())
+        .alongWith(superstructure.setGoalCommand(goal));
   }
 
   public static Command bargeScoreCommand() {
     return Commands.none();
+  }
+
+  private static Pose2d getRobotPose(Reef reef, Pose2d finalPose) {
+    return cancelTxTy
+        ? RobotState.getInstance().getEstimatedPose()
+        : RobotState.getInstance().getReefPose(reef.ordinal() / 2, finalPose);
   }
 }
