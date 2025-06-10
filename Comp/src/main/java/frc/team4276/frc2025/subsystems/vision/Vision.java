@@ -182,14 +182,12 @@ public class Vision extends SubsystemBase {
           allTxTyObservations.put(tagObs.tagId(), tagObs);
         }
 
-        boolean isPriorityStale =
-            Timer.getTimestamp() - priorityTags.get(cameraIndex).timestamp() > priorityStaleTime;
-        boolean isPriorityFurther = tagObs.distance() < priorityTags.get(cameraIndex).distance();
-
         if (priorityTags.size() <= cameraIndex) {
           priorityTags.add(tagObs);
 
-        } else if (isPriorityFurther || isPriorityStale) {
+        } else if (tagObs.distance() < priorityTags.get(cameraIndex).distance()
+            || Timer.getTimestamp() - priorityTags.get(cameraIndex).timestamp()
+                > priorityStaleTime) {
           priorityTags.set(cameraIndex, tagObs);
         }
       }

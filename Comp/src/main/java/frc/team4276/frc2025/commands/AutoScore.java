@@ -10,29 +10,48 @@ import frc.team4276.frc2025.ScoringHelper;
 import frc.team4276.frc2025.field.FieldConstants.Reef;
 import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
+import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
 import frc.team4276.frc2025.subsystems.vision.Vision;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 public class AutoScore {
-  private static final LoggedTunableNumber reefAlignThreshold = new LoggedTunableNumber("AutoScore/ReefAlignThreshold",
-      1.0);
-  private static final LoggedTunableNumber reefNudgeThreshold = new LoggedTunableNumber("AutoScore/ReefNudgeThreshold",
-      0.1);
+  private static final LoggedTunableNumber reefAlignThreshold =
+      new LoggedTunableNumber("AutoScore/ReefAlignThreshold", 1.0);
+  private static final LoggedTunableNumber reefNudgeThreshold =
+      new LoggedTunableNumber("AutoScore/ReefNudgeThreshold", 0.1);
 
-  private static final LoggedTunableNumber sideAutoSelectTime = new LoggedTunableNumber(
-      "AutoScore/VisionAutoFaceSelectTime", 0.2);
+  private static final LoggedTunableNumber sideAutoSelectTime =
+      new LoggedTunableNumber("AutoScore/VisionAutoFaceSelectTime", 0.2);
 
   private static boolean cancelTxTy = false;
+
+  private static Superstructure.Goal autoScoreLevel = Goal.L2;
+
+  public static Command selectAutoScoreLevel(Superstructure.Goal goal) {
+    return Commands.runOnce(() -> autoScoreLevel = goal);
+  }
 
   /** Append as a parrallel command group to coral align commands */
   public static Command autoScoreCommand(Superstructure superstructure) {
     return Commands.waitUntil(
-        () -> superstructure.getGoal() != Superstructure.Goal.STOW
-            && superstructure.atGoal()
-            && DriveToPose.atGoal())
+            () ->
+                superstructure.getGoal() != Superstructure.Goal.STOW
+                    && superstructure.atGoal()
+                    && DriveToPose.atGoal())
         .andThen(superstructure.scoreCommand(false));
+  }
+
+  public static Command coralAlignCommand(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Superstructure superstructure,
+      boolean isLeft,
+      Vision vision) {
+    return coralAlignCommand(
+        drive, xSupplier, ySupplier, superstructure, autoScoreLevel, () -> isLeft, vision);
   }
 
   public static Command coralAlignCommand(
@@ -45,15 +64,14 @@ public class AutoScore {
       Vision vision) {
     Debouncer debouncer = new Debouncer(sideAutoSelectTime.getAsDouble());
 
-    return Commands.waitUntil(
-        () -> debouncer.calculate(getSideFromTagId(getIdFromVision(vision)) != -1))
+    return Commands.waitUntil(() -> debouncer.calculate(getSide(vision) != -1))
         .andThen(
             coralAlignCommand(
                 drive,
                 xSupplier,
                 ySupplier,
                 superstructure,
-                getReefFromSide(getSideFromTagId(getIdFromVision(vision)), isLeft),
+                getReefFromSide(getSide(vision), isLeft),
                 goal));
   }
 
@@ -81,18 +99,21 @@ public class AutoScore {
       Superstructure.Goal goal) {
     return Commands.sequence(
         Commands.waitUntil(
-            () -> reef.getAlign()
-                .getTranslation()
-                .getDistance(getRobotPose(reef, reef.getAlign()).getTranslation()) < reefAlignThreshold.getAsDouble())
+                () ->
+                    reef.getAlign()
+                            .getTranslation()
+                            .getDistance(getRobotPose(reef, reef.getAlign()).getTranslation())
+                        < reefAlignThreshold.getAsDouble())
             .deadlineFor(
                 DriveCommands.joystickDriveAtHeading(
                     drive, xSupplier, ySupplier, () -> reef.getScore().getRotation().getRadians())),
         new DriveToPose(drive, () -> reef.getAlign(), () -> getRobotPose(reef, reef.getAlign()))
             .until(
-                () -> (reef.getAlign()
-                    .getTranslation()
-                    .getDistance(
-                        getRobotPose(reef, reef.getScore()).getTranslation()) < reefNudgeThreshold.getAsDouble())),
+                () ->
+                    (reef.getAlign()
+                            .getTranslation()
+                            .getDistance(getRobotPose(reef, reef.getScore()).getTranslation())
+                        < reefNudgeThreshold.getAsDouble())),
         new DriveToPose(drive, () -> reef.getScore(), () -> getRobotPose(reef, reef.getScore()))
             .alongWith(superstructure.setGoalCommand(goal)));
   }
@@ -106,15 +127,14 @@ public class AutoScore {
       Vision vision) {
     Debouncer debouncer = new Debouncer(sideAutoSelectTime.getAsDouble());
 
-    return Commands.waitUntil(
-        () -> debouncer.calculate(getSideFromTagId(getIdFromVision(vision)) != -1))
+    return Commands.waitUntil(() -> debouncer.calculate(getSide(vision) != -1))
         .andThen(
             coralLockCommand(
                 drive,
                 xSupplier,
                 ySupplier,
                 superstructure,
-                getReefFromSide(getSideFromTagId(getIdFromVision(vision)), () -> true),
+                getReefFromSide(getSide(vision), () -> true),
                 goal));
   }
 
@@ -126,7 +146,7 @@ public class AutoScore {
       Reef reef,
       Superstructure.Goal goal) {
     return DriveCommands.joystickDriveAtHeading(
-        drive, xSupplier, ySupplier, () -> reef.getScore().getRotation().getRadians())
+            drive, xSupplier, ySupplier, () -> reef.getScore().getRotation().getRadians())
         .alongWith(superstructure.setGoalCommand(goal));
   }
 
@@ -154,8 +174,9 @@ public class AutoScore {
     Rotation2d rotation = RobotState.getInstance().getEstimatedPose().getRotation();
 
     if (rotation
-        .minus(Reef.values()[getSideFromTagId(tag1) * 2].getAlign().getRotation())
-        .getRadians() > rotation
+            .minus(Reef.values()[getSideFromTagId(tag1) * 2].getAlign().getRotation())
+            .getRadians()
+        > rotation
             .minus(Reef.values()[getSideFromTagId(tag1) * 2].getAlign().getRotation())
             .getRadians()) {
       return tag2;
@@ -184,12 +205,19 @@ public class AutoScore {
     };
   }
 
+  private static int getSide(Vision vision) {
+    return getSideFromTagId(getIdFromVision(vision));
+  }
+
   private static Reef getReefFromSide(int side, BooleanSupplier isLeft) {
     if (side > 1 && side < 5) {
       return Reef.values()[(side * 2) + (isLeft.getAsBoolean() ? 1 : 0)];
 
-    } else {
+    } else if (side > 0) {
       return Reef.values()[(side * 2) + (isLeft.getAsBoolean() ? 0 : 1)];
+
+    } else {
+      return Reef.A;
     }
   }
 

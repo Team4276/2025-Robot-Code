@@ -105,7 +105,7 @@ public class RobotContainer {
   // Coral Scoring Logic
   @AutoLogOutput private boolean disableHeadingAutoAlign = true;
   @AutoLogOutput private boolean disableTranslationAutoAlign = true;
-  @AutoLogOutput private boolean disableVisionSim = true;
+  @AutoLogOutput private boolean disableVisionSim = false;
 
   // Dashboard inputs
   private final AutoSelector autoSelector = new AutoSelector();
@@ -587,6 +587,7 @@ public class RobotContainer {
     // Reset gyro to 0° when A button is pressed
     driver
         .a()
+        .and(driver.povDown())
         .onTrue(
             Commands.runOnce(
                     () ->
@@ -600,41 +601,35 @@ public class RobotContainer {
     /***************** Coral Triggers *****************/
     // Intake
     driver
-        .b()
+        .rightTrigger()
+        .and(driver.a().negate())
         .and(() -> !superstructure.hasCoral())
         .whileTrue(IntakeCommands.gamerIntake(superstructure, drive, driver, driverX, driverY));
 
     // Align and Score / Lock
     driver
-        .leftBumper()
+        .a()
+        .and(driver.povDown().negate())
         .toggleOnTrue(
             AutoScore.coralLockCommand(
                 drive, driverX, driverY, superstructure, Superstructure.Goal.L1, vision));
 
-    driver
-        .rightBumper()
-        .whileTrue(
-            AutoScore.coralAlignCommand(
-                    drive,
-                    driverX,
-                    driverY,
-                    superstructure,
-                    Superstructure.Goal.L2,
-                    driver.leftTrigger(),
-                    vision)
-                .alongWith(AutoScore.autoScoreCommand(superstructure)));
+    driver.b().onTrue(AutoScore.selectAutoScoreLevel(Superstructure.Goal.L2));
+
+    driver.x().onTrue(AutoScore.selectAutoScoreLevel(Superstructure.Goal.L3));
 
     driver
         .rightTrigger()
+        .and(() -> superstructure.hasCoral())
         .whileTrue(
-            AutoScore.coralAlignCommand(
-                    drive,
-                    driverX,
-                    driverY,
-                    superstructure,
-                    Superstructure.Goal.L3,
-                    driver.leftTrigger(),
-                    vision)
+            AutoScore.coralAlignCommand(drive, driverX, driverY, superstructure, false, vision)
+                .alongWith(AutoScore.autoScoreCommand(superstructure)));
+
+    driver
+        .leftTrigger()
+        .and(() -> superstructure.hasCoral())
+        .whileTrue(
+            AutoScore.coralAlignCommand(drive, driverX, driverY, superstructure, true, vision)
                 .alongWith(AutoScore.autoScoreCommand(superstructure)));
 
     // Scoring for L1
@@ -650,15 +645,15 @@ public class RobotContainer {
 
     // Misc
     driver
-        .b()
+        .povRight()
         .and(() -> superstructure.hasCoral())
         .whileTrue(superstructure.setGoalCommand(Superstructure.Goal.SHUFFLE));
 
     /***************** Algae Triggers *****************/
     // Displacing
-    driver.x().toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.LO_ALGAE));
+    driver.leftBumper().toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.LO_ALGAE));
 
-    driver.y().toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.HI_ALGAE));
+    driver.rightBumper().toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.HI_ALGAE));
 
     /***************** Climbing Triggers *****************/
     driver
@@ -698,6 +693,8 @@ public class RobotContainer {
 
   public void update() {
     updateAlerts();
+
+    SimViz.periodic();
 
     if (armCoastOverride.get() == false && armCoastOverride.get() != prevArmCoastState) {
       calibrationBuffer.restart();
