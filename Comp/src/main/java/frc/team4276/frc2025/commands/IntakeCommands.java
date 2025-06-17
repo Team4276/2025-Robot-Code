@@ -29,12 +29,10 @@ public class IntakeCommands {
                 driverY,
                 () ->
                     AllianceFlipUtil.apply(
-                            AllianceFlipUtil.applyY(
-                                        RobotState.getInstance().getEstimatedPose().getY())
-                                    < FieldConstants.fieldWidth / 2
-                                ? Rotation2d.fromDegrees(55.0)
-                                : Rotation2d.fromDegrees(305.0))
-                        .getRadians()));
+                        AllianceFlipUtil.applyY(RobotState.getInstance().getEstimatedPose().getY())
+                                < FieldConstants.fieldWidth / 2
+                            ? Rotation2d.fromDegrees(55.0)
+                            : Rotation2d.fromDegrees(305.0))));
   }
 
   public static Command intakeAtAngle(
@@ -47,7 +45,7 @@ public class IntakeCommands {
     return intake(superstructure, driver)
         .alongWith(
             DriveCommands.joystickDriveAtHeading(
-                drive, driverX, driverY, () -> AllianceFlipUtil.apply(angle).getRadians()));
+                drive, driverX, driverY, () -> AllianceFlipUtil.apply(angle)));
   }
 
   public static Command intake(Superstructure superstructure, VikXboxController driver) {

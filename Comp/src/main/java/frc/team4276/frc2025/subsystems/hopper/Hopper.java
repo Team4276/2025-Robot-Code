@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.team4276.frc2025.Constants;
-import frc.team4276.frc2025.SimViz;
+import frc.team4276.frc2025.SimManager;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import frc.team4276.util.dashboard.LoggedTunableProfile;
 import java.util.function.BooleanSupplier;
@@ -114,9 +114,9 @@ public class Hopper extends SubsystemBase {
           prevRightState.position + rightOffset, ff_right.calculate(prevRightState.velocity));
     }
 
-    SimViz.addHopperLeftMeasuredObs(leftInputs.position - leftOffset);
-    SimViz.addHopperRightMeasuredObs(rightInputs.position - rightOffset);
-    SimViz.addHopperGoalObs(goal.getPosition());
+    SimManager.addHopperLeftMeasuredObs(leftInputs.position - leftOffset);
+    SimManager.addHopperRightMeasuredObs(rightInputs.position - rightOffset);
+    SimManager.addHopperGoalObs(goal.getPosition());
 
     Logger.recordOutput("Hopper/Goal", goal.toString());
     Logger.recordOutput("Hopper/Left/Offset", leftOffset);

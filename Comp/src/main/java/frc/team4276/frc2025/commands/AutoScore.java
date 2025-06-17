@@ -1,8 +1,6 @@
 package frc.team4276.frc2025.commands;
 
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.team4276.frc2025.RobotState;
@@ -10,11 +8,10 @@ import frc.team4276.frc2025.ScoringHelper;
 import frc.team4276.frc2025.field.FieldConstants.Reef;
 import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure;
-import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
-import frc.team4276.frc2025.subsystems.vision.Vision;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
-import java.util.function.BooleanSupplier;
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class AutoScore {
   private static final LoggedTunableNumber reefAlignThreshold =
@@ -22,57 +19,64 @@ public class AutoScore {
   private static final LoggedTunableNumber reefNudgeThreshold =
       new LoggedTunableNumber("AutoScore/ReefNudgeThreshold", 0.1);
 
-  private static final LoggedTunableNumber sideAutoSelectTime =
-      new LoggedTunableNumber("AutoScore/VisionAutoFaceSelectTime", 0.2);
-
   private static boolean cancelTxTy = false;
 
-  private static Superstructure.Goal autoScoreLevel = Goal.L2;
+  private static boolean proceedScoring = false;
+  private static Supplier<Superstructure.Goal> level = () -> Superstructure.Goal.STOW;
 
-  public static Command selectAutoScoreLevel(Superstructure.Goal goal) {
-    return Commands.runOnce(() -> autoScoreLevel = goal);
-  }
-
-  /** Append as a parrallel command group to coral align commands */
-  public static Command autoScoreCommand(Superstructure superstructure) {
-    return Commands.waitUntil(
-            () ->
-                superstructure.getGoal() != Superstructure.Goal.STOW
-                    && superstructure.atGoal()
-                    && DriveToPose.atGoal())
-        .andThen(superstructure.scoreCommand(false));
+  public static Command selectAndScoreCommand(Superstructure.Goal goal) {
+    return Commands.runOnce(
+        () -> {
+          level = () -> goal;
+          proceedScoring = true;
+        });
   }
 
   public static Command coralAlignCommand(
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      Superstructure superstructure,
+      DoubleSupplier headingSupplier,
       boolean isLeft,
-      Vision vision) {
-    return coralAlignCommand(
-        drive, xSupplier, ySupplier, superstructure, autoScoreLevel, () -> isLeft, vision);
-  }
+      Superstructure superstructure) {
+    Supplier<Pose2d> robotPose = () -> RobotState.getInstance().getReefPose();
 
-  public static Command coralAlignCommand(
-      Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      Superstructure superstructure,
-      Superstructure.Goal goal,
-      BooleanSupplier isLeft,
-      Vision vision) {
-    Debouncer debouncer = new Debouncer(sideAutoSelectTime.getAsDouble());
+    Supplier<Optional<Reef>> goal =
+        () ->
+            RobotState.getInstance()
+                .getPriorityReefTag()
+                .map(tag -> getReefFromSide(getSideFromTagId(tag), isLeft))
+                .or(
+                    () ->
+                        Optional.of(
+                            getReefFromSide(
+                                getSideFromTagId(RobotState.getInstance().getLastPriorityTag()),
+                                isLeft)));
 
-    return Commands.waitUntil(() -> debouncer.calculate(getSide(vision) != -1))
+    return Commands.runOnce(() -> proceedScoring = false)
         .andThen(
-            coralAlignCommand(
-                drive,
-                xSupplier,
-                ySupplier,
-                superstructure,
-                getReefFromSide(getSide(vision), isLeft),
-                goal));
+            DriveCommands.joystickDrive(drive, xSupplier, ySupplier, headingSupplier)
+                .until(
+                    () ->
+                        RobotState.getInstance()
+                            .getPriorityReefTag()
+                            .map(tag -> getReefFromSide(getSideFromTagId(tag), isLeft))
+                            .isPresent()))
+        .andThen(
+            new DriveToPose(drive, () -> goal.get().get().getAlign(), robotPose)
+                .until(
+                    () ->
+                        inTolerance(
+                                goal.get().get(),
+                                goal.get().get().getAlign(),
+                                reefNudgeThreshold.get())
+                            && proceedScoring))
+        .andThen(
+            new DriveToPose(drive, () -> goal.get().get().getScore(), robotPose)
+                .alongWith(
+                    superstructure.setGoalCommand(level),
+                    Commands.waitUntil(() -> superstructure.atGoal() && DriveToPose.atGoal())
+                        .andThen(superstructure.scoreCommand(false))));
   }
 
   public static Command coralAlignCommand(
@@ -81,108 +85,37 @@ public class AutoScore {
       DoubleSupplier ySupplier,
       Superstructure superstructure,
       ScoringHelper scoringHelper) {
-    return coralAlignCommand(
-        drive,
-        xSupplier,
-        ySupplier,
-        superstructure,
-        scoringHelper.getSelectedReef(),
-        scoringHelper.getSuperstructureGoal());
-  }
 
-  public static Command coralAlignCommand(
-      Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      Superstructure superstructure,
-      Reef reef,
-      Superstructure.Goal goal) {
+    Supplier<Pose2d> alignPose = scoringHelper.getSelectedReef()::getAlign;
+    Supplier<Pose2d> scorePose = scoringHelper.getSelectedReef()::getScore;
+
     return Commands.sequence(
         Commands.waitUntil(
                 () ->
-                    reef.getAlign()
-                            .getTranslation()
-                            .getDistance(getRobotPose(reef, reef.getAlign()).getTranslation())
-                        < reefAlignThreshold.getAsDouble())
+                    inTolerance(
+                        scoringHelper.getSelectedReef(), alignPose.get(), reefAlignThreshold.get()))
             .deadlineFor(
                 DriveCommands.joystickDriveAtHeading(
-                    drive, xSupplier, ySupplier, () -> reef.getScore().getRotation().getRadians())),
-        new DriveToPose(drive, () -> reef.getAlign(), () -> getRobotPose(reef, reef.getAlign()))
+                    drive, xSupplier, ySupplier, () -> scorePose.get().getRotation())),
+        new DriveToPose(
+                drive,
+                alignPose,
+                () -> getRobotPose(scoringHelper.getSelectedReef(), alignPose.get()))
             .until(
                 () ->
-                    (reef.getAlign()
-                            .getTranslation()
-                            .getDistance(getRobotPose(reef, reef.getScore()).getTranslation())
-                        < reefNudgeThreshold.getAsDouble())),
-        new DriveToPose(drive, () -> reef.getScore(), () -> getRobotPose(reef, reef.getScore()))
-            .alongWith(superstructure.setGoalCommand(goal)));
-  }
-
-  public static Command coralLockCommand(
-      Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      Superstructure superstructure,
-      Superstructure.Goal goal,
-      Vision vision) {
-    Debouncer debouncer = new Debouncer(sideAutoSelectTime.getAsDouble());
-
-    return Commands.waitUntil(() -> debouncer.calculate(getSide(vision) != -1))
-        .andThen(
-            coralLockCommand(
+                    inTolerance(
+                        scoringHelper.getSelectedReef(),
+                        scorePose.get(),
+                        reefNudgeThreshold.get())),
+        new DriveToPose(
                 drive,
-                xSupplier,
-                ySupplier,
-                superstructure,
-                getReefFromSide(getSide(vision), () -> true),
-                goal));
-  }
-
-  public static Command coralLockCommand(
-      Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      Superstructure superstructure,
-      Reef reef,
-      Superstructure.Goal goal) {
-    return DriveCommands.joystickDriveAtHeading(
-            drive, xSupplier, ySupplier, () -> reef.getScore().getRotation().getRadians())
-        .alongWith(superstructure.setGoalCommand(goal));
+                scorePose,
+                () -> getRobotPose(scoringHelper.getSelectedReef(), scorePose.get()))
+            .alongWith(superstructure.setGoalCommand(scoringHelper.getSuperstructureGoal())));
   }
 
   public static Command bargeScoreCommand() {
     return Commands.none();
-  }
-
-  private static int getIdFromVision(Vision vision) {
-    if (vision.getPriorityTargObs().size() == 0) {
-      return -1;
-    }
-
-    int tag1 = vision.getPriorityTargObs().get(0).tagId();
-
-    if (vision.getPriorityTargObs().size() == 1) {
-      return tag1;
-    }
-
-    int tag2 = vision.getPriorityTargObs().get(1).tagId();
-
-    if (tag1 == tag2) {
-      return tag1;
-    }
-
-    Rotation2d rotation = RobotState.getInstance().getEstimatedPose().getRotation();
-
-    if (rotation
-            .minus(Reef.values()[getSideFromTagId(tag1) * 2].getAlign().getRotation())
-            .getRadians()
-        > rotation
-            .minus(Reef.values()[getSideFromTagId(tag1) * 2].getAlign().getRotation())
-            .getRadians()) {
-      return tag2;
-    } else {
-      return tag1;
-    }
   }
 
   private static int getSideFromTagId(int id) {
@@ -205,16 +138,12 @@ public class AutoScore {
     };
   }
 
-  private static int getSide(Vision vision) {
-    return getSideFromTagId(getIdFromVision(vision));
-  }
-
-  private static Reef getReefFromSide(int side, BooleanSupplier isLeft) {
+  private static Reef getReefFromSide(int side, boolean isLeft) {
     if (side > 1 && side < 5) {
-      return Reef.values()[(side * 2) + (isLeft.getAsBoolean() ? 1 : 0)];
+      return Reef.values()[(side * 2) + (isLeft ? 1 : 0)];
 
     } else if (side > 0) {
-      return Reef.values()[(side * 2) + (isLeft.getAsBoolean() ? 0 : 1)];
+      return Reef.values()[(side * 2) + (isLeft ? 0 : 1)];
 
     } else {
       return Reef.A;
@@ -225,5 +154,9 @@ public class AutoScore {
     return cancelTxTy
         ? RobotState.getInstance().getEstimatedPose()
         : RobotState.getInstance().getReefPose(reef.ordinal() / 2, finalPose);
+  }
+
+  private static boolean inTolerance(Reef reef, Pose2d pose, double tol) {
+    return pose.getTranslation().getDistance(getRobotPose(reef, pose).getTranslation()) < tol;
   }
 }

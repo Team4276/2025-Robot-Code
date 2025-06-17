@@ -9,7 +9,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.team4276.frc2025.Constants;
-import frc.team4276.frc2025.SimViz;
+import frc.team4276.frc2025.SimManager;
 import frc.team4276.util.dashboard.LoggedTunableNumber;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -149,8 +149,9 @@ public class Elevator {
       }
     }
 
-    SimViz.addElevatorGoalObs(goal.getPositionMetres());
-    SimViz.addElevatorMeasuredObs(Constants.isSim ? goal.getPositionMetres() : getPositionMetres());
+    SimManager.addElevatorGoalObs(goal.getPositionMetres());
+    SimManager.addElevatorMeasuredObs(
+        Constants.isSim ? goal.getPositionMetres() : getPositionMetres());
     Logger.recordOutput("Elevator/Goal", goal);
     Logger.recordOutput("Elevator/GoalMetres", goal.getPositionMetres());
     Logger.recordOutput("Elevator/GoalRotations", metresToRotations(goal.getPositionMetres()));

@@ -2,14 +2,20 @@ package frc.team4276.frc2025;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team4276.frc2025.subsystems.hopper.HopperConstants;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.ElevatorConstants;
 import org.littletonrobotics.junction.Logger;
 
-public class SimViz {
-  private SimViz() {}
+public class SimManager {
+  private SimManager() {}
   ;
+
+  static {
+    SmartDashboard.putBoolean("CoralSim/HasCoral", false);
+  }
 
   private static final double climberRadsPerMotorRotation = 2 * Math.PI / (125 * 3);
 
@@ -48,6 +54,14 @@ public class SimViz {
 
   public static void addClimberGoalObs(double position) {
     climberGoal = position;
+  }
+
+  public static void setHasCoral(boolean hasCoral) {
+    SmartDashboard.putBoolean("CoralSim/HasCoral", hasCoral);
+  }
+
+  public static boolean hasCoral() {
+    return SmartDashboard.getBoolean("CoralSim/HasCoral", false);
   }
 
   public static void periodic() {
@@ -99,5 +113,13 @@ public class SimViz {
         new Pose3d(
             Translation3d.kZero,
             new Rotation3d(0.0, climberGoal * climberRadsPerMotorRotation, 0.0)));
+
+    Pose3d coralPose =
+        hasCoral()
+            ? new Pose3d(RobotState.getInstance().getEstimatedPose())
+                .plus(new Transform3d(0.0, 0.0, 1.0, Rotation3d.kZero))
+            : Pose3d.kZero;
+
+    Logger.recordOutput("CoralSim/Poses", new Pose3d[] {coralPose});
   }
 }

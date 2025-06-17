@@ -40,6 +40,8 @@ public class RobotState {
       new LoggedTunableNumber("RobotState/MinDistanceTagPoseBlend", Units.inchesToMeters(24.0));
   private static final LoggedTunableNumber maxDistanceTagPoseBlend =
       new LoggedTunableNumber("RobotState/MaxDistanceTagPoseBlend", Units.inchesToMeters(36.0));
+  private static final LoggedTunableNumber maxTagAutoSelectDistance =
+      new LoggedTunableNumber("RobotState/MaxTagAutoSelectDistance", 1.5);
 
   private SwerveModulePosition[] lastWheelPositions =
       new SwerveModulePosition[] {
@@ -72,6 +74,8 @@ public class RobotState {
   private ChassisSpeeds robotVelocity = new ChassisSpeeds();
 
   private Pose2d trajectorySetpoint = Pose2d.kZero;
+
+  private int lastPriorityTag = -1;
 
   private static RobotState mInstance;
 
@@ -205,6 +209,39 @@ public class RobotState {
     return poseEstimator.getEstimatedPosition();
   }
 
+  public Optional<Integer> getPriorityReefTag() {
+    boolean isRed = AllianceFlipUtil.shouldFlip();
+
+    Optional<Integer> tag = Optional.empty();
+
+    for (int i = isRed ? 6 : 17; i < (isRed ? 12 : 23); i++) {
+      var curr = txTyPoses.get(i);
+
+      if (curr == null) {
+        continue;
+      }
+
+      if (Timer.getTimestamp() - curr.timestamp() > txTyObservationStaleSecs.get()
+          || curr.distance > maxTagAutoSelectDistance.getAsDouble()) {
+        continue;
+      }
+
+      if (tag.map(index -> curr.distance() < txTyPoses.get(index).distance()).orElse(true)) {
+        tag = Optional.of(i);
+      }
+    }
+
+    if (tag.isPresent()) {
+      lastPriorityTag = tag.get();
+    }
+
+    return tag;
+  }
+
+  public int getLastPriorityTag() {
+    return lastPriorityTag;
+  }
+
   public Optional<Pose2d> getTxTyPose(int tagId) {
     if (!txTyPoses.containsKey(tagId)) {
       return Optional.empty();
@@ -256,6 +293,22 @@ public class RobotState {
             0.0,
             1.0);
     return getEstimatedPose().interpolate(tagPose.get(), 1.0 - t);
+  }
+
+  public Pose2d getReefPose() {
+    var id = getPriorityReefTag();
+
+    if (id.isEmpty()) {
+      return RobotState.getInstance().getEstimatedPose();
+    }
+
+    var tagPose = getTxTyPose(id.get());
+
+    if (tagPose.isEmpty()) {
+      return RobotState.getInstance().getEstimatedPose();
+    }
+
+    return tagPose.get();
   }
 
   private boolean useTrajectorySetpoint() {

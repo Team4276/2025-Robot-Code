@@ -352,7 +352,7 @@
               "data_type": "boolean",
               "true_color": 4283215696,
               "false_color": 4294198070,
-              "true_icon": "Checkmark",
+              "true_icon": "None",
               "false_icon": "X"
             }
           },
@@ -1962,6 +1962,19 @@
             "properties": {
               "topic": "/SmartDashboard/Sim/OverrideFlip",
               "period": 0.02,
+              "data_type": "boolean"
+            }
+          },
+          {
+            "title": "HasCoral",
+            "x": 832.0,
+            "y": 224.0,
+            "width": 320.0,
+            "height": 256.0,
+            "type": "Toggle Button",
+            "properties": {
+              "topic": "/SmartDashboard/CoralSim/HasCoral",
+              "period": 0.06,
               "data_type": "boolean"
             }
           }

@@ -491,7 +491,7 @@ public class RobotContainer {
                     drive,
                     driverX,
                     driverY,
-                    () -> scoringHelper.getSelectedReef().getScore().getRotation().getRadians())
+                    () -> scoringHelper.getSelectedReef().getScore().getRotation())
                 .alongWith(superstructure.setGoalCommand(scoringHelper::getSuperstructureGoal)));
 
     driver
@@ -559,10 +559,8 @@ public class RobotContainer {
             climber
                 .climbCommand()
                 .alongWith(hopper.setGoalCommand(Hopper.Goal.CLIMB))
-                .alongWith(
-                    superstructure
-                        .setGoalCommand(Superstructure.Goal.CLIMB)
-                        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)));
+                .alongWith(superstructure.setGoalCommand(Superstructure.Goal.CLIMB))
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
     driver
         .leftTrigger()
@@ -602,7 +600,6 @@ public class RobotContainer {
     // Intake
     driver
         .rightTrigger()
-        .and(driver.a().negate())
         .and(() -> !superstructure.hasCoral())
         .whileTrue(IntakeCommands.gamerIntake(superstructure, drive, driver, driverX, driverY));
 
@@ -610,27 +607,31 @@ public class RobotContainer {
     driver
         .a()
         .and(driver.povDown().negate())
-        .toggleOnTrue(
-            AutoScore.coralLockCommand(
-                drive, driverX, driverY, superstructure, Superstructure.Goal.L1, vision));
+        .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.L1));
 
-    driver.b().onTrue(AutoScore.selectAutoScoreLevel(Superstructure.Goal.L2));
+    driver
+        .b()
+        .and(driver.rightTrigger())
+        .onTrue(AutoScore.selectAndScoreCommand(Superstructure.Goal.L2));
 
-    driver.x().onTrue(AutoScore.selectAutoScoreLevel(Superstructure.Goal.L3));
+    driver
+        .x()
+        .and(driver.rightTrigger())
+        .onTrue(AutoScore.selectAndScoreCommand(Superstructure.Goal.L3));
 
     driver
         .rightTrigger()
         .and(() -> superstructure.hasCoral())
         .whileTrue(
-            AutoScore.coralAlignCommand(drive, driverX, driverY, superstructure, false, vision)
-                .alongWith(AutoScore.autoScoreCommand(superstructure)));
+            AutoScore.coralAlignCommand(
+                drive, driverX, driverY, driverOmega, false, superstructure));
 
     driver
         .leftTrigger()
         .and(() -> superstructure.hasCoral())
         .whileTrue(
-            AutoScore.coralAlignCommand(drive, driverX, driverY, superstructure, true, vision)
-                .alongWith(AutoScore.autoScoreCommand(superstructure)));
+            AutoScore.coralAlignCommand(
+                drive, driverX, driverY, driverOmega, true, superstructure));
 
     // Scoring for L1
     driver
@@ -662,10 +663,8 @@ public class RobotContainer {
             climber
                 .climbCommand()
                 .alongWith(hopper.setGoalCommand(Hopper.Goal.CLIMB))
-                .alongWith(
-                    superstructure
-                        .setGoalCommand(Superstructure.Goal.CLIMB)
-                        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)));
+                .alongWith(superstructure.setGoalCommand(Superstructure.Goal.CLIMB))
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
     driver
         .leftTrigger()
@@ -694,7 +693,7 @@ public class RobotContainer {
   public void update() {
     updateAlerts();
 
-    SimViz.periodic();
+    SimManager.periodic();
 
     if (armCoastOverride.get() == false && armCoastOverride.get() != prevArmCoastState) {
       calibrationBuffer.restart();

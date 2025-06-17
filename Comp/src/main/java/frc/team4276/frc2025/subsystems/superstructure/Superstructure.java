@@ -3,6 +3,8 @@ package frc.team4276.frc2025.subsystems.superstructure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.team4276.frc2025.Constants;
+import frc.team4276.frc2025.SimManager;
 import frc.team4276.frc2025.subsystems.superstructure.displacer.Displacer;
 import frc.team4276.frc2025.subsystems.superstructure.elevator.Elevator;
 import frc.team4276.frc2025.subsystems.superstructure.endeffector.EndEffector;
@@ -180,6 +182,7 @@ public class Superstructure extends SubsystemBase {
         },
         () -> {
           wantScore = false;
+          SimManager.setHasCoral(false);
         });
   }
 
@@ -207,6 +210,6 @@ public class Superstructure extends SubsystemBase {
   }
 
   public boolean hasCoral() {
-    return endeffector.hasCoral();
+    return Constants.isSim ? SimManager.hasCoral() : endeffector.hasCoral();
   }
 }

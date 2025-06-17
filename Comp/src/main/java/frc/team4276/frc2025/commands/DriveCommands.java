@@ -14,12 +14,10 @@ import frc.team4276.frc2025.subsystems.drive.DriveConstants;
 import frc.team4276.util.AllianceFlipUtil;
 import frc.team4276.util.dashboard.LoggedTunablePID;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-public
-class DriveCommands { // TODO: Check how the drive is overridden when using manual vs drive at
-  // heading
-  // or drive to point
+public class DriveCommands {
   private static final double LINEAR_VELOCITY_SCALAR = 1.0;
   private static final double ANGULAR_VELOCITY_SCALAR = 0.65;
 
@@ -71,7 +69,7 @@ class DriveCommands { // TODO: Check how the drive is overridden when using manu
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      DoubleSupplier headingSupplier) {
+      Supplier<Rotation2d> headingSupplier) {
     return Commands.run(
             () -> {
               double linearMagnitude = Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble());
@@ -91,13 +89,13 @@ class DriveCommands { // TODO: Check how the drive is overridden when using manu
 
               controller.enableContinuousInput(-Math.PI, Math.PI);
 
-              double target = headingSupplier.getAsDouble();
+              double target = headingSupplier.get().getRadians();
               double error =
                   MathUtil.angleModulus(
                       RobotState.getInstance()
                           .getEstimatedPose()
                           .getRotation()
-                          .minus(Rotation2d.fromRadians(headingSupplier.getAsDouble()))
+                          .minus(Rotation2d.fromRadians(headingSupplier.get().getRadians()))
                           .getRadians());
 
               double output = controller.calculate(error, 0.0);
