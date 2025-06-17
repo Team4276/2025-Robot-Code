@@ -50,8 +50,7 @@ public class DriveChoreo extends Command { // TODO: test choreo trajectory auto
     this(drive, trajectory, () -> RobotState.getInstance().getEstimatedPose());
   }
 
-  public DriveChoreo(
-      Drive drive, Trajectory<SwerveSample> trajectory, Supplier<Pose2d> robotPose) {
+  public DriveChoreo(Drive drive, Trajectory<SwerveSample> trajectory, Supplier<Pose2d> robotPose) {
     this.drive = drive;
     this.trajectory = trajectory;
     this.robotPose = robotPose;
@@ -78,19 +77,20 @@ public class DriveChoreo extends Command { // TODO: test choreo trajectory auto
 
       var dummyState = trajectory.sampleAt(getTrajectoryTime(), false).get();
 
-      sampledState = new SwerveSample(
-        dummyState.getTimestamp(), 
-        dummyState.x, 
-        dummyState.y, 
-        dummyState.heading, 
-        dummyState.vx, 
-        dummyState.vy, 
-        dummyState.omega, 
-        dummyState.ax, 
-        dummyState.ay, 
-        dummyState.alpha, 
-        dummyForces, 
-        dummyForces);
+      sampledState =
+          new SwerveSample(
+              dummyState.getTimestamp(),
+              dummyState.x,
+              dummyState.y,
+              dummyState.heading,
+              dummyState.vx,
+              dummyState.vy,
+              dummyState.omega,
+              dummyState.ax,
+              dummyState.ay,
+              dummyState.alpha,
+              dummyForces,
+              dummyForces);
     }
 
     RobotState.getInstance().setTrajectorySetpoint(sampledState.getPose());
@@ -114,9 +114,7 @@ public class DriveChoreo extends Command { // TODO: test choreo trajectory auto
     moduleForces = new ArrayList<>();
     for (int i = 0; i < 4; i++) {
       moduleForces.add(
-          VecBuilder.fill(
-              sampledState.moduleForcesX()[i],
-              sampledState.moduleForcesY()[i]));
+          VecBuilder.fill(sampledState.moduleForcesX()[i], sampledState.moduleForcesY()[i]));
     }
 
     Logger.recordOutput("DriveTrajectory/SetpointPose", sampledState.getPose());
