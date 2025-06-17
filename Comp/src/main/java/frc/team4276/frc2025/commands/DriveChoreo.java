@@ -1,8 +1,7 @@
 package frc.team4276.frc2025.commands;
 
-import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
-import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
-import com.pathplanner.lib.util.DriveFeedforwards;
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -21,7 +20,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-public class DriveTrajectory extends Command {
+public class DriveChoreo extends Command { // TODO: test choreo trajectory auto
   private static final LoggedTunablePID xController =
       new LoggedTunablePID(4.0, 0.0, 0.0, 0.1, "DriveTrajectory/TranslationX");
   private static final LoggedTunablePID yController =
@@ -32,7 +31,7 @@ public class DriveTrajectory extends Command {
       new LoggedTunableNumber("DriveTrajectory/maxError", 0.75);
 
   private final Drive drive;
-  private final PathPlannerTrajectory trajectory;
+  private final Trajectory<SwerveSample> trajectory;
   private final Supplier<Pose2d> robotPose;
 
   private double startTime = 0.0;
@@ -47,12 +46,12 @@ public class DriveTrajectory extends Command {
 
   private final double[] dummyForces = {0.0, 0.0, 0.0, 0.0};
 
-  public DriveTrajectory(Drive drive, PathPlannerTrajectory trajectory) {
+  public DriveChoreo(Drive drive, Trajectory<SwerveSample> trajectory) {
     this(drive, trajectory, () -> RobotState.getInstance().getEstimatedPose());
   }
 
-  public DriveTrajectory(
-      Drive drive, PathPlannerTrajectory trajectory, Supplier<Pose2d> robotPose) {
+  public DriveChoreo(
+      Drive drive, Trajectory<SwerveSample> trajectory, Supplier<Pose2d> robotPose) {
     this.drive = drive;
     this.trajectory = trajectory;
     this.robotPose = robotPose;
@@ -71,50 +70,57 @@ public class DriveTrajectory extends Command {
   public void execute() {
     var currentPose = robotPose.get();
 
-    var sampledState = trajectory.sample(getTrajectoryTime());
+    var sampledState = trajectory.sampleAt(getTrajectoryTime(), false).get();
 
-    if (sampledState.pose.getTranslation().getDistance(currentPose.getTranslation())
+    if (sampledState.getPose().getTranslation().getDistance(currentPose.getTranslation())
         > maxError.getAsDouble()) {
       timeOffset += 0.02;
 
-      var dummyState = trajectory.sample(getTrajectoryTime());
+      var dummyState = trajectory.sampleAt(getTrajectoryTime(), false).get();
 
-      sampledState = new PathPlannerTrajectoryState();
-      sampledState.timeSeconds = dummyState.timeSeconds;
-      sampledState.pose = dummyState.pose;
-      sampledState.heading = dummyState.heading;
-      sampledState.feedforwards =
-          new DriveFeedforwards(dummyForces, dummyForces, dummyForces, dummyForces, dummyForces);
+      sampledState = new SwerveSample(
+        dummyState.getTimestamp(), 
+        dummyState.x, 
+        dummyState.y, 
+        dummyState.heading, 
+        dummyState.vx, 
+        dummyState.vy, 
+        dummyState.omega, 
+        dummyState.ax, 
+        dummyState.ay, 
+        dummyState.alpha, 
+        dummyForces, 
+        dummyForces);
     }
 
-    RobotState.getInstance().setTrajectorySetpoint(sampledState.pose);
+    RobotState.getInstance().setTrajectorySetpoint(sampledState.getPose());
 
-    double xError = sampledState.pose.getX() - currentPose.getTranslation().getX();
-    double yError = sampledState.pose.getY() - currentPose.getTranslation().getY();
+    double xError = sampledState.x - currentPose.getTranslation().getX();
+    double yError = sampledState.y - currentPose.getTranslation().getY();
     double xFeedback = xController.calculate(0.0, xError);
     double yFeedback = yController.calculate(0.0, yError);
     double thetaError =
         MathUtil.angleModulus(
-            sampledState.pose.getRotation().minus(currentPose.getRotation()).getRadians());
+            sampledState.getPose().getRotation().minus(currentPose.getRotation()).getRadians());
     double thetaFeedback = rotController.calculate(0.0, thetaError);
 
     ChassisSpeeds outputSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            sampledState.fieldSpeeds.vxMetersPerSecond + xFeedback,
-            sampledState.fieldSpeeds.vyMetersPerSecond + yFeedback,
-            sampledState.fieldSpeeds.omegaRadiansPerSecond + thetaFeedback,
+            sampledState.vx + xFeedback,
+            sampledState.vy + yFeedback,
+            sampledState.omega + thetaFeedback,
             currentPose.getRotation());
 
     moduleForces = new ArrayList<>();
     for (int i = 0; i < 4; i++) {
       moduleForces.add(
           VecBuilder.fill(
-              sampledState.feedforwards.robotRelativeForcesXNewtons()[i],
-              sampledState.feedforwards.robotRelativeForcesYNewtons()[i]));
+              sampledState.moduleForcesX()[i],
+              sampledState.moduleForcesY()[i]));
     }
 
-    Logger.recordOutput("DriveTrajectory/SetpointPose", sampledState.pose);
-    Logger.recordOutput("DriveTrajectory/SetpointSpeeds", sampledState.fieldSpeeds);
+    Logger.recordOutput("DriveTrajectory/SetpointPose", sampledState.getPose());
+    Logger.recordOutput("DriveTrajectory/SetpointSpeeds", sampledState.getChassisSpeeds());
     Logger.recordOutput("DriveTrajectory/OutputSpeeds", outputSpeeds);
     Logger.recordOutput("DriveTrajectory/TrajectoryTime", getTrajectoryTime());
 
@@ -127,7 +133,7 @@ public class DriveTrajectory extends Command {
 
   @Override
   public boolean isFinished() {
-    return getTrajectoryTime() > trajectory.getTotalTimeSeconds();
+    return getTrajectoryTime() > trajectory.getTotalTime();
   }
 
   @Override
