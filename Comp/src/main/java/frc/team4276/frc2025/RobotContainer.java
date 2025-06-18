@@ -82,7 +82,7 @@ public class RobotContainer {
     EXPERIMENTAL
   }
 
-  private final BindSetting bindSetting = BindSetting.EXPERIMENTAL;
+  private final BindSetting bindSetting = BindSetting.DEMO;
 
   private final VikXboxController driver = new VikXboxController(0);
   private final CommandGenericHID buttonBoard = new CommandGenericHID(1);
@@ -423,6 +423,32 @@ public class RobotContainer {
     DoubleSupplier driverOmega = () -> -driver.getRightWithDeadband().x;
 
     drive.setDefaultCommand(DriveCommands.joystickDrive(drive, driverX, driverY, driverOmega));
+
+    driver
+        .a()
+        .and(driver.povUp())
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        RobotState.getInstance()
+                            .resetPose(
+                                new Pose2d(
+                                    RobotState.getInstance().getEstimatedPose().getTranslation(),
+                                    AllianceFlipUtil.apply(Rotation2d.kZero))))
+                .ignoringDisable(true));
+
+    driver.leftTrigger().onTrue(superstructure.setGoalCommand(Superstructure.Goal.INTAKE));
+
+    driver
+        .a()
+        .and(driver.povUp().negate())
+        .toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.L1));
+
+    driver.x().toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.L2));
+
+    driver.b().toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.L3));
+
+    driver.rightTrigger().onTrue(superstructure.scoreCommand(false));
   }
 
   private void configureControllerBindings() {
