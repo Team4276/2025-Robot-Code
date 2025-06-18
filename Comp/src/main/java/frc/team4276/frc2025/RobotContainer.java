@@ -437,7 +437,7 @@ public class RobotContainer {
                                     AllianceFlipUtil.apply(Rotation2d.kZero))))
                 .ignoringDisable(true));
 
-    driver.leftTrigger().onTrue(superstructure.setGoalCommand(Superstructure.Goal.INTAKE));
+    driver.leftTrigger().whileTrue(superstructure.setGoalCommand(Superstructure.Goal.INTAKE));
 
     driver
         .a()
@@ -448,7 +448,7 @@ public class RobotContainer {
 
     driver.b().toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.L3));
 
-    driver.rightTrigger().onTrue(superstructure.scoreCommand(false));
+    driver.rightTrigger().whileTrue(superstructure.scoreCommand(false));
   }
 
   private void configureControllerBindings() {

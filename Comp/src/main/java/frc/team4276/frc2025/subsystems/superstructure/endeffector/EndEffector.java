@@ -81,7 +81,8 @@ public class EndEffector {
     } else if (currGoal == Goal.REVERSE && sensorsInputs.backRead) {
       currGoal = Goal.IDLE;
 
-    } else if ((goal == Goal.INTAKE || goal == Goal.SLOINTAKE) && currGoal != Goal.IDLE) {
+    } else if ((goal == Goal.INTAKE || goal == Goal.SLOINTAKE)
+        && (currGoal != Goal.IDLE || sensorsInputs.frontRead)) {
       // Continue staging process
 
     } else {

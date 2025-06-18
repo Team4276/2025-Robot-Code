@@ -243,6 +243,7 @@ public class Drive extends SubsystemBase {
         "Drive/SwerveStates/UnoptimizedSetpoints",
         kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(speeds, 0.02)));
     Logger.recordOutput("Drive/DesiredSpeeds", speeds);
+    Logger.recordOutput("Drive/DriveMode", mode.toString());
   }
 
   public void runVelocity(ChassisSpeeds speeds, List<Vector<N2>> forces, DriveMode mode) {
