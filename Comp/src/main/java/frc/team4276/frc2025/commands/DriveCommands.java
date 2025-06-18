@@ -7,6 +7,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.team4276.frc2025.Constants;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.subsystems.drive.Drive;
 import frc.team4276.frc2025.subsystems.drive.Drive.DriveMode;
@@ -18,8 +19,8 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
-  private static final double LINEAR_VELOCITY_SCALAR = 1.0;
-  private static final double ANGULAR_VELOCITY_SCALAR = 0.65;
+  private static final double LINEAR_VELOCITY_SCALAR = Constants.isDemo ? 0.10 : 1.0;
+  private static final double ANGULAR_VELOCITY_SCALAR = Constants.isDemo ? 0.10 : 0.65;
 
   public static Command joystickDrive(
       Drive drive,

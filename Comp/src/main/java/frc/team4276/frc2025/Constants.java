@@ -48,6 +48,8 @@ public final class Constants {
 
   public static final boolean isSim = (mode == Mode.SIM);
 
+  public static final boolean isDemo = true;
+
   /** Checks whether the correct robot is selected when deploying. */
   public static class CheckDeploy {
     public static void main(String... args) {
