@@ -82,7 +82,8 @@ public class RobotContainer {
     EXPERIMENTAL
   }
 
-  private final BindSetting bindSetting = BindSetting.DEMO;
+  private final BindSetting bindSetting =
+      Constants.isDemo ? BindSetting.DEMO : BindSetting.EXPERIMENTAL;
 
   private final VikXboxController driver = new VikXboxController(0);
   private final CommandGenericHID buttonBoard = new CommandGenericHID(1);
@@ -629,6 +630,11 @@ public class RobotContainer {
         .and(() -> !superstructure.hasCoral())
         .whileTrue(IntakeCommands.gamerIntake(superstructure, drive, driver, driverX, driverY));
 
+    driver
+        .leftTrigger()
+        .and(() -> !superstructure.hasCoral())
+        .whileTrue(IntakeCommands.intake(superstructure, driver));
+
     // Align and Score / Lock
     driver
         .a()
@@ -637,13 +643,13 @@ public class RobotContainer {
 
     driver
         .b()
-        .and(driver.rightTrigger())
-        .onTrue(AutoScore.selectAndScoreCommand(Superstructure.Goal.L2));
+        .and(driver.rightTrigger().or(driver.leftTrigger()))
+        .onTrue(AutoScore.selectAndScoreCommand(superstructure, Superstructure.Goal.L2));
 
     driver
         .x()
-        .and(driver.rightTrigger())
-        .onTrue(AutoScore.selectAndScoreCommand(Superstructure.Goal.L3));
+        .and(driver.rightTrigger().or(driver.leftTrigger()))
+        .onTrue(AutoScore.selectAndScoreCommand(superstructure, Superstructure.Goal.L3));
 
     driver
         .rightTrigger()

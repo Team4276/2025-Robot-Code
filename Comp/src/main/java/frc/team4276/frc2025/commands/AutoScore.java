@@ -2,6 +2,7 @@ package frc.team4276.frc2025.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.team4276.frc2025.RobotState;
 import frc.team4276.frc2025.ScoringHelper;
@@ -22,12 +23,16 @@ public class AutoScore {
   private static boolean cancelTxTy = false;
 
   private static boolean proceedScoring = false;
-  private static Supplier<Superstructure.Goal> level = () -> Superstructure.Goal.STOW;
 
-  public static Command selectAndScoreCommand(Superstructure.Goal goal) {
+  private static boolean proceedScoring() {
+    return proceedScoring;
+  }
+
+  public static Command selectAndScoreCommand(
+      Superstructure superstructure, Superstructure.Goal goal) {
     return Commands.runOnce(
         () -> {
-          level = () -> goal;
+          superstructure.selectAutoScoreGoal(goal);
           proceedScoring = true;
         });
   }
@@ -66,17 +71,25 @@ public class AutoScore {
             new DriveToPose(drive, () -> goal.get().get().getAlign(), robotPose)
                 .until(
                     () ->
-                        inTolerance(
-                                goal.get().get(),
-                                goal.get().get().getAlign(),
-                                reefNudgeThreshold.get())
-                            && proceedScoring))
+                        // inTolerance(
+                        // goal.get().get(),
+                        // goal.get().get().getAlign(),
+                        // reefNudgeThreshold.get())
+                        // &&
+                        proceedScoring()))
         .andThen(
             new DriveToPose(drive, () -> goal.get().get().getScore(), robotPose)
                 .alongWith(
-                    superstructure.setGoalCommand(level),
-                    Commands.waitUntil(() -> superstructure.atGoal() && DriveToPose.atGoal())
-                        .andThen(superstructure.scoreCommand(false))));
+                    // superstructure.setGoalCommand(level),
+                    superstructure.autoScoreCommand(),
+                    Commands.waitUntil(
+                            () ->
+                                superstructure.atGoal()
+                                    && superstructure.getGoal() != Superstructure.Goal.STOW
+                                    && DriveToPose.atGoal())
+                        .andThen(superstructure.scoreCommand(false))
+                        .andThen(Commands.waitSeconds(0.5))))
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
   }
 
   public static Command coralAlignCommand(

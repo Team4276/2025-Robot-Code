@@ -34,8 +34,9 @@ public class Superstructure extends SubsystemBase {
     CUSTOM
   }
 
-  private Supplier<Goal> desiredGoal = () -> Goal.STOW;
+  private Goal desiredGoal = Goal.STOW;
   private Goal currentGoal = Goal.STOW;
+  private Goal autoScoreGoal = Goal.STOW;
 
   private double elevatorCharacterizationInput = 0.0;
 
@@ -51,14 +52,14 @@ public class Superstructure extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (desiredGoal.get() == Goal.STOW
+    if (desiredGoal == Goal.STOW
         && currentGoal == Goal.INTAKE
         && (endeffector.getGoal() == EndEffector.Goal.SLOINTAKE
             || endeffector.getGoal() == EndEffector.Goal.REVERSE)) {
       // Continue intaking
 
     } else {
-      currentGoal = desiredGoal.get();
+      currentGoal = desiredGoal;
     }
 
     if (wantScore) {
@@ -140,7 +141,7 @@ public class Superstructure extends SubsystemBase {
     endeffector.periodic();
     displacer.periodic();
 
-    Logger.recordOutput("Superstructure/DesiredGoal", desiredGoal.get());
+    Logger.recordOutput("Superstructure/DesiredGoal", desiredGoal);
     Logger.recordOutput("Superstructure/CurrentGoal", currentGoal);
     Logger.recordOutput("Superstructure/WantScore", wantScore);
     Logger.recordOutput("Superstructure/HasCoral", endeffector.hasCoral());
@@ -158,8 +159,22 @@ public class Superstructure extends SubsystemBase {
     return currentGoal;
   }
 
+  public void selectAutoScoreGoal(Goal goal) {
+    autoScoreGoal = goal;
+  }
+
+  public Command autoScoreCommand() {
+    return startEnd(
+        () -> {
+          desiredGoal = autoScoreGoal;
+        },
+        () -> {
+          desiredGoal = Goal.STOW;
+        });
+  }
+
   public void setGoal(Supplier<Goal> goal) {
-    desiredGoal = goal;
+    desiredGoal = goal.get();
   }
 
   public Command setGoalCommand(Supplier<Goal> goal) {

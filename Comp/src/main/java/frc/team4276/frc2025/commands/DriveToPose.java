@@ -16,7 +16,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class DriveToPose extends Command {
   private static final LoggedTunableProfiledPID driveController =
-      new LoggedTunableProfiledPID("DriveToPose/Translation", 3.0, 0.0, 0.0, 0.01, 3.0, 3.0);
+      new LoggedTunableProfiledPID("DriveToPose/Translation", 3.0, 0.0, 0.0, 0.02, 3.0, 3.0);
   private static final LoggedTunableProfiledPID thetaController =
       new LoggedTunableProfiledPID(
           "DriveToPose/Rotation", 4.0, 0.1, 0.0, Units.degreesToRadians(1.0), 6.0, 3.0);
@@ -92,6 +92,7 @@ public class DriveToPose extends Command {
 
     error = target.get().relativeTo(currentPose);
 
+    Logger.recordOutput("DriveToPose/Target", target.get());
     Logger.recordOutput("DriveToPose/DistanceSetpoint", driveController.getSetpoint().position);
     Logger.recordOutput("DriveToPose/DistanceError", trans.getNorm());
     Logger.recordOutput("DriveToPose/ThetaMeasured", currentPose.getRotation().getRadians());

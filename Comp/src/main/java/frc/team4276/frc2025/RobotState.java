@@ -33,7 +33,7 @@ import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class RobotState {
+public class RobotState { // TODO: figure out why zeroing first breaks auto align
   private LoggedTunableNumber txTyObservationStaleSecs =
       new LoggedTunableNumber("RobotState/TxTyObsStaleSecs", 0.5);
   private static final LoggedTunableNumber minDistanceTagPoseBlend =
@@ -233,11 +233,13 @@ public class RobotState {
 
     if (tag.isPresent()) {
       lastPriorityTag = tag.get();
+      Logger.recordOutput("Robotstate/PrioTag", lastPriorityTag);
     }
 
     return tag;
   }
 
+  @AutoLogOutput(key = "Robotstate/LastPrioTag")
   public int getLastPriorityTag() {
     return lastPriorityTag;
   }
