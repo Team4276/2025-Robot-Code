@@ -44,7 +44,7 @@ public class AutoScore {
       DoubleSupplier headingSupplier,
       boolean isLeft,
       Superstructure superstructure) {
-    Supplier<Pose2d> robotPose = () -> RobotState.getInstance().getReefPose();
+    Supplier<Pose2d> robotPose = RobotState.getInstance()::getReefPose;
 
     Supplier<Optional<Reef>> goal =
         () ->
