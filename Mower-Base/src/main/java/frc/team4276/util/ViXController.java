@@ -6,15 +6,15 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
-public class VikXboxController extends CommandXboxController {
+public class ViXController extends CommandXboxController {
   private double JOYSTICK_DEADBAND = 0.1;
   private double TRIGGER_DEADBAND = 0.5;
 
-  public VikXboxController(int port) {
+  public ViXController(int port) {
     super(port);
   }
 
-  public VikXboxController(int port, double deadband) {
+  public ViXController(int port, double deadband) {
     super(port);
     this.JOYSTICK_DEADBAND = deadband;
   }

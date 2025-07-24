@@ -4,18 +4,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import frc.team4276.frc2025.field.FieldConstants.Reef;
 import frc.team4276.frc2025.subsystems.superstructure.Superstructure.Goal;
-import frc.team4276.util.VikXboxController;
+import frc.team4276.util.ViXController;
 import frc.team4276.util.drivers.VirtualSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class ScoringHelper extends VirtualSubsystem {
   private final CommandGenericHID buttonBoard;
-  private final VikXboxController xbox;
+  private final ViXController xbox;
 
   private Reef reef = Reef.A;
   private Goal goal = Goal.L1;
 
-  public ScoringHelper(CommandGenericHID buttonBoard, VikXboxController xbox) {
+  public ScoringHelper(CommandGenericHID buttonBoard, ViXController xbox) {
     this.buttonBoard = buttonBoard;
     this.xbox = xbox;
   }

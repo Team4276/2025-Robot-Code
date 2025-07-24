@@ -13,6 +13,14 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
 
+  // Step #1: add motor
+
+  // Step #6: add second motor and rename first
+
+  // Step #3: add controller
+
+  // Step #5: add max voltage
+
   public Robot() {
     m_robotContainer = new RobotContainer();
   }
@@ -20,6 +28,11 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+
+    // Step #2 & #4: set motor voltage & control motor voltage
+
+    // Step #7-9: control second motor voltage; reverse it; make it a TANK
+
   }
 
   @Override
