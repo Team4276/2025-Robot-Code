@@ -25,8 +25,8 @@ public class FieldConstants {
   public static final Pose2d blueReefCenter =
       new Pose2d(fieldCenter.minus(new Translation2d(reefToFieldCenter, 0.0)), Rotation2d.kZero);
 
-  public static final double alignOffset = Units.inchesToMeters(14.0);
-  public static final double scoringOffset = Units.inchesToMeters(31.0);
+  public static final double alignOffset = Units.inchesToMeters(13.0);
+  public static final double scoringOffset = Units.inchesToMeters(32.0);
   public static final double reefCenterToTag = Units.inchesToMeters(20.738196);
   public static final double tagToReef = Units.inchesToMeters(6.468853);
 
