@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -79,15 +80,17 @@ public class RobotContainer {
   private enum BindSetting {
     DEFAULT,
     DEMO,
-    EXPERIMENTAL
+    EXPERIMENTAL,
+    TEST
   }
 
-  private final BindSetting bindSetting =
-      Constants.isDemo ? BindSetting.DEMO : BindSetting.EXPERIMENTAL;
+  private final BindSetting bindSetting = Constants.isDemo ? BindSetting.DEMO : BindSetting.TEST;
 
   private final ViXController driver = new ViXController(0);
   private final CommandGenericHID buttonBoard = new CommandGenericHID(1);
   private final ViXController operator = new ViXController(2);
+  private final Joystick demoStickRight = new Joystick(3);
+  private final Joystick demoStickLeft = new Joystick(4);
 
   private final ScoringHelper scoringHelper = new ScoringHelper(buttonBoard, operator);
 
@@ -411,6 +414,10 @@ public class RobotContainer {
         configureExperimentalBindings();
         break;
 
+      case TEST:
+        configureTestBinds();
+        break;
+
       default:
         break;
     }
@@ -419,9 +426,9 @@ public class RobotContainer {
   private void configureDemoBindings() {
     /***************** Drive Triggers *****************/
     // Drive suppliers
-    DoubleSupplier driverX = () -> -driver.getLeftWithDeadband().y;
-    DoubleSupplier driverY = () -> -driver.getLeftWithDeadband().x;
-    DoubleSupplier driverOmega = () -> -driver.getRightWithDeadband().x;
+    DoubleSupplier driverX = () -> -demoStickLeft.getY();
+    DoubleSupplier driverY = () -> -demoStickLeft.getX();
+    DoubleSupplier driverOmega = () -> -demoStickRight.getX();
 
     drive.setDefaultCommand(DriveCommands.joystickDrive(drive, driverX, driverY, driverOmega));
 
@@ -689,6 +696,48 @@ public class RobotContainer {
     driver.rightBumper().toggleOnTrue(superstructure.setGoalCommand(Superstructure.Goal.HI_ALGAE));
 
     /***************** Climbing Triggers *****************/
+    driver
+        .povUp()
+        .toggleOnTrue(
+            climber
+                .climbCommand()
+                .alongWith(hopper.setGoalCommand(Hopper.Goal.CLIMB))
+                .alongWith(superstructure.setGoalCommand(Superstructure.Goal.CLIMB))
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+
+    driver
+        .leftTrigger()
+        .and(() -> climber.isClimbing())
+        .whileTrue(climber.setGoalCommand(Climber.Goal.RAISE));
+
+    driver
+        .rightTrigger()
+        .and(() -> climber.isClimbing())
+        .whileTrue(climber.setGoalCommand(Climber.Goal.CLIMB));
+  }
+
+  private void configureTestBinds() {
+    /***************** Drive Triggers *****************/
+    // Drive suppliers
+    DoubleSupplier driverX = () -> -driver.getLeftWithDeadband().y;
+    DoubleSupplier driverY = () -> -driver.getLeftWithDeadband().x;
+    DoubleSupplier driverOmega = () -> -driver.getRightWithDeadband().x;
+
+    drive.setDefaultCommand(DriveCommands.joystickDrive(drive, driverX, driverY, driverOmega));
+
+    driver
+        .a()
+        .and(driver.povUp())
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        RobotState.getInstance()
+                            .resetPose(
+                                new Pose2d(
+                                    RobotState.getInstance().getEstimatedPose().getTranslation(),
+                                    AllianceFlipUtil.apply(Rotation2d.kZero))))
+                .ignoringDisable(true));
+
     driver
         .povUp()
         .toggleOnTrue(

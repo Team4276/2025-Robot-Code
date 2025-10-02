@@ -29,5 +29,5 @@ public class HopperConstants {
   public static final double minInput = Math.toRadians(90.0);
   public static final double maxInput = Math.toRadians(91.0);
 
-  public static final double radsPerMotorRotation = 2 * Math.PI / 16;
+  public static final double radsPerMotorRotation = 2 * Math.PI / 20;
 }
